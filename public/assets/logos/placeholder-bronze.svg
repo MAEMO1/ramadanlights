@@ -1,0 +1,6 @@
+<svg width="120" height="60" viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+  <rect width="120" height="60" fill="#151530"/>
+  <circle cx="60" cy="24" r="15" fill="#cd7f32" opacity="0.3"/>
+  <path d="M60 12 L63.53 21.16 L73.42 21.16 L65.44 27.34 L68.98 36.5 L60 30.32 L51.02 36.5 L54.56 27.34 L46.58 21.16 L56.47 21.16 Z" fill="#cd7f32"/>
+  <text x="60" y="52" text-anchor="middle" fill="#6b6b7b" font-family="sans-serif" font-size="8">Bronzen Sponsor</text>
+</svg>
