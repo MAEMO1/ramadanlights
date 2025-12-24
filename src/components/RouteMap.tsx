@@ -142,7 +142,7 @@ export function RouteMap() {
                   <h3 className="text-white text-lg md:text-2xl lg:text-3xl font-display font-bold tracking-wide mb-0.5 md:mb-1">
                     {currentLocation.name}
                   </h3>
-                  <p className="text-white/50 text-xs md:text-sm mb-2 md:mb-3">
+                  <p className="text-white/80 text-base md:text-lg font-display font-semibold mb-2 md:mb-3">
                     {currentLocation.subtitle}
                   </p>
                   <div className="flex items-center justify-center gap-1.5 md:gap-2 text-white/70">
