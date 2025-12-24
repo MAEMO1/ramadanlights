@@ -150,7 +150,6 @@ export function RouteMap() {
                     <span className="text-xs md:text-sm font-medium tracking-wide">FEBRUARI - MAART 2026</span>
                   </div>
                 </div>
-                <div className="hidden md:block absolute left-1/2 -translate-x-1/2 -bottom-3 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-[#1a4a4a]/95" />
               </div>
             </motion.div>
           </div>
