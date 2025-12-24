@@ -132,7 +132,7 @@ export function RouteMap() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="absolute top-4 left-1/2 -translate-x-1/2 z-20"
+              className="absolute top-4 left-1/2 -translate-x-1/2 z-[500]"
             >
               <div className="relative">
                 <div className="bg-[#1a4a4a]/95 backdrop-blur-sm rounded-2xl px-8 py-5 text-center shadow-2xl">
