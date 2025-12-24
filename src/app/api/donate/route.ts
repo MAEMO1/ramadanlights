@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createMollieClient } from "@mollie/api-client";
 
-const mollieClient = createMollieClient({
-  apiKey: process.env.MOLLIE_API_KEY!,
-});
-
 export async function POST(request: NextRequest) {
   try {
+    // Check if API key is configured
+    const apiKey = process.env.MOLLIE_API_KEY;
+    if (!apiKey) {
+      console.error("MOLLIE_API_KEY is not configured");
+      return NextResponse.json(
+        { success: false, message: "Betalingssysteem is niet geconfigureerd" },
+        { status: 500 }
+      );
+    }
+
+    // Create Mollie client inside the handler
+    const mollieClient = createMollieClient({ apiKey });
+
     const { amount, name, email } = await request.json();
 
     // Validate amount
@@ -41,7 +50,7 @@ export async function POST(request: NextRequest) {
       checkoutUrl: payment.getCheckoutUrl(),
     });
   } catch (error) {
-    console.error("Mollie payment error:", error);
+    console.error("Mollie payment error:", error instanceof Error ? error.message : error);
     return NextResponse.json(
       {
         success: false,
