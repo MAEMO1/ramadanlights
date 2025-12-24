@@ -13,8 +13,8 @@ const locations: { id: LocationKey; name: string; subtitle: string; center: [num
     id: "wondelgemstraat",
     name: "WONDELGEMSTRAAT",
     subtitle: "Rabotwijk",
-    center: [51.0635, 3.7095],
-    zoom: 16,
+    center: [51.0625, 3.7100],
+    zoom: 15,
   },
   {
     id: "bevrijdingslaan",
@@ -25,16 +25,20 @@ const locations: { id: LocationKey; name: string; subtitle: string; center: [num
   },
 ];
 
-// Real coordinates from OpenStreetMap
+// Real coordinates from OpenStreetMap - extended to cover full street
 const routes = {
   wondelgemstraat: [
+    // Northern end (near Neuseplein/Gebroeders Vandeveldestraat)
     [51.065315, 3.7091596], [51.0652518, 3.7091844], [51.0651888, 3.7092075],
     [51.0646444, 3.7093865], [51.0645619, 3.7094108], [51.0641119, 3.7095433],
     [51.0640764, 3.7095529], [51.0640287, 3.7095657], [51.0639635, 3.7095847],
     [51.0637095, 3.709659], [51.0631598, 3.7098197], [51.0630933, 3.7098391],
     [51.0629157, 3.7098973], [51.0628625, 3.7099147], [51.0628113, 3.7099319],
     [51.0626315, 3.7099923], [51.0625436, 3.7100195], [51.0616656, 3.71028],
-    [51.0615748, 3.7102994]
+    [51.0615748, 3.7102994],
+    // Extended south towards Rabot
+    [51.0612, 3.7104], [51.0608, 3.7105], [51.0604, 3.7106],
+    [51.0600, 3.7107], [51.0596, 3.7108]
   ] as [number, number][],
   // Bevrijdingslaan & Phoenixstraat combined as one continuous route
   bevrijdingslaanPhoenix: [
