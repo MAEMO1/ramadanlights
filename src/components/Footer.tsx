@@ -89,7 +89,6 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
             <div>
               <p>© {new Date().getFullYear()} VGM vzw | BTW: BE 0662.896.812</p>
-              <p className="text-xs text-gray-500 mt-1">Kleine onderneming vrijgesteld van BTW (Art. 56bis W.BTW)</p>
             </div>
             <p className="text-teal">Gemaakt met zorg in Gent</p>
           </div>
