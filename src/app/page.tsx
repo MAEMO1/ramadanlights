@@ -3,6 +3,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Story } from "@/components/Story";
+import { Gallery } from "@/components/Gallery";
 import { RouteMap } from "@/components/RouteMap";
 import { SponsorGrid } from "@/components/SponsorGrid";
 import { SponsorForm } from "@/components/SponsorForm";
@@ -14,6 +15,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <Story />
+      <Gallery />
       <RouteMap />
       <SponsorGrid />
       <SponsorForm />
