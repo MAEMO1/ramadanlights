@@ -38,12 +38,12 @@ export function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <a href="#" className="flex items-center gap-3">
-            <div className={`relative w-12 h-12 ${!isScrolled ? "bg-white rounded-xl p-1" : ""}`}>
+            <div className={`relative w-12 h-12 rounded-xl overflow-hidden ${!isScrolled ? "bg-white p-1" : ""}`}>
               <Image
                 src="/assets/logos/vgm-logo.png"
                 alt="VGM Logo"
                 fill
-                className="object-contain"
+                className="object-contain rounded-lg"
               />
             </div>
             <div className="hidden sm:block">
