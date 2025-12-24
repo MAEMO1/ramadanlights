@@ -86,10 +86,6 @@ export function Story() {
                 Met Ramadan Lights willen we deze periode zichtbaar maken in
                 Gent. De verlichting symboliseert warmte en gastvrijheid.
               </p>
-              <p>
-                Net zoals kerstverlichting de winter opfleurt, zorgt
-                Ramadanverlichting voor sfeer die alle Gentenaars verbindt.
-              </p>
             </div>
           </motion.div>
 

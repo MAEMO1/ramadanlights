@@ -84,7 +84,7 @@ export function RouteMap() {
             transition={{ delay: 0.1 }}
             className="text-white/80 text-lg max-w-2xl mx-auto"
           >
-            Twee straten in het hart van Gent worden verlicht met betoverende Ramadanverlichting.
+            Drie straten in het hart van Gent worden verlicht met betoverende Ramadanverlichting.
           </motion.p>
         </div>
 
