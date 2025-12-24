@@ -25,9 +25,6 @@ export const sponsorFormSchema = z.object({
       (val) => !val || /^[+]?[0-9\s-]{9,15}$/.test(val),
       "Ongeldig telefoonnummer"
     ),
-  package: z.enum(["gold", "silver", "bronze"], {
-    errorMap: () => ({ message: "Selecteer een sponsorpakket" }),
-  }),
   message: z
     .string()
     .max(500, "Bericht mag maximaal 500 karakters bevatten")

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sponsorFormSchema, packageInfo } from "@/lib/validations";
+import { sponsorFormSchema } from "@/lib/validations";
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,9 +7,6 @@ export async function POST(request: NextRequest) {
 
     // Validate the request body
     const validatedData = sponsorFormSchema.parse(body);
-
-    // Get package details
-    const selectedPackage = packageInfo[validatedData.package];
 
     // Here you would typically:
     // 1. Send email to admin using Resend/SendGrid
@@ -19,7 +16,6 @@ export async function POST(request: NextRequest) {
     // For now, we'll log the submission
     console.log("New sponsor submission:", {
       ...validatedData,
-      packageDetails: selectedPackage,
       submittedAt: new Date().toISOString(),
     });
 
@@ -41,7 +37,6 @@ export async function POST(request: NextRequest) {
         <p><strong>Contactpersoon:</strong> ${validatedData.contactPerson}</p>
         <p><strong>Email:</strong> ${validatedData.email}</p>
         <p><strong>Telefoon:</strong> ${validatedData.phone || 'Niet opgegeven'}</p>
-        <p><strong>Pakket:</strong> ${selectedPackage.name} (${selectedPackage.price})</p>
         <p><strong>Bericht:</strong> ${validatedData.message || 'Geen bericht'}</p>
       `,
     });
@@ -54,15 +49,8 @@ export async function POST(request: NextRequest) {
       html: `
         <h1>Bedankt voor uw sponsoraanvraag!</h1>
         <p>Beste ${validatedData.contactPerson},</p>
-        <p>Wij hebben uw aanvraag voor het ${selectedPackage.name} pakket (${selectedPackage.price}) ontvangen.</p>
-        <h2>Betaalinstructies</h2>
-        <p>Gelieve het bedrag over te schrijven naar:</p>
-        <ul>
-          <li><strong>IBAN:</strong> BE93 0018 0728 1667</li>
-          <li><strong>Begunstigde:</strong> VGM vzw</li>
-          <li><strong>Mededeling:</strong> Sponsoring Ramadan Lights + ${validatedData.companyName}</li>
-        </ul>
-        <p>U ontvangt een bevestiging zodra uw betaling is ontvangen.</p>
+        <p>Wij hebben uw sponsoraanvraag ontvangen.</p>
+        <p>Wij nemen zo snel mogelijk contact met u op om de details te bespreken.</p>
         <p>Met vriendelijke groeten,<br>Het Ramadan Lights Team</p>
       `,
     });

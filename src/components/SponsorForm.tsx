@@ -5,18 +5,11 @@ import { useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { sponsorFormSchema, type SponsorFormData, packageInfo } from "@/lib/validations";
+import { sponsorFormSchema, type SponsorFormData } from "@/lib/validations";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
-import { Select } from "./ui/Select";
 import { Textarea } from "./ui/Textarea";
 import { ArrowRight } from "lucide-react";
-
-const packageOptions = [
-  { value: "gold", label: `Goud - ${packageInfo.gold.price}` },
-  { value: "silver", label: `Zilver - ${packageInfo.silver.price}` },
-  { value: "bronze", label: `Brons - ${packageInfo.bronze.price}` },
-];
 
 export function SponsorForm() {
   const ref = useRef(null);
@@ -133,14 +126,6 @@ export function SponsorForm() {
               placeholder="+32 XXX XX XX XX"
               error={errors.phone?.message}
               {...register("phone")}
-            />
-
-            <Select
-              id="package"
-              label="Sponsorpakket *"
-              options={packageOptions}
-              error={errors.package?.message}
-              {...register("package")}
             />
 
             <Textarea
