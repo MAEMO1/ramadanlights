@@ -1,10 +1,23 @@
 import type { Metadata } from "next";
+import { Sora, Inter } from "next/font/google";
 import "./globals.css";
 
+const sora = Sora({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Ramadan Lights Gent | Verbindend licht in het hart van de stad",
+  title: "Ramadan Lights Gent 2026",
   description:
-    "Ontdek de magische Ramadanverlichting in Gent. Een project dat gemeenschappen verbindt door licht en samenhorigheid.",
+    "Verbindend licht in het hart van Gent. Een initiatief van de Vereniging van Gentse Moskeeën.",
   keywords: [
     "Ramadan",
     "Gent",
@@ -17,8 +30,8 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "VGM vzw" }],
   openGraph: {
-    title: "Ramadan Lights Gent",
-    description: "Verbindend licht in het hart van de stad",
+    title: "Ramadan Lights Gent 2026",
+    description: "Verbindend licht in het hart van Gent",
     type: "website",
     locale: "nl_BE",
   },
@@ -30,8 +43,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="nl">
-      <body className="min-h-screen bg-background antialiased">
+    <html lang="nl" className={`${sora.variable} ${inter.variable}`}>
+      <body className="min-h-screen bg-white antialiased font-body">
         {children}
       </body>
     </html>

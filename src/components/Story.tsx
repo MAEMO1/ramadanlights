@@ -9,26 +9,22 @@ const features = [
   {
     icon: Heart,
     title: "Verbinding",
-    description:
-      "Ramadan Lights brengt mensen van alle achtergronden samen in een gedeelde ervaring van licht en warmte.",
+    description: "Mensen van alle achtergronden samen brengen.",
   },
   {
     icon: Users,
     title: "Gemeenschap",
-    description:
-      "Een project van en voor de Gentse gemeenschap, gedragen door lokale ondernemers en bewoners.",
+    description: "Gedragen door lokale ondernemers en bewoners.",
   },
   {
     icon: Sparkles,
-    title: "Magie",
-    description:
-      "De betoverende sfeer van verlichte straten transformeert de stad in een plek van verwondering.",
+    title: "Sfeer",
+    description: "Betoverende verlichting in de straten van Gent.",
   },
   {
     icon: MapPin,
     title: "Gent",
-    description:
-      "Onze geliefde stad staat bekend om haar openheid en diversiteit. Dit project eert die traditie.",
+    description: "Een stad bekend om openheid en diversiteit.",
   },
 ];
 
@@ -37,113 +33,106 @@ export function Story() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="verhaal" className="relative py-24 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-background-alt" />
-      <div className="absolute inset-0 pattern-overlay opacity-30" />
-
-      <div ref={ref} className="section-container relative z-10">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="heading-secondary mb-4">
-            <span className="text-primary">Licht</span> in de Duisternis
-          </h2>
-          <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-teal to-transparent mx-auto mb-6" />
-          <p className="text-text-secondary max-w-2xl mx-auto text-lg">
-            De Ramadan is een tijd van reflectie, verbinding en gemeenschap.
-            Met Ramadan Lights Gent brengen we deze waarden tot leven in onze stad.
-          </p>
-        </motion.div>
-
-        {/* Story content */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
-          {/* Text content */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
+    <section id="verhaal" className="bg-soft section-padding">
+      <div ref={ref} className="section-container">
+        {/* Header */}
+        <div className="max-w-2xl mb-20">
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            className="badge-outline mb-6 inline-block"
           >
-            <h3 className="font-serif text-2xl md:text-3xl text-text-primary mb-6">
+            Over het project
+          </motion.span>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1 }}
+            className="heading-section mb-6"
+          >
+            Licht dat verbindt
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.2 }}
+            className="text-body"
+          >
+            De Ramadan is een tijd van reflectie en verbinding.
+            Met Ramadan Lights Gent brengen we deze waarden tot leven in de
+            straten van onze stad.
+          </motion.p>
+        </div>
+
+        {/* Content grid */}
+        <div className="grid lg:grid-cols-2 gap-16 items-start mb-20">
+          {/* Text */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ delay: 0.3 }}
+          >
+            <h3 className="heading-card mb-6">
               Waarom Ramadanverlichting?
             </h3>
-            <div className="space-y-4 text-text-secondary">
+            <div className="space-y-5 text-body">
               <p>
                 De Ramadan is de heilige vastenmaand voor moslims wereldwijd.
-                Het is een tijd van bezinning, solidariteit en het versterken
-                van familiebanden en gemeenschapszin.
+                Het is een tijd van bezinning, solidariteit en gemeenschapszin.
               </p>
               <p>
-                Met Ramadan Lights willen we deze bijzondere periode zichtbaar
-                maken in het straatbeeld van Gent. De verlichting symboliseert
-                de warmte en gastvrijheid die centraal staan tijdens de Ramadan.
+                Met Ramadan Lights willen we deze periode zichtbaar maken in
+                Gent. De verlichting symboliseert warmte en gastvrijheid.
               </p>
               <p>
-                Net zoals kerstverlichting de wintermaanden opfleurt, zorgt
-                Ramadanverlichting voor een feestelijke sfeer die alle Gentenaars
-                kan verbinden – ongeacht achtergrond of geloof.
+                Net zoals kerstverlichting de winter opfleurt, zorgt
+                Ramadanverlichting voor sfeer die alle Gentenaars verbindt.
               </p>
             </div>
           </motion.div>
 
-          {/* Visual element */}
+          {/* Stats card */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="relative"
+            transition={{ delay: 0.4 }}
+            className="card"
           >
-            <div className="aspect-square relative">
-              {/* Decorative background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-teal/20 to-primary/20 rounded-2xl" />
-              <div className="absolute inset-4 border-2 border-primary/30 rounded-xl" />
-              <div className="absolute inset-8 border border-teal/30 rounded-lg" />
+            <div className="mb-8">
+              <span className="badge mb-4 inline-block">Ramadan 2026</span>
+              <h4 className="heading-card">Februari - Maart</h4>
+            </div>
 
-              {/* Center content */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-                    className="w-32 h-32 mx-auto mb-4 border-2 border-dashed border-primary/40 rounded-full flex items-center justify-center"
-                  >
-                    <svg
-                      viewBox="0 0 100 100"
-                      className="w-16 h-16 text-primary"
-                      fill="currentColor"
-                    >
-                      <path d="M50 10c-22.1 0-40 17.9-40 40s17.9 40 40 40c8.3 0 16-2.5 22.4-6.8-6.3 3.3-13.5 5.2-21.1 5.2-24.3 0-44-19.7-44-44s19.7-44 44-44c7.6 0 14.8 1.9 21.1 5.2C66 12.5 58.3 10 50 10z" />
-                    </svg>
-                  </motion.div>
-                  <p className="font-serif text-xl text-primary">Ramadan 2025</p>
-                  <p className="text-text-muted text-sm">Maart - April</p>
-                </div>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="card-soft text-center">
+                <p className="text-4xl font-display font-bold text-teal mb-2">3</p>
+                <p className="text-small">Straten verlicht</p>
+              </div>
+              <div className="card-soft text-center">
+                <p className="text-4xl font-display font-bold text-gold mb-2">30</p>
+                <p className="text-small">Dagen feest</p>
               </div>
             </div>
           </motion.div>
         </div>
 
-        {/* Features grid */}
+        {/* Features */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
-              className="lantern-card rounded-xl p-6 text-center"
+              transition={{ delay: 0.4 + index * 0.1 }}
+              className="card text-center"
             >
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                <feature.icon className="w-6 h-6 text-primary" />
+              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-teal-50 flex items-center justify-center">
+                <feature.icon className="w-6 h-6 text-teal" />
               </div>
-              <h4 className="font-serif text-lg text-text-primary mb-2">
-                {feature.title}
-              </h4>
-              <p className="text-text-muted text-sm">{feature.description}</p>
+              <h4 className="font-display font-semibold text-text-primary mb-2">{feature.title}</h4>
+              <p className="text-small">{feature.description}</p>
             </motion.div>
           ))}
         </div>

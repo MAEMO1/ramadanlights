@@ -1,14 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import "leaflet/dist/leaflet.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Custom Leaflet styles for dark teal theme */
+.leaflet-container {
+  background: #0a2020;
+  font-family: inherit;
+}
+
+.leaflet-tile-pane {
+  filter: saturate(0.7) brightness(0.9) hue-rotate(140deg);
+}
+
+.custom-pin {
+  background: none;
+  border: none;
+}
+
+/* ============================================
+   RAMADAN LIGHTS GENT - Clean Minimal
+   Inspired by alltogethernow.ie
+   ============================================ */
+
 @layer base {
-  * {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
+  :root {
+    --white: #ffffff;
+    --off-white: #fafafa;
+    --light-gray: #f5f5f5;
+    --teal: #2d9596;
+    --teal-dark: #1f6b6c;
+    --gold: #d4a853;
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --text-muted: #717171;
   }
 
   html {
@@ -16,144 +42,131 @@
   }
 
   body {
-    background-color: #0a0a1a;
-    color: #ffffff;
-    font-family: 'Inter', system-ui, sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
+    background-color: var(--white);
+    color: var(--text-primary);
+    font-family: var(--font-body), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #0a0a1a;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #2a2a4a;
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #3a3a5a;
+  ::selection {
+    background: rgba(45, 149, 150, 0.15);
   }
 }
 
 @layer components {
-  /* Glowing text effect */
-  .text-glow {
-    text-shadow: 0 0 20px rgba(212, 168, 83, 0.5),
-                 0 0 40px rgba(212, 168, 83, 0.3);
+  /* Container with generous spacing */
+  .section-container {
+    @apply max-w-6xl mx-auto px-6 lg:px-8;
   }
 
-  .text-glow-teal {
-    text-shadow: 0 0 20px rgba(45, 149, 150, 0.5),
-                 0 0 40px rgba(45, 149, 150, 0.3);
+  .section-padding {
+    @apply py-24 lg:py-32;
   }
 
-  /* Gradient border effect */
-  .border-gradient {
-    border: 2px solid transparent;
-    background: linear-gradient(#101028, #101028) padding-box,
-                linear-gradient(135deg, #d4a853, #2d9596) border-box;
+  /* Typography - clean, modern */
+  .heading-hero {
+    font-family: var(--font-display), system-ui, sans-serif;
+    @apply text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight;
+    color: var(--text-primary);
+    line-height: 1.1;
   }
 
-  /* Lantern card effect */
-  .lantern-card {
-    background: linear-gradient(180deg, #151530 0%, #101028 100%);
-    border: 1px solid #2a2a4a;
-    transition: all 0.3s ease;
+  .heading-section {
+    font-family: var(--font-display), system-ui, sans-serif;
+    @apply text-3xl md:text-4xl font-semibold tracking-tight;
+    color: var(--text-primary);
+    line-height: 1.2;
   }
 
-  .lantern-card:hover {
-    border-color: #d4a853;
-    box-shadow: 0 0 30px rgba(212, 168, 83, 0.4);
-    transform: translateY(-5px);
+  .heading-card {
+    font-family: var(--font-display), system-ui, sans-serif;
+    @apply text-xl font-semibold;
+    color: var(--text-primary);
   }
 
-  /* Gold sponsor card */
-  .sponsor-gold {
-    border-color: #d4a853;
-    box-shadow: 0 0 15px rgba(212, 168, 83, 0.2);
+  .text-body {
+    @apply text-lg leading-relaxed;
+    color: var(--text-secondary);
   }
 
-  .sponsor-gold:hover {
-    box-shadow: 0 0 40px rgba(212, 168, 83, 0.6);
+  .text-small {
+    @apply text-sm;
+    color: var(--text-muted);
   }
 
-  /* Silver sponsor card */
-  .sponsor-silver {
-    border-color: #a0a0b0;
-    box-shadow: 0 0 10px rgba(160, 160, 176, 0.1);
+  /* Cards - minimal shadow */
+  .card {
+    @apply bg-white rounded-2xl p-8;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.04);
   }
 
-  .sponsor-silver:hover {
-    border-color: #c0c0d0;
-    box-shadow: 0 0 30px rgba(160, 160, 176, 0.4);
+  .card-soft {
+    @apply rounded-2xl p-8;
+    background: var(--off-white);
   }
 
-  /* Bronze sponsor card */
-  .sponsor-bronze {
-    border-color: #cd7f32;
-    box-shadow: 0 0 10px rgba(205, 127, 50, 0.1);
-  }
-
-  .sponsor-bronze:hover {
-    border-color: #dd8f42;
-    box-shadow: 0 0 25px rgba(205, 127, 50, 0.4);
-  }
-
-  /* Islamic geometric pattern overlay */
-  .pattern-overlay {
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232d9596' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  }
-
-  /* Stars background animation */
-  .stars-bg {
-    background-image:
-      radial-gradient(2px 2px at 20px 30px, rgba(212, 168, 83, 0.3), transparent),
-      radial-gradient(2px 2px at 40px 70px, rgba(212, 168, 83, 0.2), transparent),
-      radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.3), transparent),
-      radial-gradient(2px 2px at 130px 80px, rgba(212, 168, 83, 0.2), transparent),
-      radial-gradient(1px 1px at 160px 30px, rgba(255, 255, 255, 0.2), transparent);
-    background-size: 200px 100px;
-    animation: twinkle 4s ease-in-out infinite;
-  }
-
-  /* Button styles */
+  /* Buttons - clean */
   .btn-primary {
-    @apply bg-primary text-background font-semibold px-6 py-3 rounded-lg
-           transition-all duration-300 hover:bg-primary-hover hover:shadow-glow-md;
+    @apply inline-flex items-center justify-center px-8 py-4 rounded-full font-medium text-white;
+    background: var(--teal);
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background: var(--teal-dark);
+    transform: translateY(-1px);
   }
 
   .btn-secondary {
-    @apply border-2 border-primary text-primary font-semibold px-6 py-3 rounded-lg
-           transition-all duration-300 hover:bg-primary hover:text-background;
+    @apply inline-flex items-center justify-center px-8 py-4 rounded-full font-medium;
+    background: var(--text-primary);
+    color: white;
+    transition: all 0.2s ease;
   }
 
-  /* Section container */
-  .section-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24;
+  .btn-secondary:hover {
+    opacity: 0.85;
   }
 
-  /* Heading styles */
-  .heading-primary {
-    @apply font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary;
+  .btn-outline {
+    @apply inline-flex items-center justify-center px-8 py-4 rounded-full font-medium;
+    border: 2px solid var(--text-primary);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
   }
 
-  .heading-secondary {
-    @apply font-serif text-3xl md:text-4xl font-semibold text-text-primary;
+  .btn-outline:hover {
+    background: var(--text-primary);
+    color: white;
   }
 
-  /* Input styles */
+  /* Badge - subtle */
+  .badge {
+    @apply inline-flex items-center px-4 py-2 text-sm font-medium rounded-full;
+    background: var(--teal);
+    color: white;
+  }
+
+  .badge-outline {
+    @apply inline-flex items-center px-4 py-2 text-sm font-medium rounded-full;
+    border: 1px solid var(--teal);
+    color: var(--teal);
+  }
+
+  /* Form inputs - clean */
   .input-field {
-    @apply w-full bg-background-alt border border-border rounded-lg px-4 py-3
-           text-text-primary placeholder:text-text-muted
-           focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary
-           transition-all duration-200;
+    @apply w-full px-5 py-4 rounded-xl text-text-primary placeholder:text-text-muted;
+    background: var(--off-white);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+  }
+
+  .input-field:focus {
+    @apply outline-none;
+    background: white;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(45, 149, 150, 0.1);
   }
 
   .input-label {
@@ -161,20 +174,47 @@
   }
 
   .input-error {
-    @apply text-red-400 text-sm mt-1;
+    @apply text-red-500 text-sm mt-1;
+  }
+
+  /* Divider - subtle */
+  .divider {
+    @apply w-20 h-1 rounded-full;
+    background: var(--teal);
+  }
+
+  /* Sponsor tier accents */
+  .tier-gold {
+    border-left: 4px solid var(--gold);
+  }
+
+  .tier-silver {
+    border-left: 4px solid #9ca3af;
+  }
+
+  .tier-bronze {
+    border-left: 4px solid #b4783c;
+  }
+
+  /* Image container */
+  .image-container {
+    @apply relative overflow-hidden rounded-3xl;
+  }
+
+  /* Teal accent section */
+  .bg-teal-section {
+    background: var(--teal);
+    color: white;
+  }
+
+  /* Off-white section */
+  .bg-soft {
+    background: var(--off-white);
   }
 }
 
 @layer utilities {
-  /* Fade in animation for scroll reveal */
-  .fade-in-up {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-
-  .fade-in-up.visible {
-    opacity: 1;
-    transform: translateY(0);
+  .text-balance {
+    text-wrap: balance;
   }
 }

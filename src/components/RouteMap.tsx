@@ -2,235 +2,187 @@
 
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef } from "react";
-import { MapPin, Clock, Calendar } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { Calendar, MapPin } from "lucide-react";
+import dynamic from "next/dynamic";
 
-const routeInfo = [
+type LocationKey = "wondelgemstraat" | "bevrijdingslaan";
+
+const locations: { id: LocationKey; name: string; subtitle: string; center: [number, number]; zoom: number }[] = [
   {
-    icon: MapPin,
-    title: "Locatie",
-    description: "Rabotwijk & Omgeving, Gent",
+    id: "wondelgemstraat",
+    name: "WONDELGEMSTRAAT",
+    subtitle: "Rabotwijk",
+    center: [51.0635, 3.7095],
+    zoom: 16,
   },
   {
-    icon: Calendar,
-    title: "Periode",
-    description: "Tijdens de Ramadan 2025 (Maart - April)",
-  },
-  {
-    icon: Clock,
-    title: "Beste tijd",
-    description: "Na zonsondergang voor de mooiste sfeer",
+    id: "bevrijdingslaan",
+    name: "BEVRIJDINGSLAAN",
+    subtitle: "& Phoenixstraat",
+    center: [51.0605, 3.7015],
+    zoom: 15,
   },
 ];
+
+// Real coordinates from OpenStreetMap
+const routes = {
+  wondelgemstraat: [
+    [51.065315, 3.7091596], [51.0652518, 3.7091844], [51.0651888, 3.7092075],
+    [51.0646444, 3.7093865], [51.0645619, 3.7094108], [51.0641119, 3.7095433],
+    [51.0640764, 3.7095529], [51.0640287, 3.7095657], [51.0639635, 3.7095847],
+    [51.0637095, 3.709659], [51.0631598, 3.7098197], [51.0630933, 3.7098391],
+    [51.0629157, 3.7098973], [51.0628625, 3.7099147], [51.0628113, 3.7099319],
+    [51.0626315, 3.7099923], [51.0625436, 3.7100195], [51.0616656, 3.71028],
+    [51.0615748, 3.7102994]
+  ] as [number, number][],
+  // Bevrijdingslaan & Phoenixstraat combined as one continuous route
+  bevrijdingslaanPhoenix: [
+    // Phoenixstraat (south to north)
+    [51.0577376, 3.7071108], [51.0577646, 3.7069207], [51.0578048, 3.7067926],
+    [51.0580774, 3.7060366], [51.0583278, 3.7053053], [51.0585255, 3.7048679],
+    [51.0589024, 3.7043079],
+    // Connection point to Bevrijdingslaan
+    [51.05925, 3.7038],
+    // Bevrijdingslaan (continuing northwest)
+    [51.05955, 3.7033782], [51.0605, 3.702], [51.0615, 3.7005],
+    [51.0625, 3.699], [51.0634869, 3.6959922]
+  ] as [number, number][],
+};
+
+// Map component loaded dynamically to avoid SSR issues with Leaflet
+const MapComponent = dynamic(
+  () => import("./MapComponent"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full bg-[#0a2020] flex items-center justify-center">
+        <div className="text-white/50">Kaart laden...</div>
+      </div>
+    )
+  }
+);
 
 export function RouteMap() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [activeLocation, setActiveLocation] = useState<LocationKey>("wondelgemstraat");
+
+  const currentLocation = locations.find(l => l.id === activeLocation)!;
+  const currentRoutes = activeLocation === "wondelgemstraat"
+    ? [routes.wondelgemstraat]
+    : [routes.bevrijdingslaanPhoenix];
 
   return (
-    <section id="route" className="relative py-24 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-background-alt" />
-      <div className="absolute inset-0 pattern-overlay opacity-20" />
+    <section id="route" className="bg-[#0f2d2d] section-padding overflow-hidden">
+      <div ref={ref} className="section-container">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1 }}
+            className="text-white/80 text-lg max-w-2xl mx-auto"
+          >
+            Twee straten in het hart van Gent worden verlicht met betoverende Ramadanverlichting.
+          </motion.p>
+        </div>
 
-      <div ref={ref} className="section-container relative z-10">
-        {/* Section header */}
+        {/* Location selector tabs */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          transition={{ delay: 0.2 }}
+          className="flex justify-center gap-4 mb-8"
         >
-          <h2 className="heading-secondary mb-4">
-            Ontdek de <span className="text-teal">Route</span>
-          </h2>
-          <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-teal to-transparent mx-auto mb-6" />
-          <p className="text-text-secondary max-w-2xl mx-auto text-lg">
-            Wandel door de verlichte straten van Gent en ervaar de magie van
-            Ramadan Lights.
-          </p>
+          {locations.map((location) => (
+            <button
+              key={location.id}
+              onClick={() => setActiveLocation(location.id)}
+              className={`px-6 py-3 rounded-full font-medium transition-all ${
+                activeLocation === location.id
+                  ? "bg-teal text-white"
+                  : "bg-white/10 text-white/70 hover:bg-white/20"
+              }`}
+            >
+              {location.id === "wondelgemstraat" ? "Zone 1" : "Zone 2"}
+            </button>
+          ))}
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Map placeholder */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative"
-          >
-            <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-border">
-              {/* Placeholder for Google Maps - styled dark mode */}
-              <div className="absolute inset-0 bg-background-card flex items-center justify-center">
-                <div className="text-center p-8">
-                  {/* Stylized map placeholder */}
-                  <div className="relative w-full h-64 mb-4">
-                    {/* Background grid */}
-                    <div className="absolute inset-0 opacity-20">
-                      <div className="grid grid-cols-8 grid-rows-8 h-full w-full">
-                        {Array.from({ length: 64 }).map((_, i) => (
-                          <div key={i} className="border border-border/30" />
-                        ))}
-                      </div>
-                    </div>
+        {/* Map Container */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.3 }}
+          className="relative max-w-4xl mx-auto"
+        >
+          <div className="relative aspect-[16/9] rounded-3xl overflow-hidden">
+            {/* Real Map with Leaflet */}
+            <MapComponent
+              center={currentLocation.center}
+              zoom={currentLocation.zoom}
+              routes={currentRoutes}
+              activeLocation={activeLocation}
+            />
 
-                    {/* Stylized route */}
-                    <svg
-                      viewBox="0 0 300 200"
-                      className="absolute inset-0 w-full h-full"
-                    >
-                      {/* Route path */}
-                      <motion.path
-                        d="M50,150 Q100,100 150,120 T250,80"
-                        fill="none"
-                        stroke="#d4a853"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                        strokeDasharray="10,5"
-                        initial={{ pathLength: 0 }}
-                        animate={isInView ? { pathLength: 1 } : {}}
-                        transition={{ duration: 2, delay: 0.5 }}
-                      />
-
-                      {/* Location markers */}
-                      <motion.g
-                        initial={{ scale: 0 }}
-                        animate={isInView ? { scale: 1 } : {}}
-                        transition={{ delay: 1 }}
-                      >
-                        <circle cx="50" cy="150" r="8" fill="#2d9596" />
-                        <text
-                          x="50"
-                          y="175"
-                          textAnchor="middle"
-                          fill="#a0a0b0"
-                          fontSize="10"
-                        >
-                          Start
-                        </text>
-                      </motion.g>
-
-                      <motion.g
-                        initial={{ scale: 0 }}
-                        animate={isInView ? { scale: 1 } : {}}
-                        transition={{ delay: 1.5 }}
-                      >
-                        <circle cx="150" cy="120" r="6" fill="#d4a853" />
-                      </motion.g>
-
-                      <motion.g
-                        initial={{ scale: 0 }}
-                        animate={isInView ? { scale: 1 } : {}}
-                        transition={{ delay: 2 }}
-                      >
-                        <circle cx="250" cy="80" r="8" fill="#2d9596" />
-                        <text
-                          x="250"
-                          y="105"
-                          textAnchor="middle"
-                          fill="#a0a0b0"
-                          fontSize="10"
-                        >
-                          Einde
-                        </text>
-                      </motion.g>
-                    </svg>
-
-                    {/* Glow effects */}
-                    <motion.div
-                      className="absolute top-1/4 left-1/4 w-4 h-4 rounded-full bg-primary"
-                      animate={{
-                        boxShadow: [
-                          "0 0 10px rgba(212, 168, 83, 0.5)",
-                          "0 0 20px rgba(212, 168, 83, 0.8)",
-                          "0 0 10px rgba(212, 168, 83, 0.5)",
-                        ],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  </div>
-
-                  <p className="text-text-muted text-sm">
-                    Interactieve kaart beschikbaar tijdens het evenement
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Decorative corner elements */}
-            <div className="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-lg" />
-            <div className="absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-lg" />
-            <div className="absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-lg" />
-            <div className="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-lg" />
-          </motion.div>
-
-          {/* Route information */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="space-y-8"
-          >
-            <div>
-              <h3 className="font-serif text-2xl text-text-primary mb-4">
-                Beleef de Magie
-              </h3>
-              <p className="text-text-secondary mb-6">
-                De verlichte route voert je langs de mooiste plekjes van de wijk.
-                Elke lantaarn vertelt een verhaal van hoop, gemeenschap en
-                samenhorigheid.
-              </p>
-            </div>
-
-            {/* Info cards */}
-            <div className="space-y-4">
-              {routeInfo.map((info, index) => (
-                <motion.div
-                  key={info.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-                  className="flex items-start gap-4 p-4 rounded-xl bg-background/50 border border-border"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-teal/10 flex items-center justify-center flex-shrink-0">
-                    <info.icon className="w-5 h-5 text-teal" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-text-primary mb-1">
-                      {info.title}
-                    </h4>
-                    <p className="text-text-muted text-sm">{info.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Download route PDF button */}
+            {/* Info Callout Card */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              transition={{ duration: 0.4, delay: 1 }}
+              key={activeLocation}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute top-4 left-1/2 -translate-x-1/2 z-20"
             >
-              <a
-                href="#"
-                className="inline-flex items-center gap-2 text-teal hover:text-teal-light transition-colors font-medium"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                Download routekaart (PDF)
-              </a>
+              <div className="relative">
+                <div className="bg-[#1a4a4a]/95 backdrop-blur-sm rounded-2xl px-8 py-5 text-center shadow-2xl">
+                  <p className="text-teal-light text-[10px] font-medium tracking-[0.2em] mb-2 uppercase">
+                    Ramadan Lights Gent
+                  </p>
+                  <h3 className="text-white text-2xl md:text-3xl font-display font-bold tracking-wide mb-1">
+                    {currentLocation.name}
+                  </h3>
+                  <p className="text-white/50 text-sm mb-3">
+                    {currentLocation.subtitle}
+                  </p>
+                  <div className="flex items-center justify-center gap-2 text-white/70">
+                    <Calendar className="w-4 h-4" />
+                    <span className="text-sm font-medium tracking-wide">FEBRUARI - MAART 2026</span>
+                  </div>
+                </div>
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-3 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-[#1a4a4a]/95" />
+              </div>
             </motion.div>
+          </div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.5 }}
+            className="flex flex-col sm:flex-row justify-center gap-4 mt-8"
+          >
+            <a
+              href={activeLocation === "wondelgemstraat"
+                ? "https://www.google.com/maps/dir//Wondelgemstraat,+9000+Gent"
+                : "https://www.google.com/maps/dir//Bevrijdingslaan,+9000+Gent"
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#0f2d2d] rounded-full font-semibold uppercase tracking-wide text-sm hover:bg-white/90 transition-all shadow-lg"
+            >
+              <MapPin className="w-5 h-5" />
+              Routebeschrijving
+            </a>
+            <a
+              href="#sponsor-form"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-[#0f2d2d] rounded-full font-semibold uppercase tracking-wide text-sm hover:bg-white/90 transition-all shadow-lg"
+            >
+              <Calendar className="w-5 h-5" />
+              Word Sponsor
+            </a>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -9,70 +9,45 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Dark theme background colors
-        background: {
-          DEFAULT: "#0a0a1a",
-          alt: "#101028",
-          card: "#151530",
+        // Light, clean backgrounds
+        surface: {
+          DEFAULT: "#ffffff",
+          soft: "#fafafa",
+          muted: "#f5f5f5",
         },
-        // Primary accent - Gold/Amber (symbolizes light)
-        primary: {
-          DEFAULT: "#d4a853",
-          hover: "#e6be6a",
-          light: "#f0d78a",
-          dark: "#b8923d",
-        },
-        // Secondary accent - Teal (from VGM logo)
+        // VGM Teal - primary brand
         teal: {
           DEFAULT: "#2d9596",
-          light: "#3db5b6",
-          dark: "#1d7576",
+          light: "#3aabac",
+          dark: "#1f6b6c",
+          50: "#e6f4f4",
         },
-        // Text colors
+        // Gold accent
+        gold: {
+          DEFAULT: "#d4a853",
+          light: "#e8c478",
+          dark: "#b8923f",
+        },
+        // Text hierarchy
         text: {
-          primary: "#ffffff",
-          secondary: "#a0a0b0",
-          muted: "#6b6b7b",
-        },
-        // Border colors
-        border: {
-          DEFAULT: "#2a2a4a",
-          light: "#3a3a5a",
+          primary: "#1a1a1a",
+          secondary: "#4a4a4a",
+          muted: "#717171",
+          light: "#9a9a9a",
         },
       },
       fontFamily: {
-        serif: ["Playfair Display", "Georgia", "serif"],
-        sans: ["Inter", "system-ui", "sans-serif"],
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "glow-gold": "radial-gradient(circle, rgba(212, 168, 83, 0.3) 0%, transparent 70%)",
-        "glow-teal": "radial-gradient(circle, rgba(45, 149, 150, 0.3) 0%, transparent 70%)",
+        display: ["Sora", "system-ui", "sans-serif"],
+        body: ["Inter", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        "glow-sm": "0 0 15px rgba(212, 168, 83, 0.3)",
-        "glow-md": "0 0 30px rgba(212, 168, 83, 0.4)",
-        "glow-lg": "0 0 50px rgba(212, 168, 83, 0.5)",
-        "glow-teal": "0 0 30px rgba(45, 149, 150, 0.4)",
+        "soft": "0 2px 15px rgba(0, 0, 0, 0.04)",
+        "medium": "0 4px 25px rgba(0, 0, 0, 0.06)",
+        "strong": "0 8px 40px rgba(0, 0, 0, 0.08)",
       },
-      animation: {
-        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
-        "float": "float 6s ease-in-out infinite",
-        "twinkle": "twinkle 2s ease-in-out infinite",
-      },
-      keyframes: {
-        "pulse-glow": {
-          "0%, 100%": { opacity: "0.5" },
-          "50%": { opacity: "1" },
-        },
-        "float": {
-          "0%, 100%": { transform: "translateY(0px)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
-        "twinkle": {
-          "0%, 100%": { opacity: "0.3" },
-          "50%": { opacity: "1" },
-        },
+      spacing: {
+        '18': '4.5rem',
+        '22': '5.5rem',
       },
     },
   },

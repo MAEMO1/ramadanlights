@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <!-- 8-pointed star shape -->
+    <clipPath id="starClip">
+      <polygon points="200,20 240,160 380,160 270,240 310,380 200,300 90,380 130,240 20,160 160,160"/>
+    </clipPath>
+  </defs>
+
+  <!-- Outer gold border star -->
+  <polygon
+    points="200,10 248,148 390,148 278,238 320,390 200,295 80,390 122,238 10,148 152,148"
+    fill="#E8A838"
+  />
+
+  <!-- Teal border star -->
+  <polygon
+    points="200,22 244,152 378,152 272,236 312,378 200,288 88,378 128,236 22,152 156,152"
+    fill="#2D9596"
+  />
+
+  <!-- White inner star -->
+  <polygon
+    points="200,34 240,156 366,156 266,234 304,366 200,281 96,366 134,234 34,156 160,156"
+    fill="#FFFFFF"
+  />
+
+  <!-- Teal dome -->
+  <ellipse cx="200" cy="165" rx="85" ry="70" fill="#2D9596"/>
+  <rect x="115" y="165" width="170" height="5" fill="#2D9596"/>
+
+  <!-- Crescent moon -->
+  <g transform="translate(200, 85)">
+    <circle cx="0" cy="0" r="18" fill="#2D9596"/>
+    <circle cx="8" cy="-3" r="14" fill="#FFFFFF"/>
+  </g>
+
+  <!-- VGM Text -->
+  <text x="200" y="260" text-anchor="middle" font-family="Georgia, serif" font-size="72" font-weight="bold" fill="#1A1A1A">VGM</text>
+
+  <!-- Top line -->
+  <line x1="95" y1="278" x2="305" y2="278" stroke="#1A1A1A" stroke-width="2"/>
+
+  <!-- Subtitle -->
+  <text x="200" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="500" fill="#2D9596" letter-spacing="2">VERENIGING VAN GENTSE MOSKEEËN</text>
+
+  <!-- Bottom line -->
+  <line x1="95" y1="318" x2="305" y2="318" stroke="#1A1A1A" stroke-width="2"/>
+</svg>
