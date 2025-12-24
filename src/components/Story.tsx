@@ -112,7 +112,7 @@ export function Story() {
               </div>
               <div className="card-soft text-center">
                 <p className="text-4xl font-display font-bold text-gold mb-2">30</p>
-                <p className="text-small">Dagen feest</p>
+                <p className="text-small">Dagen licht</p>
               </div>
             </div>
           </motion.div>
