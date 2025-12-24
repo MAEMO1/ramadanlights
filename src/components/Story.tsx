@@ -102,10 +102,10 @@ export function Story() {
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="card-soft text-center">
-                <p className="text-4xl font-display font-bold text-teal mb-2">3</p>
+              <a href="#route" className="card-soft text-center hover:bg-teal/10 hover:border-teal/20 transition-all cursor-pointer group">
+                <p className="text-4xl font-display font-bold text-teal mb-2 group-hover:scale-110 transition-transform">3</p>
                 <p className="text-small">Straten verlicht</p>
-              </div>
+              </a>
               <div className="card-soft text-center">
                 <p className="text-4xl font-display font-bold text-gold mb-2">30</p>
                 <p className="text-small">Dagen licht</p>
