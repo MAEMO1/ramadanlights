@@ -7,6 +7,7 @@ import { Gallery } from "@/components/Gallery";
 import { RouteMap } from "@/components/RouteMap";
 import { SponsorGrid } from "@/components/SponsorGrid";
 import { SponsorForm } from "@/components/SponsorForm";
+import { DonateSection } from "@/components/DonateSection";
 import { Footer } from "@/components/Footer";
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
       <RouteMap />
       <SponsorGrid />
       <SponsorForm />
+      <DonateSection />
       <Footer />
     </main>
   );

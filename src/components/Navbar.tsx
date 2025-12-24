@@ -10,6 +10,7 @@ const navLinks = [
   { href: "#sfeerbeelden", label: "Sfeerbeelden" },
   { href: "#route", label: "Route" },
   { href: "#sponsors", label: "Sponsors" },
+  { href: "#doneren", label: "Doneren" },
   { href: "#contact", label: "Contact" },
 ];
 
