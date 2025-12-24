@@ -1,0 +1,56 @@
+import { NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase";
+
+export async function GET() {
+  try {
+    // Return empty list if Supabase is not configured
+    if (!supabaseAdmin) {
+      return NextResponse.json({
+        success: true,
+        data: [],
+      });
+    }
+
+    const { data: iftarEvents, error } = await supabaseAdmin
+      .from("iftar_events")
+      .select(
+        `
+        id,
+        mosque_name,
+        address,
+        city,
+        iftar_time,
+        latitude,
+        longitude,
+        capacity,
+        is_free,
+        price_info,
+        description,
+        for_men,
+        for_women,
+        for_families
+      `
+      )
+      .eq("status", "approved")
+      .order("mosque_name", { ascending: true });
+
+    if (error) {
+      console.error("Database error:", error);
+      return NextResponse.json(
+        { success: false, message: "Er is een fout opgetreden" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: iftarEvents,
+    });
+  } catch (error) {
+    console.error("List error:", error);
+    return NextResponse.json(
+      { success: false, message: "Er is een fout opgetreden" },
+      { status: 500 }
+    );
+  }
+}
