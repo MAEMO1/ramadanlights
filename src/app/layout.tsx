@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     "sponsoring",
     "gemeenschap",
   ],
-  authors: [{ name: "VGM vzw" }],
+  authors: [{ name: "VGM" }],
   openGraph: {
     title: "Ramadan Lights Gent 2026",
     description: "Verbindend licht in het hart van Gent",

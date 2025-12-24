@@ -37,7 +37,7 @@ export function Footer() {
               </div>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Vereniging van Gentse Moskeeën (VGM vzw)
+              Vereniging van Gentse Moskeeën (VGM)
             </p>
           </div>
 
@@ -88,7 +88,7 @@ export function Footer() {
         <div className="pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
             <div>
-              <p>© {new Date().getFullYear()} VGM vzw | BTW: BE 0662.896.812</p>
+              <p>© {new Date().getFullYear()} VGM | BTW: BE 0662.896.812</p>
             </div>
             <p className="text-teal">Gemaakt met zorg in Gent</p>
           </div>

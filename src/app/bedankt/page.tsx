@@ -8,7 +8,7 @@ import Image from "next/image";
 
 const paymentDetails = {
   iban: "BE93 0018 0728 1667",
-  beneficiary: "VGM vzw",
+  beneficiary: "VGM",
   reference: "Sponsoring Ramadan Lights + [Uw bedrijfsnaam]",
 };
 
@@ -207,7 +207,7 @@ export default function BedanktPage() {
               </div>
               <div className="text-left">
                 <p className="text-text-primary font-serif text-sm">Ramadan Lights Gent</p>
-                <p className="text-text-muted text-xs">VGM vzw</p>
+                <p className="text-text-muted text-xs">VGM</p>
               </div>
             </div>
           </motion.div>
