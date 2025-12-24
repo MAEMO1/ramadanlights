@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
     import { Resend } from 'resend';
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    // Email to admin
+    // Email to admin (vzwvgm@gmail.com)
     await resend.emails.send({
       from: 'Ramadan Lights <noreply@ramadanlichtengent.be>',
-      to: process.env.ADMIN_EMAIL!,
+      to: 'vzwvgm@gmail.com',
       subject: `Nieuwe sponsoraanvraag: ${validatedData.companyName}`,
       html: `
         <h1>Nieuwe Sponsoraanvraag</h1>

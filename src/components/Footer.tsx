@@ -11,7 +11,7 @@ const links = [
 ];
 
 const contact = [
-  { icon: Mail, label: "info@vgm.gent", href: "mailto:info@vgm.gent" },
+  { icon: Mail, label: "vzwvgm@gmail.com", href: "mailto:vzwvgm@gmail.com" },
   { icon: MapPin, label: "Antwerpsesteenweg 24, 9000 Gent", href: "https://maps.google.com/?q=Antwerpsesteenweg+24+9000+Gent" },
 ];
 
@@ -74,10 +74,10 @@ export function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-white mb-6">Volg ons</h4>
             <div className="flex gap-3">
-              <a href="#" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-teal transition-all">
+              <a href="https://www.instagram.com/vzwvgm/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-teal transition-all">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-teal transition-all">
+              <a href="https://www.facebook.com/Vzwvgm" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-teal transition-all">
                 <Facebook className="w-5 h-5" />
               </a>
             </div>
