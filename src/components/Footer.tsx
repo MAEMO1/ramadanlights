@@ -37,7 +37,7 @@ export function Footer() {
               </div>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Een initiatief van de Vereniging van Gentse Moskeeën (VGM vzw).
+              Vereniging van Gentse Moskeeën (VGM vzw)
             </p>
           </div>
 
