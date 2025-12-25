@@ -207,7 +207,7 @@ export default function MosquePage() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="rounded-2xl overflow-hidden"
+                  className="isolate rounded-2xl overflow-hidden"
                   style={{ height: "600px" }}
                 >
                   {mosquesWithCoords.length > 0 ? (

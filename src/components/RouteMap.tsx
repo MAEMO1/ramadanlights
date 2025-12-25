@@ -146,7 +146,7 @@ export function RouteMap() {
             </div>
           </motion.div>
 
-          <div className="relative aspect-[4/3] md:aspect-[16/9] rounded-3xl overflow-hidden">
+          <div className="relative isolate aspect-[4/3] md:aspect-[16/9] rounded-3xl overflow-hidden">
             {/* Real Map with Leaflet */}
             <MapComponent
               center={currentLocation.center}

@@ -183,7 +183,7 @@ export function IftarMap({ locations }: IftarMapProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2 }}
-          className="relative rounded-2xl overflow-hidden"
+          className="relative isolate rounded-2xl overflow-hidden"
           style={{ height: "600px" }}
         >
           {locationsWithCoords.length > 0 ? (
