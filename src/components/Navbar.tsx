@@ -101,22 +101,26 @@ export function Navbar() {
                   className={`
                     relative px-4 py-2 text-sm font-medium rounded-lg
                     transition-all duration-200
-                    ${isScrolled
-                      ? isActive(link.href)
-                        ? "text-teal-600 bg-teal-50"
-                        : link.highlight
-                          ? "text-teal-600 hover:bg-teal-50"
+                    ${link.highlight
+                      ? isScrolled
+                        ? isActive(link.href)
+                          ? "text-teal-700 bg-teal-100 ring-1 ring-teal-200"
+                          : "text-teal-700 bg-teal-50 ring-1 ring-teal-100 hover:bg-teal-100 hover:ring-teal-200"
+                        : isActive(link.href)
+                          ? "text-white bg-white/25 ring-1 ring-white/40"
+                          : "text-white bg-white/10 ring-1 ring-white/20 hover:bg-white/20 hover:ring-white/30"
+                      : isScrolled
+                        ? isActive(link.href)
+                          ? "text-teal-600 bg-teal-50"
                           : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                      : isActive(link.href)
-                        ? "text-white bg-white/20"
-                        : link.highlight
-                          ? "text-white hover:bg-white/10"
+                        : isActive(link.href)
+                          ? "text-white bg-white/20"
                           : "text-white/80 hover:text-white hover:bg-white/10"
                     }
                   `}
                 >
                   {link.label}
-                  {isActive(link.href) && (
+                  {isActive(link.href) && !link.highlight && (
                     <span
                       className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full ${
                         isScrolled ? "bg-teal-600" : "bg-white"
@@ -208,10 +212,12 @@ export function Navbar() {
                         className={`
                           flex items-center justify-between px-4 py-3.5 rounded-xl mb-1
                           text-[15px] font-medium transition-colors
-                          ${isActive(link.href)
-                            ? "bg-teal-50 text-teal-700"
-                            : link.highlight
-                              ? "text-teal-600 hover:bg-teal-50"
+                          ${link.highlight
+                            ? isActive(link.href)
+                              ? "bg-teal-100 text-teal-700 ring-1 ring-teal-200"
+                              : "bg-teal-50 text-teal-700 ring-1 ring-teal-100 hover:bg-teal-100"
+                            : isActive(link.href)
+                              ? "bg-gray-100 text-gray-900"
                               : "text-gray-700 hover:bg-gray-50"
                           }
                         `}
@@ -219,7 +225,7 @@ export function Navbar() {
                         {link.label}
                         <ChevronRight
                           size={18}
-                          className={isActive(link.href) ? "text-teal-500" : "text-gray-400"}
+                          className={link.highlight || isActive(link.href) ? "text-teal-500" : "text-gray-400"}
                         />
                       </Link>
                     ))}
