@@ -113,14 +113,21 @@ const mapOptions: google.maps.MapOptions = {
   ],
 };
 
-// Simple clean marker
+// Simple clean marker with SVG crescent path
 const createMosqueMarkerIcon = (isSelected: boolean) => {
   const size = isSelected ? 44 : 36;
   const color = isSelected ? "#d4af37" : "#2d9596";
 
+  // Clean crescent moon using two overlapping circles
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 36 36">
     <circle cx="18" cy="18" r="16" fill="${color}" stroke="white" stroke-width="3"/>
-    <text x="18" y="23" text-anchor="middle" font-family="Arial" font-size="14" fill="white">☪</text>
+    <defs>
+      <mask id="crescentMask${isSelected ? 'S' : 'N'}">
+        <circle cx="18" cy="18" r="6" fill="white"/>
+        <circle cx="21" cy="18" r="5" fill="black"/>
+      </mask>
+    </defs>
+    <circle cx="18" cy="18" r="6" fill="white" mask="url(%23crescentMask${isSelected ? 'S' : 'N'})"/>
   </svg>`;
 
   return {
