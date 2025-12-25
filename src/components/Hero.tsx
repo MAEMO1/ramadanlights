@@ -13,7 +13,7 @@ export function Hero() {
           src="/assets/images/ramadan-lights-gent.jpg"
           alt="Ramadanverlichting in Gent"
           fill
-          className="object-cover object-[70%_center]"
+          className="object-cover object-[85%_center]"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
