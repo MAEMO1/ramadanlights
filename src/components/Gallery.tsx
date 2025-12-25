@@ -64,7 +64,8 @@ export function Gallery() {
                 src={image.src}
                 alt={image.alt}
                 fill
-                className="object-cover object-[85%_center]"
+                className="object-cover"
+                style={{ objectPosition: "100% center" }}
               />
             </div>
           ))}

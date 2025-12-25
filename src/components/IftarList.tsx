@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useState, useMemo } from "react";
-import { Clock, MapPin, Users, Check, Calendar, ExternalLink, Globe, Facebook, Instagram, Search, SortAsc, SortDesc } from "lucide-react";
+import { Clock, MapPin, Users, Check, Calendar, ExternalLink, Globe, Facebook, Instagram, Search, Filter, X } from "lucide-react";
 import { type IftarLocation, formatFrequencyDisplay } from "@/lib/iftar-types";
 
 interface IftarListProps {
@@ -12,15 +12,17 @@ interface IftarListProps {
   embedded?: boolean;
 }
 
-type SortOption = "name" | "city" | "time";
-type SortDirection = "asc" | "desc";
-
 export function IftarList({ locations, mosqueAddresses, embedded = false }: IftarListProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>("name");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    for_men: false,
+    for_women: false,
+    for_families: false,
+    frequency: "all" as "all" | "daily" | "weekly" | "specific_days" | "one_time",
+  });
 
   // Check if a location is a mosque based on address match
   const isMosque = (location: IftarLocation): boolean => {
@@ -31,8 +33,12 @@ export function IftarList({ locations, mosqueAddresses, embedded = false }: Ifta
     );
   };
 
-  // Filter and sort locations
-  const filteredAndSortedLocations = useMemo(() => {
+  // Check if any filter is active
+  const anyAccessibilityFilter = filters.for_men || filters.for_women || filters.for_families;
+  const hasActiveFilters = anyAccessibilityFilter || filters.frequency !== "all";
+
+  // Filter locations
+  const filteredLocations = useMemo(() => {
     let result = locations;
 
     // Filter by search query
@@ -46,28 +52,36 @@ export function IftarList({ locations, mosqueAddresses, embedded = false }: Ifta
       );
     }
 
-    // Sort
-    result = [...result].sort((a, b) => {
-      let comparison = 0;
-      switch (sortBy) {
-        case "name":
-          comparison = a.mosque_name.localeCompare(b.mosque_name);
-          break;
-        case "city":
-          comparison = a.city.localeCompare(b.city);
-          break;
-        case "time":
-          comparison = (a.iftar_time || "").localeCompare(b.iftar_time || "");
-          break;
-      }
-      return sortDirection === "asc" ? comparison : -comparison;
-    });
+    // Accessibility filters (OR logic)
+    if (anyAccessibilityFilter) {
+      result = result.filter((loc) => {
+        return (
+          (filters.for_men && loc.for_men) ||
+          (filters.for_women && loc.for_women) ||
+          (filters.for_families && loc.for_families)
+        );
+      });
+    }
+
+    // Frequency filter
+    if (filters.frequency !== "all") {
+      result = result.filter((loc) => loc.frequency === filters.frequency);
+    }
+
+    // Sort alphabetically by name
+    result = [...result].sort((a, b) => a.mosque_name.localeCompare(b.mosque_name));
 
     return result;
-  }, [locations, searchQuery, sortBy, sortDirection]);
+  }, [locations, searchQuery, filters, anyAccessibilityFilter]);
 
-  const toggleSortDirection = () => {
-    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+  const clearFilters = () => {
+    setFilters({
+      for_men: false,
+      for_women: false,
+      for_families: false,
+      frequency: "all",
+    });
+    setSearchQuery("");
   };
 
   if (locations.length === 0) {
@@ -76,75 +90,174 @@ export function IftarList({ locations, mosqueAddresses, embedded = false }: Ifta
 
   const content = (
     <div ref={ref}>
-      {/* Search & Sort Controls */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.15 }}
-          className="flex flex-col sm:flex-row gap-4 mb-8"
-        >
-          {/* Search Input */}
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
-            <input
-              type="text"
-              placeholder="Zoek op naam, adres of stad..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-field pl-12 w-full"
-            />
-          </div>
-
-          {/* Sort Controls */}
-          <div className="flex gap-2">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="input-field px-4 py-3 pr-10 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23717171%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_0.75rem_center] bg-[length:1.25rem]"
-            >
-              <option value="name">Naam</option>
-              <option value="city">Stad</option>
-              <option value="time">Tijd</option>
-            </select>
-            <button
-              onClick={toggleSortDirection}
-              className="px-4 py-3 rounded-xl bg-off-white hover:bg-gray-100 transition-colors flex items-center gap-2"
-              aria-label={sortDirection === "asc" ? "Oplopend" : "Aflopend"}
-            >
-              {sortDirection === "asc" ? (
-                <SortAsc className="w-5 h-5 text-text-secondary" />
-              ) : (
-                <SortDesc className="w-5 h-5 text-text-secondary" />
-              )}
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Results count */}
-        {searchQuery && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-sm text-text-muted mb-6"
-          >
-            {filteredAndSortedLocations.length} resultaten gevonden
-          </motion.p>
-        )}
-
-        {/* Grid */}
-        {filteredAndSortedLocations.length === 0 && searchQuery ? (
-          <div className="text-center py-12">
-            <p className="text-text-muted text-lg">Geen iftars gevonden voor &ldquo;{searchQuery}&rdquo;</p>
+      {/* Search & Filter Controls */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.15 }}
+        className="flex flex-col sm:flex-row gap-4 mb-6"
+      >
+        {/* Search Input */}
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
+          <input
+            type="text"
+            placeholder="Zoek op naam, adres of stad..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="input-field pl-12 w-full"
+          />
+          {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text-primary transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Filter Toggle */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+            showFilters || hasActiveFilters
+              ? "bg-teal text-white"
+              : "bg-gray-100 text-text-secondary hover:bg-gray-200"
+          }`}
+        >
+          <Filter className="w-4 h-4" />
+          Filters
+          {hasActiveFilters && (
+            <span className="w-5 h-5 bg-white text-teal text-xs font-bold rounded-full flex items-center justify-center">
+              {(filters.for_men ? 1 : 0) + (filters.for_women ? 1 : 0) + (filters.for_families ? 1 : 0) + (filters.frequency !== "all" ? 1 : 0)}
+            </span>
+          )}
+        </button>
+      </motion.div>
+
+      {/* Filter Panel */}
+      {showFilters && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="bg-gray-50 rounded-2xl p-5 mb-6"
+        >
+          <div className="space-y-4">
+            {/* Accessibility filters */}
+            <div>
+              <p className="text-sm font-medium text-text-secondary mb-3">Toegankelijk voor</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setFilters({ ...filters, for_men: !filters.for_men })}
+                  className={`px-4 py-2 rounded-full text-sm transition-all ${
+                    filters.for_men
+                      ? "bg-blue-500 text-white font-medium"
+                      : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
+                  }`}
+                >
+                  Mannen
+                </button>
+                <button
+                  onClick={() => setFilters({ ...filters, for_women: !filters.for_women })}
+                  className={`px-4 py-2 rounded-full text-sm transition-all ${
+                    filters.for_women
+                      ? "bg-pink-500 text-white font-medium"
+                      : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
+                  }`}
+                >
+                  Vrouwen
+                </button>
+                <button
+                  onClick={() => setFilters({ ...filters, for_families: !filters.for_families })}
+                  className={`px-4 py-2 rounded-full text-sm transition-all ${
+                    filters.for_families
+                      ? "bg-purple-500 text-white font-medium"
+                      : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
+                  }`}
+                >
+                  Gezinnen
+                </button>
+              </div>
+            </div>
+
+            {/* Frequency filter */}
+            <div>
+              <p className="text-sm font-medium text-text-secondary mb-3">Frequentie</p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: "all", label: "Alle" },
+                  { value: "daily", label: "Dagelijks" },
+                  { value: "weekly", label: "Wekelijks" },
+                  { value: "specific_days", label: "Specifieke dagen" },
+                  { value: "one_time", label: "Eenmalig" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() =>
+                      setFilters({
+                        ...filters,
+                        frequency: option.value as typeof filters.frequency,
+                      })
+                    }
+                    className={`px-4 py-2 rounded-full text-sm transition-all ${
+                      filters.frequency === option.value
+                        ? "bg-teal text-white font-medium"
+                        : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Clear filters */}
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="text-sm text-teal hover:underline"
+              >
+                Alle filters wissen
+              </button>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Results count */}
+      {(searchQuery || hasActiveFilters) && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-sm text-text-muted mb-6"
+        >
+          {filteredLocations.length} resultaat{filteredLocations.length !== 1 ? "en" : ""} gevonden
+        </motion.p>
+      )}
+
+      {/* Grid */}
+      {filteredLocations.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-text-muted text-lg">
+            {searchQuery || hasActiveFilters
+              ? "Geen iftars gevonden met de huidige filters"
+              : "Geen iftars beschikbaar"
+            }
+          </p>
+          {(searchQuery || hasActiveFilters) && (
+            <button
+              onClick={clearFilters}
               className="mt-4 text-teal hover:underline"
             >
-              Zoekfilter wissen
+              Filters wissen
             </button>
-          </div>
-        ) : (
+          )}
+        </div>
+      ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAndSortedLocations.map((location, index) => (
+          {filteredLocations.map((location, index) => (
             <motion.div
               key={location.id}
               initial={{ opacity: 0, y: 20 }}
