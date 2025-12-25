@@ -90,7 +90,7 @@ export function Navbar() {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -101,17 +101,19 @@ export function Navbar() {
                       ? "px-4 py-2 bg-teal-600 text-white font-medium rounded-md hover:bg-teal-700"
                       : isScrolled
                         ? isActive(link.href)
-                          ? "text-gray-900 font-semibold"
-                          : "text-gray-500 hover:text-gray-900"
+                          ? "text-gray-900 font-semibold px-3 py-2"
+                          : "text-gray-500 hover:text-gray-900 px-3 py-2"
                         : isActive(link.href)
-                          ? "text-white font-semibold"
-                          : "text-white/70 hover:text-white"
+                          ? "text-white font-semibold px-3 py-2"
+                          : "text-white/70 hover:text-white px-3 py-2"
                     }
                   `}
                 >
                   {link.label}
                 </Link>
               ))}
+
+              <div className={`w-px h-5 mx-3 ${isScrolled ? "bg-gray-200" : "bg-white/30"}`} />
 
               <Link
                 href="/#sponsor-form"
@@ -190,19 +192,19 @@ export function Navbar() {
                   </button>
                 </div>
 
-                <div className="py-4 space-y-2">
+                <div className="py-4 space-y-1">
                   {navLinks.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`
-                        block py-3 text-[15px] transition-colors
+                        block py-3 px-4 text-[15px] rounded-md transition-colors
                         ${link.highlight
-                          ? "px-4 bg-teal-600 text-white font-medium rounded-md text-center"
+                          ? "bg-teal-600 text-white font-medium"
                           : isActive(link.href)
-                            ? "text-gray-900 font-semibold"
-                            : "text-gray-600"
+                            ? "text-gray-900 font-semibold bg-gray-50"
+                            : "text-gray-600 hover:bg-gray-50"
                         }
                       `}
                     >
