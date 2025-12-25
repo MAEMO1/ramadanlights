@@ -7,8 +7,8 @@ import { Footer } from "@/components/Footer";
 import { IftarMap } from "@/components/IftarMap";
 import { IftarCalendar } from "@/components/IftarCalendar";
 import { IftarList } from "@/components/IftarList";
-import { IftarForm } from "@/components/IftarForm";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
+import Link from "next/link";
 import type { IftarLocation } from "@/lib/iftar-types";
 
 export default function IftarPage() {
@@ -78,12 +78,13 @@ export default function IftarPage() {
               >
                 Kalender
               </a>
-              <a
-                href="#iftar-form"
+              <Link
+                href="/iftar/toevoegen"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium border-2 border-white/30 text-white hover:bg-white/10 transition-all"
               >
+                <Plus className="w-4 h-4 mr-2" />
                 Iftar toevoegen
-              </a>
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -112,8 +113,30 @@ export default function IftarPage() {
       {/* List Section */}
       {!isLoading && <IftarList locations={locations} />}
 
-      {/* Form Section */}
-      <IftarForm />
+      {/* CTA Section */}
+      <section className="bg-gradient-to-b from-white to-soft section-padding">
+        <div className="section-container text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="heading-section mb-4">
+              Organiseert u een iftar?
+            </h2>
+            <p className="text-body mb-8 max-w-xl mx-auto">
+              Voeg uw iftar toe aan de Iftarkaart zodat iedereen uw locatie kan vinden.
+            </p>
+            <Link
+              href="/iftar/toevoegen"
+              className="btn-primary inline-flex"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Iftar toevoegen
+            </Link>
+          </motion.div>
+        </div>
+      </section>
 
       <Footer />
     </main>

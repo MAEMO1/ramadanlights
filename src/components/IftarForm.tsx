@@ -197,36 +197,6 @@ export function IftarForm() {
     <section id="iftar-form" className="bg-soft section-padding">
       <div ref={ref} className="section-container">
         <div className="max-w-2xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-10">
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              className="badge mb-6 inline-block"
-            >
-              Iftar Toevoegen
-            </motion.span>
-
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.1 }}
-              className="heading-section mb-6"
-            >
-              Dien uw iftar in
-            </motion.h2>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2 }}
-              className="text-body"
-            >
-              Organiseert uw moskee of organisatie een iftar? Voeg deze toe aan
-              de Iftarkaart zodat iedereen uw locatie kan vinden.
-            </motion.p>
-          </div>
-
           {/* Form */}
           <motion.form
             initial={{ opacity: 0, y: 20 }}
