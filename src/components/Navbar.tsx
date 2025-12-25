@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const navLinks = [
-  { href: "#verhaal", label: "Over ons" },
+  { href: "/#verhaal", label: "Over ons" },
   { href: "/iftar", label: "Iftarkaart", highlight: true },
   { href: "/moskeeen", label: "Moskeeën", highlight: true },
-  { href: "#sponsors", label: "Sponsors" },
-  { href: "#doneren", label: "Doneren" },
+  { href: "/#sponsors", label: "Sponsors" },
+  { href: "/#doneren", label: "Doneren" },
 ];
 
 export function Navbar() {
@@ -36,7 +37,7 @@ export function Navbar() {
       <div className="max-w-6xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <div className={`relative w-12 h-12 rounded-xl overflow-hidden ${!isScrolled ? "bg-white p-1" : ""}`}>
               <Image
                 src="/assets/logos/vgm-logo.png"
@@ -53,12 +54,12 @@ export function Navbar() {
                 Gent 2026
               </span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 className={`text-sm font-medium transition-colors ${
@@ -72,11 +73,11 @@ export function Navbar() {
                 }`}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
-            <a href="#sponsor-form" className="btn-primary text-sm px-6 py-3">
+            <Link href="/#sponsor-form" className="btn-primary text-sm px-6 py-3">
               Word Sponsor
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
