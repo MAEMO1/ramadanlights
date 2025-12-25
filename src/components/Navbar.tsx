@@ -97,16 +97,14 @@ export function Navbar() {
                   href={link.href}
                   className={`
                     text-sm transition-colors
-                    ${isScrolled
-                      ? isActive(link.href)
-                        ? "text-gray-900 font-semibold"
-                        : link.highlight
-                          ? "text-teal-600 font-medium hover:text-teal-700"
+                    ${link.highlight
+                      ? "px-4 py-2 bg-teal-600 text-white font-medium rounded-md hover:bg-teal-700"
+                      : isScrolled
+                        ? isActive(link.href)
+                          ? "text-gray-900 font-semibold"
                           : "text-gray-500 hover:text-gray-900"
-                      : isActive(link.href)
-                        ? "text-white font-semibold"
-                        : link.highlight
-                          ? "text-white font-medium"
+                        : isActive(link.href)
+                          ? "text-white font-semibold"
                           : "text-white/70 hover:text-white"
                     }
                   `}
@@ -192,7 +190,7 @@ export function Navbar() {
                   </button>
                 </div>
 
-                <div className="py-4 space-y-1">
+                <div className="py-4 space-y-2">
                   {navLinks.map((link) => (
                     <Link
                       key={link.href}
@@ -200,10 +198,10 @@ export function Navbar() {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`
                         block py-3 text-[15px] transition-colors
-                        ${isActive(link.href)
-                          ? "text-gray-900 font-semibold"
-                          : link.highlight
-                            ? "text-teal-600 font-medium"
+                        ${link.highlight
+                          ? "px-4 bg-teal-600 text-white font-medium rounded-md text-center"
+                          : isActive(link.href)
+                            ? "text-gray-900 font-semibold"
                             : "text-gray-600"
                         }
                       `}
