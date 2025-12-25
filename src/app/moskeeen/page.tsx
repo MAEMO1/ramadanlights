@@ -142,7 +142,7 @@ export default function MosquePage() {
   const clearSearch = () => setSearchQuery("");
 
   // Get unique cities/areas for stats
-  const uniqueAreas = [...new Set(mosques.map(m => m.city))];
+  const uniqueAreas = Array.from(new Set(mosques.map(m => m.city)));
 
   return (
     <main className="min-h-screen">
