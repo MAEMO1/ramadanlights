@@ -56,61 +56,42 @@ export function IftarMap({ locations }: IftarMapProps) {
   );
 
   return (
-    <section className="bg-[#0f2d2d] section-padding">
+    <section className="bg-off-white section-padding">
       <div ref={ref} className="section-container">
         {/* Header */}
-        <div className="text-center mb-8">
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            className="badge mb-6 inline-block"
-          >
-            Iftarkaart
-          </motion.span>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.1 }}
-            className="text-3xl md:text-4xl font-display font-bold text-white mb-4"
-          >
-            Vind een iftar bij jou in de buurt
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.2 }}
-            className="text-white/80 text-lg max-w-2xl mx-auto"
-          >
-            Bekijk alle iftar locaties in Gent en omgeving op de kaart.
-          </motion.p>
-        </div>
-
-        {/* Stats and Filter toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.3 }}
-          className="flex flex-wrap justify-center items-center gap-4 mb-6"
-        >
-          <div className="flex items-center gap-2 text-white/80">
-            <MapPin className="w-5 h-5 text-gold" />
-            <span>{locationsWithCoords.length} locaties op de kaart</span>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+          <div>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              className="heading-section"
+            >
+              Kaart
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.1 }}
+              className="text-text-muted mt-2"
+            >
+              {locationsWithCoords.length} locaties
+            </motion.p>
           </div>
 
-          <button
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
               showFilters
-                ? "bg-gold text-[#0f2d2d]"
-                : "bg-white/10 text-white hover:bg-white/20"
+                ? "bg-teal text-white"
+                : "bg-white text-text-secondary hover:bg-gray-50 border border-gray-200"
             }`}
           >
             <Filter className="w-4 h-4" />
             Filters
-          </button>
-        </motion.div>
+          </motion.button>
+        </div>
 
         {/* Filters */}
         {showFilters && (
@@ -118,73 +99,81 @@ export function IftarMap({ locations }: IftarMapProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="space-y-4 mb-6"
+            className="bg-white rounded-2xl p-6 mb-6 border border-gray-100"
           >
-            {/* Frequency filter */}
-            <div className="flex flex-wrap justify-center gap-2">
-              {[
-                { value: "all", label: "Alle" },
-                { value: "daily", label: "Dagelijks" },
-                { value: "weekly", label: "Wekelijks" },
-                { value: "specific_days", label: "Specifieke dagen" },
-                { value: "one_time", label: "Eenmalig" },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() =>
-                    setFilters({
-                      ...filters,
-                      frequency: option.value as typeof filters.frequency,
-                    })
-                  }
-                  className={`px-4 py-2 rounded-full text-sm transition-all ${
-                    filters.frequency === option.value
-                      ? "bg-gold text-[#0f2d2d] font-medium"
-                      : "bg-white/10 text-white hover:bg-white/20"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
+            <div className="space-y-4">
+              {/* Frequency filter */}
+              <div>
+                <p className="text-sm font-medium text-text-secondary mb-3">Frequentie</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: "all", label: "Alle" },
+                    { value: "daily", label: "Dagelijks" },
+                    { value: "weekly", label: "Wekelijks" },
+                    { value: "specific_days", label: "Specifieke dagen" },
+                    { value: "one_time", label: "Eenmalig" },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() =>
+                        setFilters({
+                          ...filters,
+                          frequency: option.value as typeof filters.frequency,
+                        })
+                      }
+                      className={`px-4 py-2 rounded-full text-sm transition-all ${
+                        filters.frequency === option.value
+                          ? "bg-teal text-white font-medium"
+                          : "bg-gray-100 text-text-secondary hover:bg-gray-200"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-            {/* Accessibility filters */}
-            <div className="flex flex-wrap justify-center gap-4">
-              <label className="flex items-center gap-2 text-white cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={filters.for_men}
-                  onChange={(e) =>
-                    setFilters({ ...filters, for_men: e.target.checked })
-                  }
-                  className="w-5 h-5 rounded border-white/30 text-gold focus:ring-gold"
-                />
-                <span>Mannen</span>
-              </label>
+              {/* Accessibility filters */}
+              <div>
+                <p className="text-sm font-medium text-text-secondary mb-3">Toegankelijk voor</p>
+                <div className="flex flex-wrap gap-4">
+                  <label className="flex items-center gap-2 text-text-primary cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.for_men}
+                      onChange={(e) =>
+                        setFilters({ ...filters, for_men: e.target.checked })
+                      }
+                      className="w-4 h-4 rounded border-gray-300 text-teal focus:ring-teal"
+                    />
+                    <span className="text-sm">Mannen</span>
+                  </label>
 
-              <label className="flex items-center gap-2 text-white cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={filters.for_women}
-                  onChange={(e) =>
-                    setFilters({ ...filters, for_women: e.target.checked })
-                  }
-                  className="w-5 h-5 rounded border-white/30 text-gold focus:ring-gold"
-                />
-                <span>Vrouwen</span>
-              </label>
+                  <label className="flex items-center gap-2 text-text-primary cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.for_women}
+                      onChange={(e) =>
+                        setFilters({ ...filters, for_women: e.target.checked })
+                      }
+                      className="w-4 h-4 rounded border-gray-300 text-teal focus:ring-teal"
+                    />
+                    <span className="text-sm">Vrouwen</span>
+                  </label>
 
-              <label className="flex items-center gap-2 text-white cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={filters.for_families}
-                  onChange={(e) =>
-                    setFilters({ ...filters, for_families: e.target.checked })
-                  }
-                  className="w-5 h-5 rounded border-white/30 text-gold focus:ring-gold"
-                />
-                <span>Gezinnen</span>
-              </label>
+                  <label className="flex items-center gap-2 text-text-primary cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.for_families}
+                      onChange={(e) =>
+                        setFilters({ ...filters, for_families: e.target.checked })
+                      }
+                      className="w-4 h-4 rounded border-gray-300 text-teal focus:ring-teal"
+                    />
+                    <span className="text-sm">Gezinnen</span>
+                  </label>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
@@ -193,16 +182,16 @@ export function IftarMap({ locations }: IftarMapProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.4 }}
-          className="relative rounded-2xl overflow-hidden shadow-2xl"
+          transition={{ delay: 0.2 }}
+          className="relative rounded-2xl overflow-hidden border border-gray-200"
           style={{ height: "500px" }}
         >
           {locationsWithCoords.length > 0 ? (
             <IftarMapComponent locations={locationsWithCoords} />
           ) : (
-            <div className="w-full h-full bg-[#0a2020] flex flex-col items-center justify-center text-center p-8">
-              <MapPin className="w-16 h-16 text-white/30 mb-4" />
-              <p className="text-white/60 text-lg">
+            <div className="w-full h-full bg-gray-50 flex flex-col items-center justify-center text-center p-8">
+              <MapPin className="w-12 h-12 text-gray-300 mb-4" />
+              <p className="text-text-muted">
                 {locations.length === 0
                   ? "Er zijn nog geen iftar locaties toegevoegd."
                   : "Geen locaties gevonden met de huidige filters."}

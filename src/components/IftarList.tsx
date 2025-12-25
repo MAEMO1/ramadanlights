@@ -64,17 +64,8 @@ export function IftarList({ locations }: IftarListProps) {
   }
 
   return (
-    <section id="iftar-list" className="relative bg-gradient-to-b from-gray-50 to-white section-padding overflow-hidden">
-      {/* Decorative element */}
-      <div className="absolute top-0 left-0 w-48 h-48 opacity-[0.03] pointer-events-none">
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M50 0L100 50L50 100L0 50Z" stroke="#2d9596" strokeWidth="0.5"/>
-          <path d="M50 20L80 50L50 80L20 50Z" stroke="#2d9596" strokeWidth="0.5"/>
-          <circle cx="50" cy="50" r="15" stroke="#2d9596" strokeWidth="0.5"/>
-        </svg>
-      </div>
-
-      <div ref={ref} className="section-container relative">
+    <section id="iftar-list" className="bg-off-white section-padding">
+      <div ref={ref} className="section-container">
         {/* Header */}
         <div className="text-center mb-10">
           <motion.h2
