@@ -1,13 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Mail, MapPin, Instagram, Facebook } from "lucide-react";
 
 const links = [
-  { label: "Over ons", href: "#verhaal" },
-  { label: "Route", href: "#route" },
-  { label: "Sponsors", href: "#sponsors" },
-  { label: "Word Partner", href: "#sponsor-form" },
+  { label: "Het project", href: "/#verhaal" },
+  { label: "Iftarkaart", href: "/iftar" },
+  { label: "Moskeeën", href: "/moskeeen" },
+  { label: "Sponsors", href: "/#sponsors" },
+  { label: "Doneren", href: "/#doneren" },
+  { label: "Word Sponsor", href: "/#sponsor-form" },
 ];
 
 const contact = [
@@ -47,9 +50,9 @@ export function Footer() {
             <ul className="space-y-3">
               {links.map((link) => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
