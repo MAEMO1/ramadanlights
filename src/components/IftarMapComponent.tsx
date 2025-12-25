@@ -1,159 +1,281 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { useCallback, useState } from "react";
+import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from "@react-google-maps/api";
 import { type IftarLocation, formatFrequencyDisplay } from "@/lib/iftar-types";
+import { Navigation, ExternalLink, Globe, Facebook, Instagram } from "lucide-react";
 
 export type { IftarLocation };
 
 interface IftarMapComponentProps {
   locations: IftarLocation[];
-  center?: [number, number];
+  center?: { lat: number; lng: number };
   zoom?: number;
 }
 
+const mapContainerStyle = {
+  width: "100%",
+  height: "100%",
+  minHeight: "400px",
+  borderRadius: "1rem",
+};
+
+// Dark mode map style
+const darkMapStyle: google.maps.MapTypeStyle[] = [
+  { elementType: "geometry", stylers: [{ color: "#0f2d2d" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#0f2d2d" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+  {
+    featureType: "administrative.locality",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#d4af37" }],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [{ color: "#1a4a4a" }],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#9ca5b3" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [{ color: "#2d5a5a" }],
+  },
+  {
+    featureType: "transit",
+    elementType: "labels",
+    stylers: [{ visibility: "off" }],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [{ color: "#0a1f1f" }],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#515c6d" }],
+  },
+];
+
+// Simple gold pin icon for iftar locations
+const createIftarMarkerIcon = (isSelected: boolean) => {
+  const color = isSelected ? "#ffffff" : "#d4af37";
+  const bgColor = isSelected ? "#d4af37" : "#0f2d2d";
+  const size = isSelected ? 40 : 32;
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 32 40">
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.4"/>
+        </filter>
+      </defs>
+      <g filter="url(%23shadow)">
+        <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 24 16 24s16-12 16-24c0-8.837-7.163-16-16-16z" fill="${color}"/>
+        <circle cx="16" cy="14" r="8" fill="${bgColor}"/>
+        <path d="M16 9c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2s2-.9 2-2v-4c0-1.1-.9-2-2-2z" fill="${color}"/>
+        <circle cx="16" cy="19" r="1.5" fill="${color}"/>
+      </g>
+    </svg>
+  `;
+
+  return {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    scaledSize: new google.maps.Size(size, size + 8),
+    anchor: new google.maps.Point(size / 2, size + 8),
+  };
+};
+
 export default function IftarMapComponent({
   locations,
-  center = [51.0543, 3.7174], // Gent centrum
+  center = { lat: 51.0543, lng: 3.7174 },
   zoom = 13,
 }: IftarMapComponentProps) {
-  const mapRef = useRef<L.Map | null>(null);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const markersRef = useRef<L.Marker[]>([]);
+  const [activeInfoWindow, setActiveInfoWindow] = useState<string | null>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
 
-  useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+  });
 
-    // Initialize map
-    mapRef.current = L.map(mapContainerRef.current, {
-      center,
-      zoom,
-      zoomControl: true,
-      scrollWheelZoom: true,
-    });
+  const onLoad = useCallback((map: google.maps.Map) => {
+    setMap(map);
 
-    // Add dark tile layer
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        subdomains: "abcd",
-        maxZoom: 19,
-      }
-    ).addTo(mapRef.current);
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, []);
-
-  // Update markers when locations change
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    // Clear existing markers
-    markersRef.current.forEach((marker) => marker.remove());
-    markersRef.current = [];
-
-    // Add new markers
-    locations.forEach((location) => {
-      if (location.latitude && location.longitude) {
-        // Custom gold marker icon for iftar locations
-        const markerIcon = L.divIcon({
-          className: "custom-iftar-marker",
-          html: `
-            <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 24 16 24s16-12 16-24c0-8.837-7.163-16-16-16z" fill="#FFD700"/>
-              <circle cx="16" cy="16" r="8" fill="#0f2d2d"/>
-              <path d="M16 10c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2s2-.9 2-2v-4c0-1.1-.9-2-2-2z" fill="#FFD700"/>
-              <circle cx="16" cy="20" r="1.5" fill="#FFD700"/>
-            </svg>
-          `,
-          iconSize: [32, 40],
-          iconAnchor: [16, 40],
-          popupAnchor: [0, -40],
-        });
-
-        const marker = L.marker([location.latitude, location.longitude], {
-          icon: markerIcon,
-        });
-
-        // Create popup content
-        const accessibilityTags = [
-          location.for_men ? "Mannen" : "",
-          location.for_women ? "Vrouwen" : "",
-          location.for_families ? "Gezinnen" : "",
-        ]
-          .filter(Boolean)
-          .join(" • ");
-
-        const frequencyText = formatFrequencyDisplay(location.frequency, location.days_of_week || []);
-
-        // Build links HTML
-        const linksHtml = [];
-        if (location.registration_url) {
-          linksHtml.push(`<a href="${location.registration_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #0f9f9f; color: white; text-decoration: none; border-radius: 12px; font-size: 11px;">Inschrijven</a>`);
+    // Fit bounds to show all locations
+    const locationsWithCoords = locations.filter((l) => l.latitude && l.longitude);
+    if (locationsWithCoords.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      locationsWithCoords.forEach((location) => {
+        if (location.latitude && location.longitude) {
+          bounds.extend({ lat: location.latitude, lng: location.longitude });
         }
-        if (location.website_url) {
-          linksHtml.push(`<a href="${location.website_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #f3f4f6; color: #374151; text-decoration: none; border-radius: 12px; font-size: 11px;">Website</a>`);
-        }
-        if (location.facebook_url) {
-          linksHtml.push(`<a href="${location.facebook_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #dbeafe; color: #1d4ed8; text-decoration: none; border-radius: 12px; font-size: 11px;">Facebook</a>`);
-        }
-        if (location.instagram_url) {
-          linksHtml.push(`<a href="${location.instagram_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #fce7f3; color: #be185d; text-decoration: none; border-radius: 12px; font-size: 11px;">Instagram</a>`);
-        }
-
-        const popupContent = `
-          <div style="min-width: 200px; font-family: system-ui, sans-serif;">
-            <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #0f2d2d;">
-              ${location.mosque_name}
-            </h3>
-            <p style="margin: 0 0 4px 0; font-size: 13px; color: #666;">
-              ${location.address}, ${location.city}
-            </p>
-            <p style="margin: 0 0 4px 0; font-size: 14px; font-weight: 500; color: #0f2d2d;">
-              Iftar: ${location.iftar_time}
-            </p>
-            <p style="margin: 0 0 8px 0; font-size: 12px; color: #0f9f9f; font-weight: 500;">
-              ${frequencyText}
-            </p>
-            ${location.capacity ? `<p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">Capaciteit: ${location.capacity} personen</p>` : ""}
-            <p style="margin: 0 0 4px 0; font-size: 12px; color: ${location.is_free ? "#10b981" : "#666"};">
-              ${location.is_free ? "Gratis" : location.price_info || "Betaald"}
-            </p>
-            ${accessibilityTags ? `<p style="margin: 8px 0 0 0; font-size: 11px; color: #888; border-top: 1px solid #eee; padding-top: 8px;">${accessibilityTags}</p>` : ""}
-            ${linksHtml.length > 0 ? `<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">${linksHtml.join("")}</div>` : ""}
-          </div>
-        `;
-
-        marker.bindPopup(popupContent, {
-          closeButton: true,
-          className: "iftar-popup",
-        });
-
-        marker.addTo(mapRef.current!);
-        markersRef.current.push(marker);
-      }
-    });
-
-    // Fit bounds to show all markers if there are any
-    if (markersRef.current.length > 0) {
-      const group = L.featureGroup(markersRef.current);
-      mapRef.current.fitBounds(group.getBounds().pad(0.1));
+      });
+      map.fitBounds(bounds, 50);
     }
   }, [locations]);
 
+  const onUnmount = useCallback(() => {
+    setMap(null);
+  }, []);
+
+  if (loadError) {
+    return (
+      <div className="w-full h-full bg-[#0a2020] rounded-2xl flex items-center justify-center" style={{ minHeight: "400px" }}>
+        <div className="text-white/50">Kaart kon niet geladen worden</div>
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="w-full h-full bg-[#0a2020] rounded-2xl flex items-center justify-center" style={{ minHeight: "400px" }}>
+        <div className="text-white/50">Kaart laden...</div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      ref={mapContainerRef}
-      className="w-full h-full rounded-2xl"
-      style={{ minHeight: "400px" }}
-    />
+    <GoogleMap
+      mapContainerStyle={mapContainerStyle}
+      center={center}
+      zoom={zoom}
+      onLoad={onLoad}
+      onUnmount={onUnmount}
+      options={{
+        disableDefaultUI: false,
+        zoomControl: true,
+        streetViewControl: false,
+        mapTypeControl: false,
+        fullscreenControl: true,
+        styles: darkMapStyle,
+      }}
+    >
+      {locations.map((location) => {
+        if (!location.latitude || !location.longitude) return null;
+
+        const isActive = activeInfoWindow === location.id;
+        const frequencyText = formatFrequencyDisplay(location.frequency, location.days_of_week || []);
+
+        return (
+          <MarkerF
+            key={location.id}
+            position={{ lat: location.latitude, lng: location.longitude }}
+            icon={createIftarMarkerIcon(isActive)}
+            onClick={() => setActiveInfoWindow(location.id)}
+            zIndex={isActive ? 1000 : 1}
+          >
+            {isActive && (
+              <InfoWindowF
+                position={{ lat: location.latitude, lng: location.longitude }}
+                onCloseClick={() => setActiveInfoWindow(null)}
+              >
+                <div className="p-2 min-w-[220px] max-w-[280px]">
+                  <h3 className="font-semibold text-base text-[#0f2d2d] mb-1">
+                    {location.mosque_name}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {location.address}, {location.city}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full text-xs font-medium">
+                      {location.iftar_time || "Tijd onbekend"}
+                    </span>
+                    <span className="px-2 py-0.5 bg-teal/10 text-teal rounded-full text-xs font-medium">
+                      {frequencyText}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {location.is_free && (
+                      <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
+                        Gratis
+                      </span>
+                    )}
+                    {location.capacity && (
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs">
+                        {location.capacity} pers.
+                      </span>
+                    )}
+                    {location.for_men && (
+                      <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">M</span>
+                    )}
+                    {location.for_women && (
+                      <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">V</span>
+                    )}
+                    {location.for_families && (
+                      <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">Gezin</span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-100">
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${location.address}, ${location.city}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-teal text-white text-xs rounded-full hover:bg-teal/90"
+                    >
+                      <Navigation className="w-3 h-3" />
+                      Route
+                    </a>
+                    {location.registration_url && (
+                      <a
+                        href={location.registration_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-amber-500 text-white text-xs rounded-full hover:bg-amber-600"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Inschrijven
+                      </a>
+                    )}
+                    {location.website_url && (
+                      <a
+                        href={location.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200"
+                      >
+                        <Globe className="w-3 h-3" />
+                      </a>
+                    )}
+                    {location.facebook_url && (
+                      <a
+                        href={location.facebook_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full hover:bg-blue-200"
+                      >
+                        <Facebook className="w-3 h-3" />
+                      </a>
+                    )}
+                    {location.instagram_url && (
+                      <a
+                        href={location.instagram_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-pink-100 text-pink-700 text-xs rounded-full hover:bg-pink-200"
+                      >
+                        <Instagram className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </InfoWindowF>
+            )}
+          </MarkerF>
+        );
+      })}
+    </GoogleMap>
   );
 }

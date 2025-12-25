@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { useCallback, useState } from "react";
+import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from "@react-google-maps/api";
+import { Navigation } from "lucide-react";
 
 interface Mosque {
   id: string;
@@ -21,145 +21,166 @@ interface MosqueMapComponentProps {
   onMosqueSelect?: (mosque: Mosque) => void;
 }
 
-// Custom mosque icon - mosque silhouette with dome and minaret
-const createMosqueIcon = (isSelected: boolean) => {
-  const size = isSelected ? 44 : 36;
-  return L.divIcon({
-    className: "custom-mosque-marker",
-    html: `
-      <div style="
-        width: ${size}px;
-        height: ${size}px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        transition: all 0.2s;
-      ">
-        <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 64 64">
-          <!-- Background circle -->
-          <circle cx="32" cy="32" r="30" fill="${isSelected ? "#d4af37" : "#0d9488"}" stroke="white" stroke-width="3"/>
-          <!-- Mosque building -->
-          <g fill="white">
-            <!-- Main dome -->
-            <path d="M32 14c-6 0-11 4-11 9v2h22v-2c0-5-5-9-11-9z"/>
-            <!-- Dome crescent -->
-            <circle cx="32" cy="13" r="2"/>
-            <path d="M32 10l1 2h-2z"/>
-            <!-- Building body -->
-            <rect x="21" y="25" width="22" height="18" rx="1"/>
-            <!-- Door -->
-            <path d="M28 43v-10c0-2.2 1.8-4 4-4s4 1.8 4 4v10h-8z"/>
-            <!-- Left minaret -->
-            <rect x="16" y="20" width="4" height="23"/>
-            <path d="M18 15c-1.5 0-3 1.5-3 3v2h6v-2c0-1.5-1.5-3-3-3z"/>
-            <circle cx="18" cy="14" r="1.5"/>
-            <!-- Right minaret -->
-            <rect x="44" y="20" width="4" height="23"/>
-            <path d="M46 15c-1.5 0-3 1.5-3 3v2h6v-2c0-1.5-1.5-3-3-3z"/>
-            <circle cx="46" cy="14" r="1.5"/>
-            <!-- Windows -->
-            <circle cx="26" cy="32" r="2"/>
-            <circle cx="38" cy="32" r="2"/>
-          </g>
-        </svg>
-      </div>
-    `,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size],
-    popupAnchor: [0, -size],
-  });
+const mapContainerStyle = {
+  width: "100%",
+  height: "100%",
+};
+
+// Center of Gent
+const center = {
+  lat: 51.0543,
+  lng: 3.7174,
+};
+
+const mapOptions: google.maps.MapOptions = {
+  disableDefaultUI: false,
+  zoomControl: true,
+  streetViewControl: false,
+  mapTypeControl: false,
+  fullscreenControl: true,
+  styles: [
+    {
+      featureType: "poi",
+      elementType: "labels",
+      stylers: [{ visibility: "off" }],
+    },
+    {
+      featureType: "transit",
+      elementType: "labels",
+      stylers: [{ visibility: "off" }],
+    },
+  ],
+};
+
+// Simple mosque marker icon as SVG data URL
+const createMosqueMarkerIcon = (isSelected: boolean) => {
+  const color = isSelected ? "#d4af37" : "#0d9488";
+  const size = isSelected ? 40 : 32;
+
+  // Simple, clean mosque icon - just a dome shape
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 32 32">
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.3"/>
+        </filter>
+      </defs>
+      <g filter="url(%23shadow)">
+        <!-- Pin shape -->
+        <path d="M16 2C10.48 2 6 6.48 6 12c0 7.5 10 17 10 17s10-9.5 10-17c0-5.52-4.48-10-10-10z" fill="${color}"/>
+        <!-- Inner circle -->
+        <circle cx="16" cy="12" r="6" fill="white"/>
+        <!-- Simple mosque dome -->
+        <path d="M16 8c-2.5 0-4.5 1.5-4.5 3.5v2.5h9v-2.5c0-2-2-3.5-4.5-3.5z" fill="${color}"/>
+        <!-- Crescent on top -->
+        <circle cx="16" cy="8" r="1" fill="${color}"/>
+      </g>
+    </svg>
+  `;
+
+  return {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    scaledSize: new google.maps.Size(size, size),
+    anchor: new google.maps.Point(size / 2, size),
+  };
 };
 
 export default function MosqueMapComponent({ mosques, selectedMosqueId, onMosqueSelect }: MosqueMapComponentProps) {
-  const mapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<L.Marker[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeInfoWindow, setActiveInfoWindow] = useState<string | null>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
 
-  // Center of Gent
-  const center: [number, number] = [51.0543, 3.7174];
-  const zoom = 13;
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+  });
 
-  useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
+  const onLoad = useCallback((map: google.maps.Map) => {
+    setMap(map);
 
-    // Initialize map
-    mapRef.current = L.map(containerRef.current, {
-      center,
-      zoom,
-      zoomControl: true,
-    });
-
-    // Add tile layer
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(mapRef.current);
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, []);
-
-  // Update markers when mosques or selection changes
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    // Remove existing markers
-    markersRef.current.forEach((marker) => marker.remove());
-    markersRef.current = [];
-
-    // Add new markers
+    // Fit bounds to show all mosques
     const mosquesWithCoords = mosques.filter((m) => m.latitude && m.longitude);
-
-    mosquesWithCoords.forEach((mosque) => {
-      if (!mosque.latitude || !mosque.longitude || !mapRef.current) return;
-
-      const isSelected = mosque.id === selectedMosqueId;
-      const marker = L.marker([mosque.latitude, mosque.longitude], {
-        icon: createMosqueIcon(isSelected),
-      });
-
-      marker.bindPopup(`
-        <div style="min-width: 200px;">
-          <h3 style="font-weight: 600; margin-bottom: 4px; color: #0d9488;">${mosque.name}</h3>
-          <p style="font-size: 13px; color: #666;">${mosque.fullAddress}</p>
-          <a
-            href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mosque.fullAddress)}"
-            target="_blank"
-            rel="noopener noreferrer"
-            style="display: inline-block; margin-top: 8px; padding: 6px 12px; background: #0d9488; color: white; border-radius: 6px; text-decoration: none; font-size: 12px;"
-          >
-            Route plannen
-          </a>
-        </div>
-      `);
-
-      marker.on("click", () => {
-        if (onMosqueSelect) {
-          onMosqueSelect(mosque);
+    if (mosquesWithCoords.length > 0) {
+      const bounds = new google.maps.LatLngBounds();
+      mosquesWithCoords.forEach((mosque) => {
+        if (mosque.latitude && mosque.longitude) {
+          bounds.extend({ lat: mosque.latitude, lng: mosque.longitude });
         }
       });
-
-      marker.addTo(mapRef.current!);
-      markersRef.current.push(marker);
-
-      // Open popup if selected
-      if (isSelected) {
-        marker.openPopup();
-      }
-    });
-
-    // Fit bounds if there are markers
-    if (mosquesWithCoords.length > 0) {
-      const bounds = L.latLngBounds(
-        mosquesWithCoords.map((m) => [m.latitude!, m.longitude!] as [number, number])
-      );
-      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+      map.fitBounds(bounds, 50);
     }
-  }, [mosques, selectedMosqueId, onMosqueSelect]);
+  }, [mosques]);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  const onUnmount = useCallback(() => {
+    setMap(null);
+  }, []);
+
+  const handleMarkerClick = (mosque: Mosque) => {
+    setActiveInfoWindow(mosque.id);
+    if (onMosqueSelect) {
+      onMosqueSelect(mosque);
+    }
+  };
+
+  if (loadError) {
+    return (
+      <div className="w-full h-full bg-[#0a2020] rounded-2xl flex items-center justify-center">
+        <div className="text-white/50">Kaart kon niet geladen worden</div>
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div className="w-full h-full bg-[#0a2020] rounded-2xl flex items-center justify-center">
+        <div className="text-white/50">Kaart laden...</div>
+      </div>
+    );
+  }
+
+  const mosquesWithCoords = mosques.filter((m) => m.latitude && m.longitude);
+
+  return (
+    <GoogleMap
+      mapContainerStyle={mapContainerStyle}
+      center={center}
+      zoom={13}
+      onLoad={onLoad}
+      onUnmount={onUnmount}
+      options={mapOptions}
+    >
+      {mosquesWithCoords.map((mosque) => (
+        <MarkerF
+          key={mosque.id}
+          position={{ lat: mosque.latitude!, lng: mosque.longitude! }}
+          icon={createMosqueMarkerIcon(mosque.id === selectedMosqueId || mosque.id === activeInfoWindow)}
+          onClick={() => handleMarkerClick(mosque)}
+          zIndex={mosque.id === selectedMosqueId ? 1000 : 1}
+        >
+          {activeInfoWindow === mosque.id && (
+            <InfoWindowF
+              position={{ lat: mosque.latitude!, lng: mosque.longitude! }}
+              onCloseClick={() => setActiveInfoWindow(null)}
+            >
+              <div className="p-2 min-w-[200px]">
+                <h3 className="font-semibold text-base text-teal mb-1">
+                  {mosque.name}
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  {mosque.fullAddress}
+                </p>
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mosque.fullAddress)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal text-white text-sm rounded-full hover:bg-teal/90 transition-colors"
+                >
+                  <Navigation className="w-3.5 h-3.5" />
+                  Route
+                </a>
+              </div>
+            </InfoWindowF>
+          )}
+        </MarkerF>
+      ))}
+    </GoogleMap>
+  );
 }
