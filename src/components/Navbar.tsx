@@ -7,13 +7,10 @@ import Image from "next/image";
 
 const navLinks = [
   { href: "#verhaal", label: "Over ons" },
-  { href: "#sfeerbeelden", label: "Sfeerbeelden" },
-  { href: "#route", label: "Route" },
-  { href: "/iftar", label: "Iftarkaart" },
-  { href: "/moskeeen", label: "Moskeeën" },
+  { href: "/iftar", label: "Iftarkaart", highlight: true },
+  { href: "/moskeeen", label: "Moskeeën", highlight: true },
   { href: "#sponsors", label: "Sponsors" },
   { href: "#doneren", label: "Doneren" },
-  { href: "#contact", label: "Contact" },
 ];
 
 export function Navbar() {
@@ -65,9 +62,13 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`text-sm font-medium transition-colors ${
-                  isScrolled
-                    ? "text-text-secondary hover:text-teal"
-                    : "text-white/90 hover:text-white"
+                  link.highlight
+                    ? isScrolled
+                      ? "text-teal font-semibold bg-teal/10 px-3 py-1.5 rounded-full hover:bg-teal/20"
+                      : "text-white font-semibold bg-white/20 px-3 py-1.5 rounded-full hover:bg-white/30"
+                    : isScrolled
+                      ? "text-text-secondary hover:text-teal"
+                      : "text-white/90 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -103,7 +104,11 @@ export function Navbar() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="block px-4 py-3 text-text-secondary hover:text-teal hover:bg-surface-soft rounded-xl transition-colors font-medium"
+                  className={`block px-4 py-3 rounded-xl transition-colors font-medium ${
+                    link.highlight
+                      ? "text-teal font-semibold bg-teal/10 hover:bg-teal/20"
+                      : "text-text-secondary hover:text-teal hover:bg-surface-soft"
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}

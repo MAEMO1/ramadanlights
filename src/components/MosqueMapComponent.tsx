@@ -52,45 +52,25 @@ const mapOptions: google.maps.MapOptions = {
   ],
 };
 
-// Beautiful mosque marker icon
+// Clean, minimal mosque marker
 const createMosqueMarkerIcon = (isSelected: boolean) => {
-  const size = isSelected ? 56 : 48;
+  const size = isSelected ? 44 : 38;
   const color = isSelected ? "#d4af37" : "#0d9488";
 
   const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 12}" viewBox="0 0 48 60">
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 40 40">
       <defs>
-        <filter id="shadow" x="-30%" y="-20%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.35"/>
+        <filter id="s" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
         </filter>
-        <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style="stop-color:${isSelected ? '#f0d060' : '#14b8a6'};stop-opacity:1" />
-          <stop offset="100%" style="stop-color:${color};stop-opacity:1" />
-        </linearGradient>
       </defs>
-      <g filter="url(%23shadow)">
-        <!-- Pin body -->
-        <path d="M24 4C14.06 4 6 12.06 6 22c0 14 18 32 18 32s18-18 18-32c0-9.94-8.06-18-18-18z" fill="url(%23grad)"/>
-        <!-- White inner circle -->
-        <circle cx="24" cy="20" r="12" fill="white"/>
-        <!-- Mosque silhouette -->
+      <g filter="url(%23s)">
+        <circle cx="20" cy="20" r="16" fill="${color}"/>
+        <circle cx="20" cy="20" r="13" fill="white"/>
         <g fill="${color}">
-          <!-- Central dome -->
-          <ellipse cx="24" cy="17" rx="6" ry="4"/>
-          <!-- Crescent on dome -->
-          <circle cx="24" cy="13" r="1.5"/>
-          <!-- Building base -->
-          <rect x="16" y="20" width="16" height="8" rx="1"/>
-          <!-- Door -->
-          <path d="M22 28v-5a2 2 0 0 1 4 0v5" fill="white"/>
-          <!-- Left minaret -->
-          <rect x="13" y="16" width="3" height="12"/>
-          <ellipse cx="14.5" cy="15" rx="2" ry="1.5"/>
-          <circle cx="14.5" cy="13.5" r="1"/>
-          <!-- Right minaret -->
-          <rect x="32" y="16" width="3" height="12"/>
-          <ellipse cx="33.5" cy="15" rx="2" ry="1.5"/>
-          <circle cx="33.5" cy="13.5" r="1"/>
+          <path d="M20 10 L20 8 M19 9 L21 9" stroke="${color}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M20 11c-4 0-7 2.5-7 5.5v8h14v-8c0-3-3-5.5-7-5.5z"/>
+          <rect x="18" y="20" width="4" height="5" rx="2" fill="white"/>
         </g>
       </g>
     </svg>
@@ -98,8 +78,8 @@ const createMosqueMarkerIcon = (isSelected: boolean) => {
 
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    scaledSize: new google.maps.Size(size, size + 12),
-    anchor: new google.maps.Point(size / 2, size + 12),
+    scaledSize: new google.maps.Size(size, size),
+    anchor: new google.maps.Point(size / 2, size / 2),
   };
 };
 
