@@ -88,6 +88,7 @@ function getRamadanDays(): Date[] {
 export function IftarCalendar({ locations }: IftarCalendarProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("week");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedIftar, setSelectedIftar] = useState<IftarLocation | null>(null);
   const [startDate, setStartDate] = useState(() => {
     // Start with today if within Ramadan, otherwise start of Ramadan
     const today = new Date();
@@ -370,23 +371,24 @@ export function IftarCalendar({ locations }: IftarCalendarProps) {
                       </p>
                     ) : (
                       iftarsForDay.map((iftar) => (
-                        <div
+                        <button
                           key={iftar.id}
-                          className="p-2 bg-surface-soft rounded-lg text-xs"
+                          onClick={() => setSelectedIftar(iftar)}
+                          className="w-full p-2 bg-surface-soft rounded-lg text-xs text-left hover:bg-teal/10 hover:ring-1 hover:ring-teal/30 transition-all cursor-pointer"
                         >
                           <div className="font-semibold text-text-primary truncate">
                             {iftar.mosque_name}
                           </div>
                           <div className="flex items-center gap-1 text-text-muted mt-1">
                             <Clock className="w-3 h-3" />
-                            <span>{iftar.iftar_time}</span>
+                            <span>{iftar.iftar_time || "Tijd onbekend"}</span>
                           </div>
                           {iftar.is_free && (
                             <span className="inline-block mt-1 px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-[10px] font-medium">
                               Gratis
                             </span>
                           )}
-                        </div>
+                        </button>
                       ))
                     )}
                   </div>
@@ -415,6 +417,159 @@ export function IftarCalendar({ locations }: IftarCalendarProps) {
           <Calendar className="w-4 h-4 inline-block mr-1" />
           Ramadan 2026: 17 februari - 19 maart
         </motion.div>
+
+        {/* Iftar Detail Modal (for 3days/week view) */}
+        <AnimatePresence>
+          {selectedIftar && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+              onClick={() => setSelectedIftar(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white rounded-2xl max-w-md w-full max-h-[80vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Modal header */}
+                <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-teal/5">
+                  <div>
+                    <div className="text-xl font-bold text-text-primary">
+                      {selectedIftar.mosque_name}
+                    </div>
+                    <div className="text-sm text-text-muted">
+                      {selectedIftar.address}, {selectedIftar.city}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedIftar(null)}
+                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Modal content */}
+                <div className="p-4 space-y-4">
+                  {/* Time and frequency */}
+                  <div className="flex flex-wrap gap-3">
+                    <div className="flex items-center gap-2 px-3 py-2 bg-teal/10 rounded-xl">
+                      <Clock className="w-5 h-5 text-teal" />
+                      <span className="font-semibold text-teal">
+                        {selectedIftar.iftar_time || "Tijd onbekend"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 rounded-xl">
+                      <Calendar className="w-4 h-4 text-amber-600" />
+                      <span className="text-sm font-medium text-amber-700">
+                        {formatFrequencyDisplay(selectedIftar.frequency, selectedIftar.days_of_week || [])}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2">
+                    {selectedIftar.is_free && (
+                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                        Gratis
+                      </span>
+                    )}
+                    {!selectedIftar.is_free && selectedIftar.price_info && (
+                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                        {selectedIftar.price_info}
+                      </span>
+                    )}
+                    {selectedIftar.capacity && (
+                      <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                        {selectedIftar.capacity} personen
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Accessibility */}
+                  <div className="flex flex-wrap gap-2">
+                    {selectedIftar.for_men && (
+                      <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
+                        Mannen
+                      </span>
+                    )}
+                    {selectedIftar.for_women && (
+                      <span className="px-2 py-1 bg-pink-50 text-pink-700 text-xs rounded-full">
+                        Vrouwen
+                      </span>
+                    )}
+                    {selectedIftar.for_families && (
+                      <span className="px-2 py-1 bg-purple-50 text-purple-700 text-xs rounded-full">
+                        Gezinnen
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Description */}
+                  {selectedIftar.description && (
+                    <p className="text-sm text-text-muted">
+                      {selectedIftar.description}
+                    </p>
+                  )}
+
+                  {/* Links */}
+                  {(selectedIftar.registration_url || selectedIftar.website_url || selectedIftar.facebook_url || selectedIftar.instagram_url) && (
+                    <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                      {selectedIftar.registration_url && (
+                        <a
+                          href={selectedIftar.registration_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal text-white text-sm rounded-full hover:bg-teal/90 transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Inschrijven
+                        </a>
+                      )}
+                      {selectedIftar.website_url && (
+                        <a
+                          href={selectedIftar.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-gray-200 transition-colors"
+                        >
+                          <Globe className="w-4 h-4" />
+                          Website
+                        </a>
+                      )}
+                      {selectedIftar.facebook_url && (
+                        <a
+                          href={selectedIftar.facebook_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-100 text-blue-700 text-sm rounded-full hover:bg-blue-200 transition-colors"
+                        >
+                          <Facebook className="w-4 h-4" />
+                          Facebook
+                        </a>
+                      )}
+                      {selectedIftar.instagram_url && (
+                        <a
+                          href={selectedIftar.instagram_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-pink-100 text-pink-700 text-sm rounded-full hover:bg-pink-200 transition-colors"
+                        >
+                          <Instagram className="w-4 h-4" />
+                          Instagram
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Day Detail Modal (for month view) */}
         <AnimatePresence>
