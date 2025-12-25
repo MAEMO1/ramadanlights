@@ -10,11 +10,10 @@ export function Hero() {
       {/* Full-width background image */}
       <div className="absolute inset-0">
         <Image
-          src="/assets/images/ramadan-lights-gent.jpg"
+          src="/assets/images/ramadan_verlichting_final.jpg"
           alt="Ramadanverlichting in Gent"
           fill
           className="object-cover"
-          style={{ objectPosition: "100% center" }}
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />

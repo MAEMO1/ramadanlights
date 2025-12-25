@@ -7,7 +7,7 @@ import Image from "next/image";
 
 const images = [
   {
-    src: "/assets/images/ramadan-lights-gent.jpg",
+    src: "/assets/images/ramadan_verlichting_final.jpg",
     alt: "Ramadanverlichting Sleepstraat Gent",
   },
 ];
@@ -65,7 +65,6 @@ export function Gallery() {
                 alt={image.alt}
                 fill
                 className="object-cover"
-                style={{ objectPosition: "100% center" }}
               />
             </div>
           ))}
