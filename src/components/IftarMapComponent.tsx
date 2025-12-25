@@ -20,15 +20,29 @@ const mapContainerStyle = {
   borderRadius: "1rem",
 };
 
-// Clean light map style
-const lightMapStyle: google.maps.MapTypeStyle[] = [
-  { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+// Dark teal map style (matching mosques page)
+const darkTealMapStyle: google.maps.MapTypeStyle[] = [
   {
-    featureType: "administrative.locality",
+    elementType: "geometry",
+    stylers: [{ color: "#1d3d3d" }],
+  },
+  {
+    elementType: "labels.text.stroke",
+    stylers: [{ color: "#1d3d3d" }],
+  },
+  {
     elementType: "labels.text.fill",
-    stylers: [{ color: "#1a1a1a" }],
+    stylers: [{ color: "#8ec3c3" }],
+  },
+  {
+    featureType: "administrative",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#2d5a5a" }],
+  },
+  {
+    featureType: "administrative.land_parcel",
+    elementType: "labels.text.fill",
+    stylers: [{ color: "#5a8a8a" }],
   },
   {
     featureType: "poi",
@@ -36,24 +50,29 @@ const lightMapStyle: google.maps.MapTypeStyle[] = [
     stylers: [{ visibility: "off" }],
   },
   {
-    featureType: "poi.park",
+    featureType: "poi",
     elementType: "geometry",
-    stylers: [{ color: "#e5e5e5" }],
+    stylers: [{ color: "#243f3f" }],
   },
   {
     featureType: "road",
     elementType: "geometry",
-    stylers: [{ color: "#ffffff" }],
+    stylers: [{ color: "#2a4f4f" }],
   },
   {
     featureType: "road",
-    elementType: "labels.text.fill",
-    stylers: [{ color: "#9e9e9e" }],
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#1f3a3a" }],
   },
   {
     featureType: "road.highway",
     elementType: "geometry",
-    stylers: [{ color: "#dadada" }],
+    stylers: [{ color: "#3a6363" }],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry.stroke",
+    stylers: [{ color: "#2a4f4f" }],
   },
   {
     featureType: "transit",
@@ -61,26 +80,46 @@ const lightMapStyle: google.maps.MapTypeStyle[] = [
     stylers: [{ visibility: "off" }],
   },
   {
+    featureType: "transit.line",
+    elementType: "geometry",
+    stylers: [{ color: "#2a4f4f" }],
+  },
+  {
     featureType: "water",
     elementType: "geometry",
-    stylers: [{ color: "#c9c9c9" }],
+    stylers: [{ color: "#0f2828" }],
   },
   {
     featureType: "water",
     elementType: "labels.text.fill",
-    stylers: [{ color: "#9e9e9e" }],
+    stylers: [{ color: "#4a7a7a" }],
   },
 ];
 
 // Elegant drop-pin marker for iftar locations
 const createIftarMarkerIcon = (isSelected: boolean) => {
-  const scale = isSelected ? 1.15 : 1;
-  const width = Math.round(36 * scale);
-  const height = Math.round(48 * scale);
-  const teal = "#2d9596";
-  const white = "#ffffff";
+  const scale = isSelected ? 1.2 : 1;
+  const width = Math.round(40 * scale);
+  const height = Math.round(52 * scale);
+  const color = isSelected ? "#d4af37" : "#2d9596";
+  const colorDark = isSelected ? "#b8962f" : "#1f6b6c";
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 36 48"><defs><filter id="ds" x="-50%" y="-30%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/></filter></defs><g filter="url(%23ds)"><path d="M18 47c0 0-15-17-15-29C3 9.72 9.72 3 18 3s15 6.72 15 15c0 12-15 29-15 29z" fill="${teal}"/><circle cx="18" cy="18" r="10" fill="${white}"/><text x="18" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="${teal}">☪</text></g></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 40 52">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="${color}" flood-opacity="0.4"/>
+      </filter>
+      <linearGradient id="pinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:${color};stop-opacity:1" />
+        <stop offset="100%" style="stop-color:${colorDark};stop-opacity:1" />
+      </linearGradient>
+    </defs>
+    <g filter="url(%23glow)">
+      <path d="M20 50c0 0-17-19-17-32C3 9.16 10.16 2 20 2s17 7.16 17 16c0 13-17 32-17 32z" fill="url(%23pinGrad)"/>
+      <circle cx="20" cy="18" r="11" fill="white"/>
+      <text x="20" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="${color}">☪</text>
+    </g>
+  </svg>`;
 
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
@@ -113,7 +152,7 @@ export default function IftarMapComponent({
           bounds.extend({ lat: location.latitude, lng: location.longitude });
         }
       });
-      map.fitBounds(bounds, 50);
+      map.fitBounds(bounds, 80);
     }
   }, [locations]);
 
@@ -150,7 +189,8 @@ export default function IftarMapComponent({
         streetViewControl: false,
         mapTypeControl: false,
         fullscreenControl: true,
-        styles: lightMapStyle,
+        styles: darkTealMapStyle,
+        maxZoom: 15,
       }}
     >
       {locations.map((location) => {

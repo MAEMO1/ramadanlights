@@ -134,7 +134,7 @@ export function IftarCalendar({ locations }: IftarCalendarProps) {
   const selectedDayIftars = selectedDate ? getIftarsForDate(locations, selectedDate) : [];
 
   return (
-    <section className="bg-white section-padding">
+    <section className="bg-[#f8fafa] section-padding">
       <div className="section-container">
         {/* Header */}
         <div className="mb-8">

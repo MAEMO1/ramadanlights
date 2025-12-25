@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { MapPin, Navigation, Search, Map, List, ArrowRight } from "lucide-react";
+import { MapPin, Navigation, Search, Map, LayoutGrid, ArrowRight, X } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const MosqueMapComponent = dynamic(() => import("@/components/MosqueMapComponent"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-gray-100 rounded-2xl flex items-center justify-center">
-      <div className="text-text-muted">Kaart laden...</div>
+    <div className="w-full h-full bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center gap-3 text-text-muted">
+        <div className="w-5 h-5 border-2 border-teal/30 border-t-teal rounded-full animate-spin" />
+        <span>Kaart laden...</span>
+      </div>
     </div>
   ),
 });
@@ -69,7 +72,7 @@ export default function MosquePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 bg-[#0f2d2d]">
+      <section className="pt-32 pb-20 bg-[#0f2d2d]">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -103,89 +106,106 @@ export default function MosquePage() {
       {/* Main Content Section */}
       <section id="mosques-content" className="bg-off-white section-padding">
         <div className="section-container">
-          {/* Header with title and controls */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
-            <div>
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="heading-section mb-2"
-              >
-                Alle moskeeën
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="text-body"
-              >
-                {filteredMosques.length} moskee{filteredMosques.length !== 1 ? "ën" : ""}
-                {searchQuery && ` gevonden voor "${searchQuery}"`}
-              </motion.p>
-            </div>
-
-            {/* Controls */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.15 }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
-                <input
-                  type="text"
-                  placeholder="Zoeken..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input-field pl-12 w-full sm:w-64"
-                />
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-8"
+          >
+            {/* Title row */}
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+              <div>
+                <h2 className="heading-section">Alle moskeeën</h2>
+                <p className="text-text-muted mt-1">
+                  {isLoading ? "Laden..." : `${filteredMosques.length} locatie${filteredMosques.length !== 1 ? "s" : ""}`}
+                  {searchQuery && !isLoading && (
+                    <span className="text-text-muted/70"> voor &ldquo;{searchQuery}&rdquo;</span>
+                  )}
+                </p>
               </div>
 
-              {/* View Toggle */}
-              <div className="flex rounded-xl overflow-hidden border border-gray-200 bg-white">
+              {/* Segmented Control - Apple style */}
+              <div className="inline-flex p-1 bg-gray-100 rounded-lg">
                 <button
                   onClick={() => setViewMode("map")}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all ${
+                  className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                     viewMode === "map"
-                      ? "bg-teal text-white"
-                      : "bg-white text-text-secondary hover:bg-gray-50"
+                      ? "text-text-primary"
+                      : "text-text-muted hover:text-text-secondary"
                   }`}
                 >
-                  <Map className="w-4 h-4" />
-                  Kaart
+                  {viewMode === "map" && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute inset-0 bg-white rounded-md shadow-sm"
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                    />
+                  )}
+                  <Map className="w-4 h-4 relative z-10" />
+                  <span className="relative z-10">Kaart</span>
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all border-l border-gray-200 ${
+                  className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                     viewMode === "list"
-                      ? "bg-teal text-white"
-                      : "bg-white text-text-secondary hover:bg-gray-50"
+                      ? "text-text-primary"
+                      : "text-text-muted hover:text-text-secondary"
                   }`}
                 >
-                  <List className="w-4 h-4" />
-                  Lijst
+                  {viewMode === "list" && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute inset-0 bg-white rounded-md shadow-sm"
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                    />
+                  )}
+                  <LayoutGrid className="w-4 h-4 relative z-10" />
+                  <span className="relative z-10">Lijst</span>
                 </button>
               </div>
-            </motion.div>
-          </div>
+            </div>
 
+            {/* Search bar */}
+            <div className="relative max-w-sm">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+              <input
+                type="text"
+                placeholder="Zoek moskee..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-11 pr-10 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal/30 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text-primary transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Content */}
           {isLoading ? (
-            <div className="h-[500px] bg-white rounded-2xl flex items-center justify-center shadow-sm">
-              <div className="text-text-muted">Locaties laden...</div>
+            <div className="h-[500px] bg-white rounded-2xl border border-gray-100 flex items-center justify-center">
+              <div className="flex items-center gap-3 text-text-muted">
+                <div className="w-5 h-5 border-2 border-teal/30 border-t-teal rounded-full animate-spin" />
+                <span>Locaties laden...</span>
+              </div>
             </div>
           ) : (
-            <>
+            <AnimatePresence mode="wait">
               {/* Map View */}
               {viewMode === "map" && (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="rounded-2xl overflow-hidden shadow-lg"
+                  key="map"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
                   style={{ height: "600px" }}
                 >
                   {mosquesWithCoords.length > 0 ? (
@@ -195,14 +215,14 @@ export default function MosquePage() {
                       onMosqueSelect={setSelectedMosque}
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center">
-                      <p className="text-text-muted mb-4">Geen moskeeën gevonden</p>
+                    <div className="w-full h-full bg-gray-50 flex flex-col items-center justify-center">
+                      <p className="text-text-muted mb-3">Geen moskeeën gevonden</p>
                       {searchQuery && (
                         <button
                           onClick={() => setSearchQuery("")}
-                          className="text-teal hover:underline text-sm"
+                          className="text-teal text-sm hover:underline"
                         >
-                          Zoekfilter wissen
+                          Zoekopdracht wissen
                         </button>
                       )}
                     </div>
@@ -212,71 +232,72 @@ export default function MosquePage() {
 
               {/* List View */}
               {viewMode === "list" && (
-                <>
+                <motion.div
+                  key="list"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
                   {filteredMosques.length === 0 ? (
-                    <div className="bg-white rounded-2xl shadow-sm py-16 text-center">
-                      <p className="text-text-muted text-lg mb-4">
-                        Geen moskeeën gevonden{searchQuery && ` voor "${searchQuery}"`}
+                    <div className="bg-white rounded-2xl border border-gray-100 py-16 text-center">
+                      <p className="text-text-muted mb-3">
+                        Geen moskeeën gevonden
                       </p>
                       {searchQuery && (
                         <button
                           onClick={() => setSearchQuery("")}
-                          className="text-teal hover:underline"
+                          className="text-teal text-sm hover:underline"
                         >
-                          Zoekfilter wissen
+                          Zoekopdracht wissen
                         </button>
                       )}
                     </div>
                   ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-                    >
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
                       {filteredMosques.map((mosque, index) => (
-                        <motion.div
+                        <motion.article
                           key={mosque.id}
-                          initial={{ opacity: 0, y: 20 }}
+                          initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.03 }}
-                          className={`card hover:shadow-lg transition-all cursor-pointer ${
-                            selectedMosque?.id === mosque.id ? "ring-2 ring-teal" : ""
+                          className={`group bg-white rounded-2xl border border-gray-100 p-6 hover:border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer ${
+                            selectedMosque?.id === mosque.id ? "ring-2 ring-teal border-transparent" : ""
                           }`}
                           onClick={() => setSelectedMosque(mosque)}
                         >
-                          <div className="mb-4">
-                            <h3 className="font-display font-semibold text-lg text-text-primary mb-1">
-                              {mosque.name}
-                            </h3>
-                            <div className="flex items-start gap-2 text-text-muted text-sm">
-                              <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                              <span>{mosque.fullAddress}</span>
-                            </div>
-                          </div>
+                          {/* Name & Address */}
+                          <h3 className="font-display font-semibold text-text-primary mb-2 group-hover:text-teal transition-colors">
+                            {mosque.name}
+                          </h3>
+                          <p className="flex items-start gap-2 text-text-muted text-sm mb-5">
+                            <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-text-muted/50" />
+                            <span>{mosque.fullAddress}</span>
+                          </p>
 
-                          <div className="flex items-center justify-between">
-                            <span className="px-3 py-1 bg-teal/10 text-teal text-sm font-medium rounded-full">
+                          {/* Footer */}
+                          <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                            <span className="text-xs font-medium text-teal bg-teal/8 px-2.5 py-1 rounded-full">
                               {mosque.city}
                             </span>
-
                             <a
                               href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mosque.fullAddress)}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-teal text-sm font-medium hover:underline"
+                              className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-teal transition-colors"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <Navigation className="w-4 h-4" />
+                              <Navigation className="w-3.5 h-3.5" />
                               Route
                             </a>
                           </div>
-                        </motion.div>
+                        </motion.article>
                       ))}
-                    </motion.div>
+                    </div>
                   )}
-                </>
+                </motion.div>
               )}
-            </>
+            </AnimatePresence>
           )}
         </div>
       </section>

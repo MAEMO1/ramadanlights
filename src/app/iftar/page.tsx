@@ -76,10 +76,13 @@ export default function IftarPage() {
       {/* Map Section */}
       <div id="iftar-map">
         {isLoading ? (
-          <section className="bg-off-white section-padding">
+          <section className="bg-[#0f2d2d] section-padding">
             <div className="section-container">
-              <div className="h-[500px] bg-gray-100 rounded-2xl flex items-center justify-center">
-                <div className="text-text-muted">Locaties laden...</div>
+              <div className="h-[600px] bg-[#1d3d3d] rounded-2xl flex items-center justify-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 border-2 border-teal-500/30 border-t-teal-500 rounded-full animate-spin mb-4" />
+                  <div className="text-white/50">Locaties laden...</div>
+                </div>
               </div>
             </div>
           </section>
