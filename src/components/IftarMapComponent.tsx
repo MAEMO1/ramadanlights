@@ -67,35 +67,26 @@ const darkMapStyle: google.maps.MapTypeStyle[] = [
   },
 ];
 
-// Beautiful gold pin icon for iftar locations with plate/food symbol
+// Clean, minimal iftar marker with crescent
 const createIftarMarkerIcon = (isSelected: boolean) => {
-  const size = isSelected ? 56 : 48;
+  const size = isSelected ? 44 : 38;
+  const gold = "#d4af37";
+  const dark = "#0f2d2d";
 
   const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size + 12}" viewBox="0 0 48 60">
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 40 40">
       <defs>
-        <filter id="shadow" x="-30%" y="-20%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.4"/>
+        <filter id="s" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
         </filter>
-        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style="stop-color:#fcd34d;stop-opacity:1" />
-          <stop offset="100%" style="stop-color:#d4af37;stop-opacity:1" />
-        </linearGradient>
       </defs>
-      <g filter="url(%23shadow)">
-        <!-- Pin body -->
-        <path d="M24 4C14.06 4 6 12.06 6 22c0 14 18 32 18 32s18-18 18-32c0-9.94-8.06-18-18-18z" fill="url(%23goldGrad)"/>
-        <!-- Dark inner circle -->
-        <circle cx="24" cy="20" r="12" fill="#0f2d2d"/>
-        <!-- Iftar symbol: crescent moon and star -->
-        <g fill="#d4af37">
-          <!-- Crescent moon -->
-          <path d="M20 14c0 5.5 4.5 10 10 10a10 10 0 0 1-3-7c0-4.5-3-8-7-8a10 10 0 0 1 0 5z"/>
-          <!-- Star -->
-          <polygon points="30,12 31,15 34,15 31.5,17 32.5,20 30,18 27.5,20 28.5,17 26,15 29,15"/>
-          <!-- Plate/dish at bottom -->
-          <ellipse cx="24" cy="26" rx="8" ry="2.5"/>
-          <path d="M16 25c0-1 3.5-2 8-2s8 1 8 2" fill="none" stroke="#d4af37" stroke-width="1.5"/>
+      <g filter="url(%23s)">
+        <circle cx="20" cy="20" r="16" fill="${gold}"/>
+        <circle cx="20" cy="20" r="13" fill="${dark}"/>
+        <g fill="${gold}">
+          <circle cx="18" cy="18" r="7"/>
+          <circle cx="21" cy="16" r="5" fill="${dark}"/>
+          <circle cx="27" cy="13" r="1.5"/>
         </g>
       </g>
     </svg>
@@ -103,8 +94,8 @@ const createIftarMarkerIcon = (isSelected: boolean) => {
 
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    scaledSize: new google.maps.Size(size, size + 12),
-    anchor: new google.maps.Point(size / 2, size + 12),
+    scaledSize: new google.maps.Size(size, size),
+    anchor: new google.maps.Point(size / 2, size / 2),
   };
 };
 
