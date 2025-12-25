@@ -77,10 +77,10 @@ const createIftarMarkerIcon = (isSelected: boolean) => {
   const scale = isSelected ? 1.15 : 1;
   const width = Math.round(36 * scale);
   const height = Math.round(48 * scale);
-  const gold = "#d4af37";
-  const dark = "#0f2d2d";
+  const teal = "#2d9596";
+  const white = "#ffffff";
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 36 48"><defs><filter id="ds" x="-50%" y="-30%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.35"/></filter></defs><g filter="url(%23ds)"><path d="M18 47c0 0-15-17-15-29C3 9.72 9.72 3 18 3s15 6.72 15 15c0 12-15 29-15 29z" fill="${gold}"/><circle cx="18" cy="18" r="10" fill="${dark}"/><text x="18" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="${gold}">☪</text></g></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 36 48"><defs><filter id="ds" x="-50%" y="-30%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/></filter></defs><g filter="url(%23ds)"><path d="M18 47c0 0-15-17-15-29C3 9.72 9.72 3 18 3s15 6.72 15 15c0 12-15 29-15 29z" fill="${teal}"/><circle cx="18" cy="18" r="10" fill="${white}"/><text x="18" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="${teal}">☪</text></g></svg>`;
 
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
@@ -150,7 +150,7 @@ export default function IftarMapComponent({
         streetViewControl: false,
         mapTypeControl: false,
         fullscreenControl: true,
-        styles: darkMapStyle,
+        styles: lightMapStyle,
       }}
     >
       {locations.map((location) => {
