@@ -8,7 +8,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { href: "/#verhaal", label: "Over ons" },
+  { href: "/#verhaal", label: "Het project", gold: true },
   { href: "/iftar", label: "Iftarkaart", highlight: true },
   { href: "/moskeeen", label: "Moskeeën", highlight: true },
   { href: "/#sponsors", label: "Sponsors" },
@@ -99,13 +99,17 @@ export function Navbar() {
                     text-sm transition-colors
                     ${link.highlight
                       ? "px-4 py-2 bg-teal-600 text-white font-medium rounded-md hover:bg-teal-700"
-                      : isScrolled
-                        ? isActive(link.href)
-                          ? "text-gray-900 font-semibold px-3 py-2"
-                          : "text-gray-500 hover:text-gray-900 px-3 py-2"
-                        : isActive(link.href)
-                          ? "text-white font-semibold px-3 py-2"
-                          : "text-white/70 hover:text-white px-3 py-2"
+                      : link.gold
+                        ? isScrolled
+                          ? "text-gold font-semibold hover:text-gold-dark px-3 py-2"
+                          : "text-gold-light font-semibold hover:text-gold px-3 py-2"
+                        : isScrolled
+                          ? isActive(link.href)
+                            ? "text-gray-900 font-semibold px-3 py-2"
+                            : "text-gray-500 hover:text-gray-900 px-3 py-2"
+                          : isActive(link.href)
+                            ? "text-white font-semibold px-3 py-2"
+                            : "text-white/70 hover:text-white px-3 py-2"
                     }
                   `}
                 >
@@ -202,9 +206,11 @@ export function Navbar() {
                         block py-3 px-4 text-[15px] rounded-md transition-colors
                         ${link.highlight
                           ? "bg-teal-600 text-white font-medium"
-                          : isActive(link.href)
-                            ? "text-gray-900 font-semibold bg-gray-50"
-                            : "text-gray-600 hover:bg-gray-50"
+                          : link.gold
+                            ? "text-gold font-semibold hover:bg-gold/10"
+                            : isActive(link.href)
+                              ? "text-gray-900 font-semibold bg-gray-50"
+                              : "text-gray-600 hover:bg-gray-50"
                         }
                       `}
                     >
