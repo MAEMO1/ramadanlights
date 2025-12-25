@@ -122,7 +122,7 @@ export function SponsorForm() {
             <Input
               id="phone"
               type="tel"
-              label="Telefoonnummer"
+              label="Telefoonnummer *"
               placeholder="+32 XXX XX XX XX"
               error={errors.phone?.message}
               {...register("phone")}

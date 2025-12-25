@@ -20,11 +20,8 @@ export const sponsorFormSchema = z.object({
     .email("Ongeldig e-mailadres"),
   phone: z
     .string()
-    .optional()
-    .refine(
-      (val) => !val || /^[+]?[0-9\s-]{9,15}$/.test(val),
-      "Ongeldig telefoonnummer"
-    ),
+    .min(9, "Telefoonnummer moet minimaal 9 cijfers bevatten")
+    .regex(/^[+]?[0-9\s-]{9,15}$/, "Ongeldig telefoonnummer"),
   message: z
     .string()
     .max(500, "Bericht mag maximaal 500 karakters bevatten")
