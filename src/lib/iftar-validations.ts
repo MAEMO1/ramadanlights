@@ -36,12 +36,19 @@ export const iftarFormSchema = z.object({
     .optional()
     .or(z.literal("")),
   capacity: z
-    .number()
-    .int()
-    .positive("Capaciteit moet een positief getal zijn")
-    .max(10000, "Capaciteit mag maximaal 10000 zijn")
+    .union([
+      z.number().int().positive("Capaciteit moet een positief getal zijn").max(10000, "Capaciteit mag maximaal 10000 zijn"),
+      z.nan(),
+      z.literal(""),
+    ])
     .optional()
-    .nullable(),
+    .nullable()
+    .transform((val) => {
+      if (val === "" || val === null || val === undefined || (typeof val === "number" && isNaN(val))) {
+        return null;
+      }
+      return val;
+    }),
   is_free: z.boolean().default(true),
   price_info: z
     .string()
