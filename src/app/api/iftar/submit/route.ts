@@ -77,6 +77,29 @@ export async function POST(request: NextRequest) {
     // Validate form data
     const validatedData = iftarFormSchema.parse(body);
 
+    // Check for duplicate submissions (same mosque_name and address)
+    const { data: existingIftars } = await supabaseAdmin
+      .from("iftar_events")
+      .select("id, status")
+      .eq("mosque_name", validatedData.mosque_name)
+      .eq("address", validatedData.address)
+      .limit(1);
+
+    if (existingIftars && existingIftars.length > 0) {
+      const existing = existingIftars[0];
+      if (existing.status === "approved") {
+        return NextResponse.json(
+          { success: false, message: "Deze iftar locatie bestaat al en is goedgekeurd." },
+          { status: 400 }
+        );
+      } else if (existing.status === "pending") {
+        return NextResponse.json(
+          { success: false, message: "Deze iftar locatie is al ingediend en wacht op goedkeuring." },
+          { status: 400 }
+        );
+      }
+    }
+
     // Geocode the address
     const coordinates = await geocodeAddress(validatedData.address, validatedData.city);
 
