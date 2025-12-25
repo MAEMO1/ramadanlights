@@ -254,45 +254,40 @@ export default function MosquePage() {
                       )}
                     </div>
                   ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredMosques.map((mosque, index) => (
                         <motion.article
                           key={mosque.id}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.03 }}
-                          className={`group bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 cursor-pointer ${
-                            selectedMosque?.id === mosque.id ? "ring-2 ring-gold" : ""
+                          transition={{ delay: index * 0.02 }}
+                          className={`group bg-white rounded-xl p-5 cursor-pointer transition-colors ${
+                            selectedMosque?.id === mosque.id ? "ring-2 ring-teal" : "hover:bg-gray-50"
                           }`}
                           onClick={() => setSelectedMosque(mosque)}
                         >
-                          {/* Header with icon */}
-                          <div className="flex items-start gap-4 mb-4">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal to-teal-dark flex items-center justify-center text-white text-xl flex-shrink-0 shadow-lg shadow-teal/20">
-                              ☪
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-display font-semibold text-text-primary text-lg leading-tight group-hover:text-teal transition-colors">
-                                {mosque.name}
-                              </h3>
-                              <span className="text-sm text-teal font-medium">
-                                {mosque.city}
-                              </span>
-                            </div>
+                          {/* Name and city */}
+                          <div className="mb-3">
+                            <h3 className="font-display font-semibold text-text-primary leading-tight group-hover:text-teal transition-colors">
+                              {mosque.name}
+                            </h3>
+                            <span className="text-sm text-teal">
+                              {mosque.city}
+                            </span>
                           </div>
 
                           {/* Address */}
-                          <div className="flex items-start gap-2 text-text-muted text-sm mb-5">
-                            <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <p className="flex items-start gap-2 text-text-muted text-sm mb-4">
+                            <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 opacity-50" />
                             <span>{mosque.fullAddress}</span>
-                          </div>
+                          </p>
 
-                          {/* Route button */}
+                          {/* Route link */}
                           <a
                             href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mosque.fullAddress)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-teal text-white text-sm font-medium rounded-full hover:bg-teal-dark transition-colors shadow-md shadow-teal/20"
+                            className="inline-flex items-center gap-1.5 text-teal text-sm font-medium hover:underline"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Navigation className="w-4 h-4" />
