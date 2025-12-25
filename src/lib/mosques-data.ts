@@ -30,6 +30,7 @@ export const mosques: Mosque[] = [
   { id: "19", name: "Ilmihal Dernegi", address: "Dendermondsesteenweg", houseNumber: "283", city: "Gent" },
   { id: "20", name: "Afghan Attaqwa Moskee", address: "Dendermondsesteenweg", houseNumber: "417", city: "Gent" },
   { id: "21", name: "Sadique Cultureel Centrum", address: "Frans van Ryhovelaan", houseNumber: "317", city: "Gent" },
+  { id: "22", name: "Moskee Nur", address: "Phoenixstraat", houseNumber: "78", city: "Gent" },
 ];
 
 export function getFullAddress(mosque: Mosque): string {

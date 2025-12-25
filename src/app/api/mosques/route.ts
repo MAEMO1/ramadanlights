@@ -27,6 +27,7 @@ const precomputedCoordinates: Record<string, { lat: number; lng: number }> = {
   "19": { lat: 51.0539, lng: 3.7594 }, // Dendermondsesteenweg 283
   "20": { lat: 51.0556, lng: 3.7756 }, // Dendermondsesteenweg 417
   "21": { lat: 51.0367, lng: 3.7106 }, // Frans van Ryhovelaan 317
+  "22": { lat: 51.0568, lng: 3.7398 }, // Phoenixstraat 78
 };
 
 async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
