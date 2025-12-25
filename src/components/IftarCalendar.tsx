@@ -134,10 +134,23 @@ export function IftarCalendar({ locations }: IftarCalendarProps) {
   const selectedDayIftars = selectedDate ? getIftarsForDate(locations, selectedDate) : [];
 
   return (
-    <section className="bg-white section-padding">
-      <div className="section-container">
+    <section className="relative bg-white section-padding overflow-hidden">
+      {/* Transition gradient from dark map section */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#0f2d2d] to-transparent pointer-events-none" />
+
+      {/* Subtle decorative pattern */}
+      <div className="absolute top-0 right-0 w-64 h-64 opacity-[0.03] pointer-events-none">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" stroke="#2d9596" strokeWidth="0.5"/>
+          <circle cx="50" cy="50" r="35" stroke="#2d9596" strokeWidth="0.5"/>
+          <circle cx="50" cy="50" r="25" stroke="#2d9596" strokeWidth="0.5"/>
+          <path d="M50 5L50 95M5 50L95 50M15 15L85 85M85 15L15 85" stroke="#2d9596" strokeWidth="0.3"/>
+        </svg>
+      </div>
+
+      <div className="section-container relative">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 pt-8">
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

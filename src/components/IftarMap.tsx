@@ -24,18 +24,25 @@ export function IftarMap({ locations }: IftarMapProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [filters, setFilters] = useState({
-    for_men: true,
-    for_women: true,
-    for_families: true,
+    for_men: false,
+    for_women: false,
+    for_families: false,
     frequency: "all" as "all" | "daily" | "weekly" | "specific_days" | "one_time",
   });
   const [showFilters, setShowFilters] = useState(false);
 
+  // Check if any accessibility filter is active
+  const anyAccessibilityFilter = filters.for_men || filters.for_women || filters.for_families;
+
   const filteredLocations = locations.filter((loc) => {
-    // Accessibility filters
-    if (filters.for_men && !loc.for_men) return false;
-    if (filters.for_women && !loc.for_women) return false;
-    if (filters.for_families && !loc.for_families) return false;
+    // Accessibility filters (OR logic - show if matches ANY selected filter)
+    if (anyAccessibilityFilter) {
+      const matchesAccessibility =
+        (filters.for_men && loc.for_men) ||
+        (filters.for_women && loc.for_women) ||
+        (filters.for_families && loc.for_families);
+      if (!matchesAccessibility) return false;
+    }
 
     // Frequency filter
     if (filters.frequency !== "all" && loc.frequency !== filters.frequency) return false;
