@@ -9,6 +9,32 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
+// Format frequency for display
+function formatFrequency(frequency: string, daysOfWeek: string[]): string {
+  const dayLabels: Record<string, string> = {
+    monday: "Maandag",
+    tuesday: "Dinsdag",
+    wednesday: "Woensdag",
+    thursday: "Donderdag",
+    friday: "Vrijdag",
+    saturday: "Zaterdag",
+    sunday: "Zondag",
+  };
+
+  switch (frequency) {
+    case "daily":
+      return "Dagelijks";
+    case "weekly":
+    case "specific_days":
+      const days = daysOfWeek.map((d) => dayLabels[d] || d).join(", ");
+      return frequency === "weekly" ? `Wekelijks (${days})` : `Specifieke dagen: ${days}`;
+    case "one_time":
+      return "Eenmalig";
+    default:
+      return frequency;
+  }
+}
+
 // Geocode address using OpenStreetMap Nominatim
 async function geocodeAddress(address: string, city: string): Promise<{ lat: number; lng: number } | null> {
   try {
@@ -61,7 +87,7 @@ export async function POST(request: NextRequest) {
         mosque_name: validatedData.mosque_name,
         address: validatedData.address,
         city: validatedData.city,
-        iftar_time: validatedData.iftar_time,
+        iftar_time: validatedData.iftar_time || null,
         contact_name: validatedData.contact_name,
         contact_email: validatedData.contact_email,
         contact_phone: validatedData.contact_phone || null,
@@ -74,6 +100,14 @@ export async function POST(request: NextRequest) {
         for_men: validatedData.for_men,
         for_women: validatedData.for_women,
         for_families: validatedData.for_families,
+        frequency: validatedData.frequency,
+        days_of_week: validatedData.days_of_week,
+        start_date: validatedData.start_date || null,
+        end_date: validatedData.end_date || null,
+        registration_url: validatedData.registration_url || null,
+        website_url: validatedData.website_url || null,
+        facebook_url: validatedData.facebook_url || null,
+        instagram_url: validatedData.instagram_url || null,
         status: "pending",
       })
       .select()
@@ -107,6 +141,9 @@ export async function POST(request: NextRequest) {
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Moskee/Organisatie:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.mosque_name}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Adres:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.address}, ${validatedData.city}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Iftar tijd:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.iftar_time}</td></tr>
+            <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Frequentie:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${formatFrequency(validatedData.frequency, validatedData.days_of_week)}</td></tr>
+            ${validatedData.start_date ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Startdatum:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.start_date}</td></tr>` : ""}
+            ${validatedData.end_date ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Einddatum:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.end_date}</td></tr>` : ""}
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Contactpersoon:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.contact_name}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Email:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.contact_email}</td></tr>
             ${validatedData.contact_phone ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Telefoon:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.contact_phone}</td></tr>` : ""}
@@ -115,6 +152,10 @@ export async function POST(request: NextRequest) {
             ${validatedData.price_info ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Prijsinfo:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.price_info}</td></tr>` : ""}
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Toegankelijkheid:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${[validatedData.for_men ? "Mannen" : "", validatedData.for_women ? "Vrouwen" : "", validatedData.for_families ? "Gezinnen" : ""].filter(Boolean).join(", ")}</td></tr>
             ${validatedData.description ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Beschrijving:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${validatedData.description}</td></tr>` : ""}
+            ${validatedData.registration_url ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Inschrijvingslink:</strong></td><td style="padding: 8px; border: 1px solid #ddd;"><a href="${validatedData.registration_url}">${validatedData.registration_url}</a></td></tr>` : ""}
+            ${validatedData.website_url ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Website:</strong></td><td style="padding: 8px; border: 1px solid #ddd;"><a href="${validatedData.website_url}">${validatedData.website_url}</a></td></tr>` : ""}
+            ${validatedData.facebook_url ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Facebook:</strong></td><td style="padding: 8px; border: 1px solid #ddd;"><a href="${validatedData.facebook_url}">${validatedData.facebook_url}</a></td></tr>` : ""}
+            ${validatedData.instagram_url ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Instagram:</strong></td><td style="padding: 8px; border: 1px solid #ddd;"><a href="${validatedData.instagram_url}">${validatedData.instagram_url}</a></td></tr>` : ""}
           </table>
 
           <div style="margin-top: 30px;">

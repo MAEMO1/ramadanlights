@@ -3,23 +3,9 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { type IftarLocation, formatFrequencyDisplay } from "@/lib/iftar-types";
 
-export interface IftarLocation {
-  id: string;
-  mosque_name: string;
-  address: string;
-  city: string;
-  iftar_time: string;
-  latitude: number | null;
-  longitude: number | null;
-  capacity: number | null;
-  is_free: boolean;
-  price_info: string | null;
-  description: string | null;
-  for_men: boolean;
-  for_women: boolean;
-  for_families: boolean;
-}
+export type { IftarLocation };
 
 interface IftarMapComponentProps {
   locations: IftarLocation[];
@@ -106,6 +92,23 @@ export default function IftarMapComponent({
           .filter(Boolean)
           .join(" • ");
 
+        const frequencyText = formatFrequencyDisplay(location.frequency, location.days_of_week || []);
+
+        // Build links HTML
+        const linksHtml = [];
+        if (location.registration_url) {
+          linksHtml.push(`<a href="${location.registration_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #0f9f9f; color: white; text-decoration: none; border-radius: 12px; font-size: 11px;">Inschrijven</a>`);
+        }
+        if (location.website_url) {
+          linksHtml.push(`<a href="${location.website_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #f3f4f6; color: #374151; text-decoration: none; border-radius: 12px; font-size: 11px;">Website</a>`);
+        }
+        if (location.facebook_url) {
+          linksHtml.push(`<a href="${location.facebook_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #dbeafe; color: #1d4ed8; text-decoration: none; border-radius: 12px; font-size: 11px;">Facebook</a>`);
+        }
+        if (location.instagram_url) {
+          linksHtml.push(`<a href="${location.instagram_url}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #fce7f3; color: #be185d; text-decoration: none; border-radius: 12px; font-size: 11px;">Instagram</a>`);
+        }
+
         const popupContent = `
           <div style="min-width: 200px; font-family: system-ui, sans-serif;">
             <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #0f2d2d;">
@@ -114,14 +117,18 @@ export default function IftarMapComponent({
             <p style="margin: 0 0 4px 0; font-size: 13px; color: #666;">
               ${location.address}, ${location.city}
             </p>
-            <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 500; color: #0f2d2d;">
+            <p style="margin: 0 0 4px 0; font-size: 14px; font-weight: 500; color: #0f2d2d;">
               Iftar: ${location.iftar_time}
+            </p>
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #0f9f9f; font-weight: 500;">
+              ${frequencyText}
             </p>
             ${location.capacity ? `<p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">Capaciteit: ${location.capacity} personen</p>` : ""}
             <p style="margin: 0 0 4px 0; font-size: 12px; color: ${location.is_free ? "#10b981" : "#666"};">
               ${location.is_free ? "Gratis" : location.price_info || "Betaald"}
             </p>
             ${accessibilityTags ? `<p style="margin: 8px 0 0 0; font-size: 11px; color: #888; border-top: 1px solid #eee; padding-top: 8px;">${accessibilityTags}</p>` : ""}
+            ${linksHtml.length > 0 ? `<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">${linksHtml.join("")}</div>` : ""}
           </div>
         `;
 

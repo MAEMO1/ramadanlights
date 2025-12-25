@@ -5,10 +5,11 @@ import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { IftarMap } from "@/components/IftarMap";
+import { IftarCalendar } from "@/components/IftarCalendar";
 import { IftarList } from "@/components/IftarList";
 import { IftarForm } from "@/components/IftarForm";
 import { ArrowRight } from "lucide-react";
-import type { IftarLocation } from "@/components/IftarMapComponent";
+import type { IftarLocation } from "@/lib/iftar-types";
 
 export default function IftarPage() {
   const [locations, setLocations] = useState<IftarLocation[]>([]);
@@ -72,6 +73,12 @@ export default function IftarPage() {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </a>
               <a
+                href="#iftar-calendar"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium border-2 border-gold/50 text-gold hover:bg-gold/10 transition-all"
+              >
+                Kalender
+              </a>
+              <a
                 href="#iftar-form"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium border-2 border-white/30 text-white hover:bg-white/10 transition-all"
               >
@@ -95,6 +102,11 @@ export default function IftarPage() {
         ) : (
           <IftarMap locations={locations} />
         )}
+      </div>
+
+      {/* Calendar Section */}
+      <div id="iftar-calendar">
+        {!isLoading && <IftarCalendar locations={locations} />}
       </div>
 
       {/* List Section */}

@@ -28,7 +28,15 @@ export async function GET() {
         description,
         for_men,
         for_women,
-        for_families
+        for_families,
+        frequency,
+        days_of_week,
+        start_date,
+        end_date,
+        registration_url,
+        website_url,
+        facebook_url,
+        instagram_url
       `
       )
       .eq("status", "approved")

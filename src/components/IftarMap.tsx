@@ -5,7 +5,7 @@ import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { MapPin, Users, Filter } from "lucide-react";
 import dynamic from "next/dynamic";
-import type { IftarLocation } from "./IftarMapComponent";
+import type { IftarLocation } from "@/lib/iftar-types";
 
 const IftarMapComponent = dynamic(() => import("./IftarMapComponent"), {
   ssr: false,
@@ -27,13 +27,19 @@ export function IftarMap({ locations }: IftarMapProps) {
     for_men: true,
     for_women: true,
     for_families: true,
+    frequency: "all" as "all" | "daily" | "weekly" | "specific_days" | "one_time",
   });
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredLocations = locations.filter((loc) => {
+    // Accessibility filters
     if (filters.for_men && !loc.for_men) return false;
     if (filters.for_women && !loc.for_women) return false;
     if (filters.for_families && !loc.for_families) return false;
+
+    // Frequency filter
+    if (filters.frequency !== "all" && loc.frequency !== filters.frequency) return false;
+
     return true;
   });
 
@@ -105,43 +111,74 @@ export function IftarMap({ locations }: IftarMapProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex flex-wrap justify-center gap-4 mb-6"
+            className="space-y-4 mb-6"
           >
-            <label className="flex items-center gap-2 text-white cursor-pointer">
-              <input
-                type="checkbox"
-                checked={filters.for_men}
-                onChange={(e) =>
-                  setFilters({ ...filters, for_men: e.target.checked })
-                }
-                className="w-5 h-5 rounded border-white/30 text-gold focus:ring-gold"
-              />
-              <span>Mannen</span>
-            </label>
+            {/* Frequency filter */}
+            <div className="flex flex-wrap justify-center gap-2">
+              {[
+                { value: "all", label: "Alle" },
+                { value: "daily", label: "Dagelijks" },
+                { value: "weekly", label: "Wekelijks" },
+                { value: "specific_days", label: "Specifieke dagen" },
+                { value: "one_time", label: "Eenmalig" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() =>
+                    setFilters({
+                      ...filters,
+                      frequency: option.value as typeof filters.frequency,
+                    })
+                  }
+                  className={`px-4 py-2 rounded-full text-sm transition-all ${
+                    filters.frequency === option.value
+                      ? "bg-gold text-[#0f2d2d] font-medium"
+                      : "bg-white/10 text-white hover:bg-white/20"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
 
-            <label className="flex items-center gap-2 text-white cursor-pointer">
-              <input
-                type="checkbox"
-                checked={filters.for_women}
-                onChange={(e) =>
-                  setFilters({ ...filters, for_women: e.target.checked })
-                }
-                className="w-5 h-5 rounded border-white/30 text-gold focus:ring-gold"
-              />
-              <span>Vrouwen</span>
-            </label>
+            {/* Accessibility filters */}
+            <div className="flex flex-wrap justify-center gap-4">
+              <label className="flex items-center gap-2 text-white cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filters.for_men}
+                  onChange={(e) =>
+                    setFilters({ ...filters, for_men: e.target.checked })
+                  }
+                  className="w-5 h-5 rounded border-white/30 text-gold focus:ring-gold"
+                />
+                <span>Mannen</span>
+              </label>
 
-            <label className="flex items-center gap-2 text-white cursor-pointer">
-              <input
-                type="checkbox"
-                checked={filters.for_families}
-                onChange={(e) =>
-                  setFilters({ ...filters, for_families: e.target.checked })
-                }
-                className="w-5 h-5 rounded border-white/30 text-gold focus:ring-gold"
-              />
-              <span>Gezinnen</span>
-            </label>
+              <label className="flex items-center gap-2 text-white cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filters.for_women}
+                  onChange={(e) =>
+                    setFilters({ ...filters, for_women: e.target.checked })
+                  }
+                  className="w-5 h-5 rounded border-white/30 text-gold focus:ring-gold"
+                />
+                <span>Vrouwen</span>
+              </label>
+
+              <label className="flex items-center gap-2 text-white cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filters.for_families}
+                  onChange={(e) =>
+                    setFilters({ ...filters, for_families: e.target.checked })
+                  }
+                  className="w-5 h-5 rounded border-white/30 text-gold focus:ring-gold"
+                />
+                <span>Gezinnen</span>
+              </label>
+            </div>
           </motion.div>
         )}
 

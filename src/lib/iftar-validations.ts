@@ -17,7 +17,9 @@ export const iftarFormSchema = z.object({
     .default("Gent"),
   iftar_time: z
     .string()
-    .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Ongeldige tijd (gebruik HH:MM formaat)"),
+    .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, "Ongeldige tijd (gebruik HH:MM formaat)")
+    .optional()
+    .or(z.literal("")),
   contact_name: z
     .string()
     .min(2, "Naam moet minimaal 2 tekens bevatten")
@@ -56,6 +58,44 @@ export const iftarFormSchema = z.object({
   for_men: z.boolean().default(true),
   for_women: z.boolean().default(true),
   for_families: z.boolean().default(true),
+
+  // Frequentie
+  frequency: z
+    .enum(["daily", "weekly", "specific_days", "one_time"])
+    .default("daily"),
+  days_of_week: z
+    .array(z.enum(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]))
+    .default([]),
+  start_date: z
+    .string()
+    .optional()
+    .or(z.literal("")),
+  end_date: z
+    .string()
+    .optional()
+    .or(z.literal("")),
+
+  // Links
+  registration_url: z
+    .string()
+    .url("Ongeldige URL")
+    .optional()
+    .or(z.literal("")),
+  website_url: z
+    .string()
+    .url("Ongeldige URL")
+    .optional()
+    .or(z.literal("")),
+  facebook_url: z
+    .string()
+    .url("Ongeldige URL")
+    .optional()
+    .or(z.literal("")),
+  instagram_url: z
+    .string()
+    .url("Ongeldige URL")
+    .optional()
+    .or(z.literal("")),
 });
 
 export type IftarFormData = z.infer<typeof iftarFormSchema>;
