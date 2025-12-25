@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { MapPin, Grid3X3, Map, Navigation, Search, X } from "lucide-react";
+import { MapPin, Navigation, Search, Map, ArrowRight } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const MosqueMapComponent = dynamic(() => import("@/components/MosqueMapComponent"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-      <div className="text-gray-400">Kaart laden...</div>
+    <div className="w-full h-full bg-gray-100 rounded-2xl flex items-center justify-center">
+      <div className="text-text-muted">Kaart laden...</div>
     </div>
   ),
 });
@@ -30,8 +30,6 @@ interface Mosque {
 export default function MosquePage() {
   const [mosques, setMosques] = useState<Mosque[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<"map" | "list">("map");
-  const [selectedMosque, setSelectedMosque] = useState<Mosque | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -52,199 +50,241 @@ export default function MosquePage() {
     fetchMosques();
   }, []);
 
-  const filteredMosques = mosques.filter((mosque) =>
-    mosque.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    mosque.fullAddress.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredMosques = useMemo(() => {
+    if (!searchQuery.trim()) return mosques;
+    const query = searchQuery.toLowerCase();
+    return mosques.filter(
+      (mosque) =>
+        mosque.name.toLowerCase().includes(query) ||
+        mosque.fullAddress.toLowerCase().includes(query)
+    );
+  }, [mosques, searchQuery]);
 
   const mosquesWithCoords = filteredMosques.filter((m) => m.latitude && m.longitude);
 
-  const clearSearch = () => setSearchQuery("");
-
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen">
       <Navbar />
 
-      {/* Hero - Clean & Editorial */}
-      <section className="pt-32 pb-12 md:pt-40 md:pb-16 bg-white border-b border-gray-100">
+      {/* Hero Section - Dark & Professional (like iftar page) */}
+      <section className="pt-32 pb-24 bg-[#0f2d2d]">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-2xl"
+            className="max-w-3xl"
           >
-            <p className="text-teal font-medium mb-3 tracking-wide text-sm uppercase">
+            <p className="text-teal-400 font-medium mb-4 tracking-wide uppercase text-sm">
               Gent
             </p>
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-4 tracking-tight">
+
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-white mb-6 tracking-tight">
               Moskeeën
             </h1>
-            <p className="text-xl text-gray-500 leading-relaxed">
-              Alle {mosques.length > 0 ? mosques.length : ""} moskeeën en islamitische centra in Gent.
+
+            <p className="text-xl text-white/70 mb-10 leading-relaxed max-w-2xl">
+              Vind alle {mosques.length > 0 ? mosques.length : ""} moskeeën en islamitische centra in Gent en omgeving.
             </p>
+
+            <a
+              href="#mosque-map"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-white text-[#0f2d2d] hover:bg-white/90 transition-all"
+            >
+              Bekijk de kaart
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </a>
           </motion.div>
         </div>
       </section>
 
-      {/* Toolbar */}
-      <section className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+      {/* Map Section */}
+      <section id="mosque-map" className="bg-off-white section-padding">
         <div className="section-container">
-          <div className="flex items-center justify-between gap-4 py-4">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Zoeken..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border-0 rounded-lg text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:bg-white transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={clearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            {/* View toggle */}
-            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setViewMode("map")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 text-sm transition-colors ${
-                  viewMode === "map"
-                    ? "bg-gray-900 text-white"
-                    : "bg-white text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <Map className="w-4 h-4" />
-                <span className="hidden sm:inline">Kaart</span>
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`flex items-center gap-1.5 px-3.5 py-2 text-sm transition-colors border-l border-gray-200 ${
-                  viewMode === "list"
-                    ? "bg-gray-900 text-white"
-                    : "bg-white text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <Grid3X3 className="w-4 h-4" />
-                <span className="hidden sm:inline">Lijst</span>
-              </button>
-            </div>
+          <div className="text-center mb-10">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="heading-section mb-4"
+            >
+              Moskeeën op de kaart
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-body"
+            >
+              Klik op een marker voor meer informatie
+            </motion.p>
           </div>
+
+          {isLoading ? (
+            <div className="h-[500px] bg-gray-100 rounded-2xl flex items-center justify-center">
+              <div className="text-text-muted">Kaart laden...</div>
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="rounded-2xl overflow-hidden shadow-lg"
+              style={{ height: "500px" }}
+            >
+              {mosquesWithCoords.length > 0 ? (
+                <MosqueMapComponent
+                  mosques={mosquesWithCoords}
+                  onMosqueSelect={() => {}}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                  <p className="text-text-muted">Geen moskeeën gevonden</p>
+                </div>
+              )}
+            </motion.div>
+          )}
         </div>
       </section>
 
-      {/* Results info */}
-      {searchQuery && (
-        <div className="section-container pt-6">
-          <p className="text-sm text-gray-500">
-            {filteredMosques.length} resultaten voor &ldquo;{searchQuery}&rdquo;
-          </p>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <section className="py-6 md:py-8">
+      {/* List Section */}
+      <section id="mosque-list" className="bg-off-white section-padding">
         <div className="section-container">
-          {isLoading ? (
-            <div className="h-[500px] bg-gray-50 rounded-xl flex items-center justify-center">
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+          {/* Header */}
+          <div className="text-center mb-10">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="heading-section mb-4"
+            >
+              Alle moskeeën
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-body"
+            >
+              {mosques.length} moskee{mosques.length !== 1 ? "ën" : ""} in Gent
+            </motion.p>
+          </div>
+
+          {/* Search */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.15 }}
+            className="mb-8"
+          >
+            <div className="relative max-w-md mx-auto">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
+              <input
+                type="text"
+                placeholder="Zoek op naam of adres..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field pl-12 w-full"
+              />
+            </div>
+          </motion.div>
+
+          {/* Results count */}
+          {searchQuery && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm text-text-muted mb-6 text-center"
+            >
+              {filteredMosques.length} resultaten gevonden
+            </motion.p>
+          )}
+
+          {/* Grid */}
+          {filteredMosques.length === 0 && searchQuery ? (
+            <div className="text-center py-12">
+              <p className="text-text-muted text-lg">
+                Geen moskeeën gevonden voor &ldquo;{searchQuery}&rdquo;
+              </p>
+              <button
+                onClick={() => setSearchQuery("")}
+                className="mt-4 text-teal hover:underline"
+              >
+                Zoekfilter wissen
+              </button>
             </div>
           ) : (
-            <>
-              {/* Map View */}
-              {viewMode === "map" && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredMosques.map((mosque, index) => (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="rounded-xl overflow-hidden bg-gray-100"
-                  style={{ height: "calc(100vh - 280px)", minHeight: "500px", maxHeight: "700px" }}
+                  key={mosque.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.05 + index * 0.03 }}
+                  className="card hover:shadow-lg transition-shadow"
                 >
-                  {mosquesWithCoords.length > 0 ? (
-                    <MosqueMapComponent
-                      mosques={mosquesWithCoords}
-                      selectedMosqueId={selectedMosque?.id}
-                      onMosqueSelect={setSelectedMosque}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center">
-                      <p className="text-gray-500 mb-4">Geen moskeeën gevonden</p>
-                      <button
-                        onClick={clearSearch}
-                        className="text-teal hover:underline text-sm"
-                      >
-                        Zoekopdracht wissen
-                      </button>
+                  {/* Header */}
+                  <div className="mb-4">
+                    <h3 className="font-display font-semibold text-lg text-text-primary mb-1">
+                      {mosque.name}
+                    </h3>
+                    <div className="flex items-start gap-2 text-text-muted text-sm">
+                      <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span>{mosque.fullAddress}</span>
                     </div>
-                  )}
-                </motion.div>
-              )}
+                  </div>
 
-              {/* List View */}
-              {viewMode === "list" && (
-                <>
-                  {filteredMosques.length > 0 ? (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="divide-y divide-gray-100"
-                    >
-                      {filteredMosques.map((mosque, index) => (
-                        <motion.article
-                          key={mosque.id}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: index * 0.02 }}
-                          className={`group py-5 first:pt-0 last:pb-0 cursor-pointer ${
-                            selectedMosque?.id === mosque.id ? "bg-teal/5 -mx-4 px-4 rounded-lg" : ""
-                          }`}
-                          onClick={() => setSelectedMosque(mosque)}
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-gray-900 group-hover:text-teal transition-colors truncate">
-                                {mosque.name}
-                              </h3>
-                              <p className="text-gray-500 text-sm mt-1 flex items-center gap-1.5">
-                                <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-                                <span className="truncate">{mosque.fullAddress}</span>
-                              </p>
-                            </div>
-                            <a
-                              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mosque.fullAddress)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-shrink-0 flex items-center gap-1.5 text-sm text-gray-400 hover:text-teal transition-colors"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Navigation className="w-4 h-4" />
-                              <span className="hidden md:inline">Route</span>
-                            </a>
-                          </div>
-                        </motion.article>
-                      ))}
-                    </motion.div>
-                  ) : (
-                    <div className="py-16 text-center">
-                      <p className="text-gray-500 mb-4">Geen moskeeën gevonden</p>
-                      <button
-                        onClick={clearSearch}
-                        className="text-teal hover:underline text-sm"
-                      >
-                        Zoekopdracht wissen
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            </>
+                  {/* City badge */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-3 py-1 bg-teal/10 text-teal text-sm font-medium rounded-full">
+                      {mosque.city}
+                    </span>
+                  </div>
+
+                  {/* Route button */}
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mosque.fullAddress)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal text-white text-sm font-medium rounded-full hover:bg-teal/90 transition-colors"
+                  >
+                    <Navigation className="w-4 h-4" />
+                    Route plannen
+                  </a>
+                </motion.div>
+              ))}
+            </div>
           )}
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-[#0f2d2d] section-padding">
+        <div className="section-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-2xl mx-auto text-center"
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-white mb-4">
+              Op zoek naar een iftar?
+            </h2>
+            <p className="text-lg text-white/70 mb-8">
+              Bekijk de iftarkaart om iftar locaties in Gent te vinden.
+            </p>
+            <a
+              href="/iftar"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-white text-[#0f2d2d] hover:bg-white/90 transition-all"
+            >
+              <Map className="w-5 h-5 mr-2" />
+              Naar de iftarkaart
+            </a>
+          </motion.div>
         </div>
       </section>
 

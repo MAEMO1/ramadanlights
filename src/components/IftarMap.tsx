@@ -184,7 +184,7 @@ export function IftarMap({ locations }: IftarMapProps) {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.2 }}
           className="relative rounded-2xl overflow-hidden border border-gray-200"
-          style={{ height: "500px" }}
+          style={{ height: "600px" }}
         >
           {locationsWithCoords.length > 0 ? (
             <IftarMapComponent locations={locationsWithCoords} />
