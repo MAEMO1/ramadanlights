@@ -96,33 +96,18 @@ const darkTealMapStyle: google.maps.MapTypeStyle[] = [
   },
 ];
 
-// Elegant drop-pin marker for iftar locations
+// Simple drop-pin marker for iftar locations (mobile compatible)
 const createIftarMarkerIcon = (isSelected: boolean) => {
   const scale = isSelected ? 1.2 : 1;
   const width = Math.round(40 * scale);
   const height = Math.round(52 * scale);
-  const color = isSelected ? "#d4af37" : "#2d9596";
-  const colorDark = isSelected ? "#b8962f" : "#1f6b6c";
+  const color = isSelected ? "%23d4af37" : "%232d9596";
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 40 52">
-    <defs>
-      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="${color}" flood-opacity="0.4"/>
-      </filter>
-      <linearGradient id="pinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" style="stop-color:${color};stop-opacity:1" />
-        <stop offset="100%" style="stop-color:${colorDark};stop-opacity:1" />
-      </linearGradient>
-    </defs>
-    <g filter="url(%23glow)">
-      <path d="M20 50c0 0-17-19-17-32C3 9.16 10.16 2 20 2s17 7.16 17 16c0 13-17 32-17 32z" fill="url(%23pinGrad)"/>
-      <circle cx="20" cy="18" r="11" fill="white"/>
-      <text x="20" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="${color}">☪</text>
-    </g>
-  </svg>`;
+  // Simple SVG - crescent made with two circles
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 40 52"><path d="M20 50c0 0-17-19-17-32C3 9.16 10.16 2 20 2s17 7.16 17 16c0 13-17 32-17 32z" fill="${color}" stroke="white" stroke-width="2"/><circle cx="20" cy="18" r="10" fill="white"/><circle cx="18" cy="18" r="6" fill="${color}"/><circle cx="21" cy="18" r="5" fill="white"/></svg>`;
 
   return {
-    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    url: `data:image/svg+xml,${svg}`,
     scaledSize: new google.maps.Size(width, height),
     anchor: new google.maps.Point(width / 2, height),
   };

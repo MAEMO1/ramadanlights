@@ -8,17 +8,28 @@ import { type IftarLocation, formatFrequencyDisplay } from "@/lib/iftar-types";
 
 interface IftarListProps {
   locations: IftarLocation[];
+  mosqueAddresses?: Set<string>;
+  embedded?: boolean;
 }
 
 type SortOption = "name" | "city" | "time";
 type SortDirection = "asc" | "desc";
 
-export function IftarList({ locations }: IftarListProps) {
+export function IftarList({ locations, mosqueAddresses, embedded = false }: IftarListProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  // Check if a location is a mosque based on address match
+  const isMosque = (location: IftarLocation): boolean => {
+    if (!mosqueAddresses) return false;
+    const locationAddress = location.address.toLowerCase();
+    return Array.from(mosqueAddresses).some(mosqueAddr =>
+      locationAddress.includes(mosqueAddr) || mosqueAddr.includes(locationAddress)
+    );
+  };
 
   // Filter and sort locations
   const filteredAndSortedLocations = useMemo(() => {
@@ -63,31 +74,9 @@ export function IftarList({ locations }: IftarListProps) {
     return null;
   }
 
-  return (
-    <section id="iftar-list" className="bg-off-white section-padding">
-      <div ref={ref} className="section-container">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            className="heading-section mb-4"
-          >
-            Alle iftar locaties
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.1 }}
-            className="text-body"
-          >
-            {locations.length} iftar{locations.length !== 1 ? "s" : ""}{" "}
-            beschikbaar
-          </motion.p>
-        </div>
-
-        {/* Search & Sort Controls */}
+  const content = (
+    <div ref={ref}>
+      {/* Search & Sort Controls */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -165,9 +154,20 @@ export function IftarList({ locations }: IftarListProps) {
             >
               {/* Header */}
               <div className="mb-4">
-                <h3 className="font-display font-semibold text-lg text-text-primary mb-1">
-                  {location.mosque_name}
-                </h3>
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <h3 className="font-display font-semibold text-lg text-text-primary">
+                    {location.mosque_name}
+                  </h3>
+                  {mosqueAddresses && (
+                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0 ${
+                      isMosque(location)
+                        ? "bg-teal/10 text-teal"
+                        : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {isMosque(location) ? "Moskee" : "Organisatie"}
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-start gap-2 text-text-muted text-sm">
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>
@@ -300,6 +300,36 @@ export function IftarList({ locations }: IftarListProps) {
           ))}
         </div>
         )}
+    </div>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <section id="iftar-list" className="bg-off-white section-padding">
+      <div className="section-container">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            className="heading-section mb-4"
+          >
+            Alle iftar locaties
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1 }}
+            className="text-body"
+          >
+            {locations.length} iftar{locations.length !== 1 ? "s" : ""}{" "}
+            beschikbaar
+          </motion.p>
+        </div>
+        {content}
       </div>
     </section>
   );

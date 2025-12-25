@@ -113,27 +113,20 @@ const mapOptions: google.maps.MapOptions = {
   ],
 };
 
-// Simple clean marker with SVG crescent path
+// Simple drop-pin marker for mosques (mobile compatible)
 const createMosqueMarkerIcon = (isSelected: boolean) => {
-  const size = isSelected ? 44 : 36;
-  const color = isSelected ? "#d4af37" : "#2d9596";
+  const scale = isSelected ? 1.2 : 1;
+  const width = Math.round(40 * scale);
+  const height = Math.round(52 * scale);
+  const color = isSelected ? "%23d4af37" : "%232d9596";
 
-  // Clean crescent moon using two overlapping circles
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 36 36">
-    <circle cx="18" cy="18" r="16" fill="${color}" stroke="white" stroke-width="3"/>
-    <defs>
-      <mask id="crescentMask${isSelected ? 'S' : 'N'}">
-        <circle cx="18" cy="18" r="6" fill="white"/>
-        <circle cx="21" cy="18" r="5" fill="black"/>
-      </mask>
-    </defs>
-    <circle cx="18" cy="18" r="6" fill="white" mask="url(%23crescentMask${isSelected ? 'S' : 'N'})"/>
-  </svg>`;
+  // Simple SVG - crescent made with two circles (clip approach)
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 40 52"><path d="M20 50c0 0-17-19-17-32C3 9.16 10.16 2 20 2s17 7.16 17 16c0 13-17 32-17 32z" fill="${color}" stroke="white" stroke-width="2"/><circle cx="20" cy="18" r="10" fill="white"/><circle cx="18" cy="18" r="6" fill="${color}"/><circle cx="21" cy="18" r="5" fill="white"/></svg>`;
 
   return {
-    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    scaledSize: new google.maps.Size(size, size),
-    anchor: new google.maps.Point(size / 2, size / 2),
+    url: `data:image/svg+xml,${svg}`,
+    scaledSize: new google.maps.Size(width, height),
+    anchor: new google.maps.Point(width / 2, height),
   };
 };
 
@@ -218,7 +211,7 @@ export default function MosqueMapComponent({ mosques, selectedMosqueId, onMosque
       onMosqueSelect(mosque);
     }
     if (map && mosque.latitude && mosque.longitude) {
-      map.panTo({ lat: mosque.latitude + 0.002, lng: mosque.longitude });
+      map.panTo({ lat: mosque.latitude + 0.003, lng: mosque.longitude });
     }
   };
 
@@ -274,7 +267,7 @@ export default function MosqueMapComponent({ mosques, selectedMosqueId, onMosque
           mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
           getPixelPositionOffset={(width, height) => ({
             x: -(width / 2),
-            y: -(height + 28),
+            y: -(height + 55),
           })}
         >
           <InfoTooltip mosque={activeMosque} onClose={handleCloseInfoWindow} />

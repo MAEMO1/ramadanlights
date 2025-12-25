@@ -1,19 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { IftarMap } from "@/components/IftarMap";
 import { IftarCalendar } from "@/components/IftarCalendar";
 import { IftarList } from "@/components/IftarList";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, Plus, Calendar, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import type { IftarLocation } from "@/lib/iftar-types";
+import { mosques } from "@/lib/mosques-data";
 
 export default function IftarPage() {
   const [locations, setLocations] = useState<IftarLocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [contentView, setContentView] = useState<"calendar" | "list">("calendar");
+
+  // Create a set of mosque addresses for quick lookup
+  const mosqueAddresses = new Set(
+    mosques.map(m => `${m.address} ${m.houseNumber}`.toLowerCase())
+  );
 
   useEffect(() => {
     async function fetchLocations() {
@@ -91,13 +98,104 @@ export default function IftarPage() {
         )}
       </div>
 
-      {/* Calendar Section */}
-      <div id="iftar-calendar">
-        {!isLoading && <IftarCalendar locations={locations} />}
-      </div>
+      {/* Calendar / List Section with Toggle */}
+      <div id="iftar-content">
+        {!isLoading && (
+          <section className="bg-[#f8fafa] section-padding">
+            <div className="section-container">
+              {/* Header with toggle */}
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+                <div>
+                  <motion.h2
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-2xl md:text-3xl font-display font-semibold text-text-primary"
+                  >
+                    {contentView === "calendar" ? "Iftar planning" : "Alle iftar locaties"}
+                  </motion.h2>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-text-muted mt-1"
+                  >
+                    {contentView === "calendar"
+                      ? "Bekijk welke iftars beschikbaar zijn per dag"
+                      : `${locations.length} iftar${locations.length !== 1 ? "s" : ""} beschikbaar`
+                    }
+                  </motion.p>
+                </div>
 
-      {/* List Section */}
-      {!isLoading && <IftarList locations={locations} />}
+                {/* Segmented Control */}
+                <div className="inline-flex p-1 bg-gray-100 rounded-lg">
+                  <button
+                    onClick={() => setContentView("calendar")}
+                    className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                      contentView === "calendar"
+                        ? "text-white"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                  >
+                    {contentView === "calendar" && (
+                      <motion.div
+                        layoutId="contentTab"
+                        className="absolute inset-0 bg-teal rounded-md"
+                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                      />
+                    )}
+                    <Calendar className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Kalender</span>
+                  </button>
+                  <button
+                    onClick={() => setContentView("list")}
+                    className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                      contentView === "list"
+                        ? "text-white"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                  >
+                    {contentView === "list" && (
+                      <motion.div
+                        layoutId="contentTab"
+                        className="absolute inset-0 bg-teal rounded-md"
+                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                      />
+                    )}
+                    <LayoutGrid className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">Lijst</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <AnimatePresence mode="wait">
+                {contentView === "calendar" && (
+                  <motion.div
+                    key="calendar"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <IftarCalendar locations={locations} embedded />
+                  </motion.div>
+                )}
+                {contentView === "list" && (
+                  <motion.div
+                    key="list"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <IftarList locations={locations} mosqueAddresses={mosqueAddresses} embedded />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </section>
+        )}
+      </div>
 
       {/* CTA Section */}
       <section className="bg-[#0f2d2d] section-padding">

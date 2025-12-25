@@ -7,6 +7,7 @@ import { type IftarLocation, formatFrequencyDisplay } from "@/lib/iftar-types";
 
 interface IftarCalendarProps {
   locations: IftarLocation[];
+  embedded?: boolean;
 }
 
 type ViewMode = "3days" | "week" | "month";
@@ -85,7 +86,7 @@ function getRamadanDays(): Date[] {
   return days;
 }
 
-export function IftarCalendar({ locations }: IftarCalendarProps) {
+export function IftarCalendar({ locations, embedded = false }: IftarCalendarProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("week");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedIftar, setSelectedIftar] = useState<IftarLocation | null>(null);
@@ -133,32 +134,9 @@ export function IftarCalendar({ locations }: IftarCalendarProps) {
 
   const selectedDayIftars = selectedDate ? getIftarsForDate(locations, selectedDate) : [];
 
-  return (
-    <section className="bg-[#f8fafa] section-padding">
-      <div className="section-container">
-        {/* Header */}
-        <div className="mb-8">
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="heading-section mb-4"
-          >
-            Iftar planning
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-body"
-          >
-            Bekijk welke iftars beschikbaar zijn per dag
-          </motion.p>
-        </div>
-
-        {/* Controls */}
+  const content = (
+    <>
+      {/* Controls */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -692,6 +670,36 @@ export function IftarCalendar({ locations }: IftarCalendarProps) {
             </motion.div>
           )}
         </AnimatePresence>
+    </>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <section className="bg-[#f8fafa] section-padding">
+      <div className="section-container">
+        {/* Header */}
+        <div className="mb-8">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="heading-section mb-4"
+          >
+            Iftar planning
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-body"
+          >
+            Bekijk welke iftars beschikbaar zijn per dag
+          </motion.p>
+        </div>
+        {content}
       </div>
     </section>
   );
