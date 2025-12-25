@@ -2,7 +2,7 @@
 
 import { useCallback, useState, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, MarkerF, OverlayView } from "@react-google-maps/api";
-import { Navigation, X } from "lucide-react";
+import { Navigation, MapPin } from "lucide-react";
 
 interface Mosque {
   id: string;
@@ -26,7 +26,6 @@ const mapContainerStyle = {
   height: "100%",
 };
 
-// Center of Gent
 const center = {
   lat: 51.0543,
   lng: 3.7174,
@@ -39,7 +38,6 @@ const mapOptions: google.maps.MapOptions = {
   mapTypeControl: false,
   fullscreenControl: true,
   styles: [
-    // Subtle dark teal theme
     {
       elementType: "geometry",
       stylers: [{ color: "#1d3d3d" }],
@@ -115,89 +113,58 @@ const mapOptions: google.maps.MapOptions = {
   ],
 };
 
-// Elegant drop-pin marker for mosques
+// Simple clean marker
 const createMosqueMarkerIcon = (isSelected: boolean) => {
-  const scale = isSelected ? 1.2 : 1;
-  const width = Math.round(40 * scale);
-  const height = Math.round(52 * scale);
+  const size = isSelected ? 44 : 36;
   const color = isSelected ? "#d4af37" : "#2d9596";
-  const glowColor = isSelected ? "#d4af37" : "#2d9596";
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 40 52">
-    <defs>
-      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="${glowColor}" flood-opacity="0.4"/>
-      </filter>
-      <linearGradient id="pinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" style="stop-color:${color};stop-opacity:1" />
-        <stop offset="100%" style="stop-color:${isSelected ? '#b8962f' : '#1f6b6c'};stop-opacity:1" />
-      </linearGradient>
-    </defs>
-    <g filter="url(%23glow)">
-      <path d="M20 50c0 0-17-19-17-32C3 9.16 10.16 2 20 2s17 7.16 17 16c0 13-17 32-17 32z" fill="url(%23pinGrad)"/>
-      <circle cx="20" cy="18" r="11" fill="white"/>
-      <text x="20" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="${color}">☪</text>
-    </g>
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 36 36">
+    <circle cx="18" cy="18" r="16" fill="${color}" stroke="white" stroke-width="3"/>
+    <text x="18" y="23" text-anchor="middle" font-family="Arial" font-size="14" fill="white">☪</text>
   </svg>`;
 
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    scaledSize: new google.maps.Size(width, height),
-    anchor: new google.maps.Point(width / 2, height),
+    scaledSize: new google.maps.Size(size, size),
+    anchor: new google.maps.Point(size / 2, size / 2),
   };
 };
 
-// Custom InfoWindow component that matches the design
-interface CustomInfoWindowProps {
+// Clean minimal tooltip
+interface InfoTooltipProps {
   mosque: Mosque;
   onClose: () => void;
 }
 
-const CustomInfoWindow = ({ mosque, onClose }: CustomInfoWindowProps) => {
+const InfoTooltip = ({ mosque, onClose }: InfoTooltipProps) => {
   return (
-    <div className="relative">
-      {/* Arrow pointing down */}
-      <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-4 h-4 bg-white rotate-45 shadow-lg" />
-
-      {/* Card content */}
-      <div className="relative bg-white rounded-2xl shadow-2xl p-5 min-w-[280px] max-w-[320px] border border-gray-100">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
-
-        {/* Header with icon */}
-        <div className="flex items-start gap-3 mb-3 pr-8">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white text-lg shadow-md flex-shrink-0">
-            ☪
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 text-base leading-tight">
-              {mosque.name}
-            </h3>
-            <span className="text-xs text-teal-600 font-medium">{mosque.city}</span>
-          </div>
-        </div>
-
-        {/* Address */}
-        <p className="text-sm text-gray-500 mb-4 pl-[52px]">
-          {mosque.fullAddress}
+    <div
+      className="bg-[#0f2d2d] text-white rounded-lg shadow-xl min-w-[240px] max-w-[280px] overflow-hidden"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Content */}
+      <div className="p-4">
+        <h3 className="font-semibold text-white text-base mb-1 pr-2">
+          {mosque.name}
+        </h3>
+        <p className="text-white/60 text-sm flex items-start gap-1.5 mb-4">
+          <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+          <span>{mosque.fullAddress}</span>
         </p>
 
-        {/* Route button */}
         <a
           href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mosque.fullAddress)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm font-medium rounded-xl hover:from-teal-600 hover:to-teal-700 transition-all shadow-md shadow-teal-500/20"
+          className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-teal text-white text-sm font-medium rounded-lg hover:bg-teal/90 transition-colors"
         >
           <Navigation className="w-4 h-4" />
           Route plannen
         </a>
       </div>
+
+      {/* Arrow */}
+      <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-[#0f2d2d]" />
     </div>
   );
 };
@@ -211,7 +178,6 @@ export default function MosqueMapComponent({ mosques, selectedMosqueId, onMosque
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   });
 
-  // Find and set active mosque when activeInfoWindow changes
   useEffect(() => {
     if (activeInfoWindow) {
       const mosque = mosques.find(m => m.id === activeInfoWindow);
@@ -223,8 +189,6 @@ export default function MosqueMapComponent({ mosques, selectedMosqueId, onMosque
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
-
-    // Fit bounds to show all mosques
     const mosquesWithCoords = mosques.filter((m) => m.latitude && m.longitude);
     if (mosquesWithCoords.length > 0) {
       const bounds = new google.maps.LatLngBounds();
@@ -246,10 +210,8 @@ export default function MosqueMapComponent({ mosques, selectedMosqueId, onMosque
     if (onMosqueSelect) {
       onMosqueSelect(mosque);
     }
-
-    // Pan to mosque with offset for info window
     if (map && mosque.latitude && mosque.longitude) {
-      map.panTo({ lat: mosque.latitude + 0.003, lng: mosque.longitude });
+      map.panTo({ lat: mosque.latitude + 0.002, lng: mosque.longitude });
     }
   };
 
@@ -260,21 +222,18 @@ export default function MosqueMapComponent({ mosques, selectedMosqueId, onMosque
 
   if (loadError) {
     return (
-      <div className="w-full h-full bg-[#0a2020] rounded-2xl flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-white/30 text-4xl mb-4">☪</div>
-          <div className="text-white/50">Kaart kon niet geladen worden</div>
-        </div>
+      <div className="w-full h-full bg-[#0f2d2d] flex items-center justify-center">
+        <div className="text-white/50">Kaart kon niet geladen worden</div>
       </div>
     );
   }
 
   if (!isLoaded) {
     return (
-      <div className="w-full h-full bg-[#0a2020] rounded-2xl flex items-center justify-center">
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-2 border-teal-500/30 border-t-teal-500 rounded-full animate-spin mb-4" />
-          <div className="text-white/50">Kaart laden...</div>
+      <div className="w-full h-full bg-[#0f2d2d] flex items-center justify-center">
+        <div className="flex items-center gap-3 text-white/50">
+          <div className="w-5 h-5 border-2 border-teal/30 border-t-teal rounded-full animate-spin" />
+          <span>Kaart laden...</span>
         </div>
       </div>
     );
@@ -302,17 +261,16 @@ export default function MosqueMapComponent({ mosques, selectedMosqueId, onMosque
         />
       ))}
 
-      {/* Custom InfoWindow using OverlayView */}
       {activeMosque && activeMosque.latitude && activeMosque.longitude && (
         <OverlayView
           position={{ lat: activeMosque.latitude, lng: activeMosque.longitude }}
           mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
           getPixelPositionOffset={(width, height) => ({
             x: -(width / 2),
-            y: -(height + 60),
+            y: -(height + 28),
           })}
         >
-          <CustomInfoWindow mosque={activeMosque} onClose={handleCloseInfoWindow} />
+          <InfoTooltip mosque={activeMosque} onClose={handleCloseInfoWindow} />
         </OverlayView>
       )}
     </GoogleMap>
