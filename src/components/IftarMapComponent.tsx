@@ -67,35 +67,20 @@ const darkMapStyle: google.maps.MapTypeStyle[] = [
   },
 ];
 
-// Clean, minimal iftar marker with crescent
+// Elegant drop-pin marker for iftar locations
 const createIftarMarkerIcon = (isSelected: boolean) => {
-  const size = isSelected ? 44 : 38;
+  const scale = isSelected ? 1.15 : 1;
+  const width = Math.round(36 * scale);
+  const height = Math.round(48 * scale);
   const gold = "#d4af37";
   const dark = "#0f2d2d";
 
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 40 40">
-      <defs>
-        <filter id="s" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
-        </filter>
-      </defs>
-      <g filter="url(%23s)">
-        <circle cx="20" cy="20" r="16" fill="${gold}"/>
-        <circle cx="20" cy="20" r="13" fill="${dark}"/>
-        <g fill="${gold}">
-          <circle cx="18" cy="18" r="7"/>
-          <circle cx="21" cy="16" r="5" fill="${dark}"/>
-          <circle cx="27" cy="13" r="1.5"/>
-        </g>
-      </g>
-    </svg>
-  `;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 36 48"><defs><filter id="ds" x="-50%" y="-30%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.35"/></filter></defs><g filter="url(%23ds)"><path d="M18 47c0 0-15-17-15-29C3 9.72 9.72 3 18 3s15 6.72 15 15c0 12-15 29-15 29z" fill="${gold}"/><circle cx="18" cy="18" r="10" fill="${dark}"/><text x="18" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="${gold}">☪</text></g></svg>`;
 
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    scaledSize: new google.maps.Size(size, size),
-    anchor: new google.maps.Point(size / 2, size / 2),
+    scaledSize: new google.maps.Size(width, height),
+    anchor: new google.maps.Point(width / 2, height),
   };
 };
 

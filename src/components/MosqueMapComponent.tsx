@@ -52,34 +52,19 @@ const mapOptions: google.maps.MapOptions = {
   ],
 };
 
-// Clean, minimal mosque marker
+// Elegant drop-pin marker for mosques
 const createMosqueMarkerIcon = (isSelected: boolean) => {
-  const size = isSelected ? 44 : 38;
+  const scale = isSelected ? 1.15 : 1;
+  const width = Math.round(36 * scale);
+  const height = Math.round(48 * scale);
   const color = isSelected ? "#d4af37" : "#0d9488";
 
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 40 40">
-      <defs>
-        <filter id="s" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
-        </filter>
-      </defs>
-      <g filter="url(%23s)">
-        <circle cx="20" cy="20" r="16" fill="${color}"/>
-        <circle cx="20" cy="20" r="13" fill="white"/>
-        <g fill="${color}">
-          <path d="M20 10 L20 8 M19 9 L21 9" stroke="${color}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-          <path d="M20 11c-4 0-7 2.5-7 5.5v8h14v-8c0-3-3-5.5-7-5.5z"/>
-          <rect x="18" y="20" width="4" height="5" rx="2" fill="white"/>
-        </g>
-      </g>
-    </svg>
-  `;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 36 48"><defs><filter id="ds" x="-50%" y="-30%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.3"/></filter></defs><g filter="url(%23ds)"><path d="M18 47c0 0-15-17-15-29C3 9.72 9.72 3 18 3s15 6.72 15 15c0 12-15 29-15 29z" fill="${color}"/><circle cx="18" cy="18" r="10" fill="white"/><text x="18" y="23" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="${color}">☪</text></g></svg>`;
 
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
-    scaledSize: new google.maps.Size(size, size),
-    anchor: new google.maps.Point(size / 2, size / 2),
+    scaledSize: new google.maps.Size(width, height),
+    anchor: new google.maps.Point(width / 2, height),
   };
 };
 
