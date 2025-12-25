@@ -37,8 +37,8 @@ export default function IftarPage() {
     <main className="min-h-screen">
       <Navbar />
 
-      {/* Hero Section - Clean & Minimal */}
-      <section className="pt-32 pb-20 bg-white">
+      {/* Hero Section - Dark & Professional */}
+      <section className="pt-32 pb-24 bg-[#0f2d2d]">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -46,24 +46,24 @@ export default function IftarPage() {
             transition={{ duration: 0.5 }}
             className="max-w-3xl"
           >
-            <p className="text-teal font-medium mb-4">Ramadan 2026</p>
+            <p className="text-teal-400 font-medium mb-4 tracking-wide uppercase text-sm">Ramadan 2026</p>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-text-primary mb-6 tracking-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-white mb-6 tracking-tight">
               Iftarkaart Gent
             </h1>
 
-            <p className="text-xl text-text-secondary mb-10 leading-relaxed">
+            <p className="text-xl text-white/70 mb-10 leading-relaxed max-w-2xl">
               Vind iftar locaties in Gent en omgeving. Moskeeën en organisaties kunnen hun iftar toevoegen aan de kaart.
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <a href="#iftar-map" className="btn-primary">
+              <a href="#iftar-map" className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-white text-[#0f2d2d] hover:bg-white/90 transition-all">
                 Bekijk de kaart
                 <ArrowRight className="w-4 h-4 ml-2" />
               </a>
               <Link
                 href="/iftar/toevoegen"
-                className="btn-outline"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 transition-all"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Iftar toevoegen
@@ -97,7 +97,7 @@ export default function IftarPage() {
       {!isLoading && <IftarList locations={locations} />}
 
       {/* CTA Section */}
-      <section className="bg-white section-padding border-t border-gray-100">
+      <section className="bg-[#0f2d2d] section-padding">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -105,15 +105,15 @@ export default function IftarPage() {
             viewport={{ once: true }}
             className="max-w-2xl mx-auto text-center"
           >
-            <h2 className="heading-section mb-4">
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-white mb-4">
               Organiseert u een iftar?
             </h2>
-            <p className="text-body mb-8">
+            <p className="text-lg text-white/70 mb-8">
               Voeg uw iftar toe aan de Iftarkaart zodat iedereen uw locatie kan vinden.
             </p>
             <Link
               href="/iftar/toevoegen"
-              className="btn-primary inline-flex"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-white text-[#0f2d2d] hover:bg-white/90 transition-all"
             >
               <Plus className="w-5 h-5 mr-2" />
               Iftar toevoegen
