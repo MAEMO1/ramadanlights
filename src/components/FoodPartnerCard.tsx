@@ -52,9 +52,111 @@ export function FoodPartnerCard({
   const isFeatured = isFeaturedPartner(partner.partner_tier);
   const hasPremiumFeatures = isPremiumPartner(partner.partner_tier);
   const isPremium = partner.partner_tier === "premium";
+  const isBasicPartner = partner.partner_tier === "partner"; // €300 tier - should be compact
 
   // Check if has any delivery option
   const hasDelivery = partner.uber_eats_url || partner.deliveroo_url || partner.takeaway_url;
+
+  // Compact card for basic partner tier (€300)
+  if (isBasicPartner) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.1 + index * 0.05 }}
+        className={`group relative rounded-xl overflow-hidden transition-all hover:shadow-lg ${tierConfig.cardStyle}`}
+      >
+        <div className="flex items-center gap-4 p-4">
+          {/* Small Image/Logo */}
+          <div className="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden">
+            {partner.cover_image_url || partner.logo_url ? (
+              <img
+                src={partner.logo_url || partner.cover_image_url || ""}
+                alt={partner.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                <ImageIcon className="w-6 h-6 text-gray-300" />
+              </div>
+            )}
+            {partner.is_halal_certified && (
+              <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-600 text-white rounded-full flex items-center justify-center">
+                <Check className="w-3 h-3" />
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h3 className="font-display font-semibold text-text-primary group-hover:text-teal transition-colors truncate">
+                  {partner.name}
+                </h3>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs text-text-muted">
+                    {categoryLabels[partner.category]}
+                  </span>
+                  {partner.cuisine_type && (
+                    <span className="flex items-center gap-1 text-xs text-text-muted">
+                      <span>{cuisineIcons[partner.cuisine_type]}</span>
+                      {cuisineTypeLabels[partner.cuisine_type]}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {hasDelivery && (
+                <div className="flex-shrink-0 p-1.5 bg-teal/10 text-teal rounded-full">
+                  <Truck className="w-3.5 h-3.5" />
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5 mt-1.5 text-xs text-text-muted">
+              <MapPin className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{partner.address}, {partner.city}</span>
+            </div>
+
+            {/* Iftar Special - Compact */}
+            {partner.iftar_special && (
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                <span className="text-xs text-amber-700 truncate">{partner.iftar_special}</span>
+                {partner.iftar_special_price && (
+                  <span className="text-xs font-semibold text-amber-900 flex-shrink-0">{partner.iftar_special_price}</span>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex flex-col gap-2 flex-shrink-0">
+            {partner.website_url && (
+              <a
+                href={partner.website_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 bg-teal text-white rounded-full hover:bg-teal/90 transition-colors"
+                title="Website"
+              >
+                <Globe className="w-4 h-4" />
+              </a>
+            )}
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${partner.address}, ${partner.postal_code || ""} ${partner.city}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
+              title="Route"
+            >
+              <Navigation className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

@@ -120,13 +120,6 @@ export function Navbar() {
               <div className={`w-px h-5 mx-3 ${isScrolled ? "bg-gray-200" : "bg-white/30"}`} />
 
               <Link
-                href="/#doneren"
-                className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gold text-white hover:bg-gold-dark"
-              >
-                #LightUpRamadan
-              </Link>
-
-              <Link
                 href="/#sponsor-form"
                 className={`
                   px-4 py-2 text-sm font-medium rounded-md transition-colors
@@ -137,6 +130,13 @@ export function Navbar() {
                 `}
               >
                 Word Sponsor
+              </Link>
+
+              <Link
+                href="/#doneren"
+                className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-gold text-white hover:bg-gold-dark"
+              >
+                #LightUpRamadan
               </Link>
             </div>
 
@@ -228,16 +228,6 @@ export function Navbar() {
 
                 <div className="py-4 border-t border-gray-100 space-y-2">
                   <Link
-                    href="/#doneren"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="
-                      block w-full py-3 text-center text-[15px] font-medium
-                      bg-gold text-white rounded-md
-                    "
-                  >
-                    #LightUpRamadan
-                  </Link>
-                  <Link
                     href="/#sponsor-form"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="
@@ -246,6 +236,16 @@ export function Navbar() {
                     "
                   >
                     Word Sponsor
+                  </Link>
+                  <Link
+                    href="/#doneren"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="
+                      block w-full py-3 text-center text-[15px] font-medium
+                      bg-gold text-white rounded-md
+                    "
+                  >
+                    #LightUpRamadan
                   </Link>
                 </div>
               </div>
