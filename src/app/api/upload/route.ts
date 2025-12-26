@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 export async function POST(request: NextRequest) {
   try {
-    if (!supabaseAdmin) {
+    const supabase = getSupabaseAdmin();
+
+    if (!supabase) {
       return NextResponse.json(
         { success: false, message: "Database niet geconfigureerd" },
         { status: 500 }
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload to Supabase Storage
-    const { data, error } = await supabaseAdmin.storage
+    const { data, error } = await supabase.storage
       .from("images")
       .upload(fileName, buffer, {
         contentType: file.type,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -18,7 +18,9 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!supabaseAdmin) {
+  const supabase = getSupabaseAdmin();
+
+    if (!supabase) {
     return NextResponse.redirect(
       new URL("/wat-te-doen?error=config", request.url)
     );
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Find the activity by approval token
-    const { data: activity, error: findError } = await supabaseAdmin
+    const { data: activity, error: findError } = await supabase
       .from("activities")
       .select("*")
       .eq("approval_token", token)
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
         ? { status: "approved", approved_at: new Date().toISOString() }
         : { status: "rejected", rejected_at: new Date().toISOString() };
 
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await supabase
       .from("activities")
       .update(updateData)
       .eq("id", activity.id);

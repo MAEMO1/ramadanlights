@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 // Force dynamic - don't cache this route
 export const dynamic = 'force-dynamic';
@@ -7,7 +7,9 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     // Return empty list if Supabase is not configured
-    if (!supabaseAdmin) {
+    const supabase = getSupabaseAdmin();
+
+    if (!supabase) {
       return NextResponse.json({
         success: true,
         data: [],
@@ -17,7 +19,7 @@ export async function GET() {
     // Get today's date for filtering
     const today = new Date().toISOString().split("T")[0];
 
-    const { data: activities, error } = await supabaseAdmin
+    const { data: activities, error } = await supabase
       .from("activities")
       .select(
         `

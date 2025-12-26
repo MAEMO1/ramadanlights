@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 import { foodPartnerFormSchema } from "@/lib/food-partner-validations";
 import { categoryLabels } from "@/lib/food-partner-types";
 import { Resend } from "resend";
@@ -51,7 +51,9 @@ async function geocodeAddress(
 export async function POST(request: NextRequest) {
   try {
     // Check if Supabase is configured
-    if (!supabaseAdmin) {
+    const supabase = getSupabaseAdmin();
+
+    if (!supabase) {
       return NextResponse.json(
         { success: false, message: "Database is niet geconfigureerd" },
         { status: 500 }
@@ -64,7 +66,7 @@ export async function POST(request: NextRequest) {
     const validatedData = foodPartnerFormSchema.parse(body);
 
     // Check for duplicate submissions (same name and address)
-    const { data: existingPartners } = await supabaseAdmin
+    const { data: existingPartners } = await supabase
       .from("food_partners")
       .select("id, status")
       .eq("name", validatedData.name)
@@ -103,7 +105,7 @@ export async function POST(request: NextRequest) {
     const slug = generateSlug(validatedData.name);
 
     // Insert into Supabase
-    const { data: foodPartner, error: dbError } = await supabaseAdmin
+    const { data: foodPartner, error: dbError } = await supabase
       .from("food_partners")
       .insert({
         name: validatedData.name,

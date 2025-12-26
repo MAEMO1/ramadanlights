@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 import { iftarFormSchema } from "@/lib/iftar-validations";
 import { Resend } from "resend";
 import { ZodError } from "zod";
@@ -65,7 +65,9 @@ async function geocodeAddress(address: string, city: string): Promise<{ lat: num
 export async function POST(request: NextRequest) {
   try {
     // Check if Supabase is configured
-    if (!supabaseAdmin) {
+    const supabase = getSupabaseAdmin();
+
+    if (!supabase) {
       return NextResponse.json(
         { success: false, message: "Database is niet geconfigureerd" },
         { status: 500 }
@@ -78,7 +80,7 @@ export async function POST(request: NextRequest) {
     const validatedData = iftarFormSchema.parse(body);
 
     // Check for duplicate submissions (same mosque_name and address)
-    const { data: existingIftars } = await supabaseAdmin
+    const { data: existingIftars } = await supabase
       .from("iftar_events")
       .select("id, status")
       .eq("mosque_name", validatedData.mosque_name)
@@ -104,7 +106,7 @@ export async function POST(request: NextRequest) {
     const coordinates = await geocodeAddress(validatedData.address, validatedData.city);
 
     // Insert into Supabase
-    const { data: iftarEvent, error: dbError } = await supabaseAdmin
+    const { data: iftarEvent, error: dbError } = await supabase
       .from("iftar_events")
       .insert({
         mosque_name: validatedData.mosque_name,

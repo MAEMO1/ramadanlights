@@ -1,20 +1,22 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 // Force dynamic - don't cache this route
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const supabase = getSupabaseAdmin();
+
     // Return empty list if Supabase is not configured
-    if (!supabaseAdmin) {
+    if (!supabase) {
       return NextResponse.json({
         success: true,
         data: [],
       });
     }
 
-    const { data: iftarEvents, error } = await supabaseAdmin
+    const { data: iftarEvents, error } = await supabase
       .from("iftar_events")
       .select(
         `

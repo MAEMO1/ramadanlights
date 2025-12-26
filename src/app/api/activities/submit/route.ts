@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { getSupabaseAdmin } from "@/lib/supabase";
 import { activityFormSchema } from "@/lib/activity-validations";
 import { activityTypeLabels } from "@/lib/activity-types";
 import { Resend } from "resend";
@@ -54,7 +54,9 @@ function formatDate(dateStr: string): string {
 export async function POST(request: NextRequest) {
   try {
     // Check if Supabase is configured
-    if (!supabaseAdmin) {
+    const supabase = getSupabaseAdmin();
+
+    if (!supabase) {
       return NextResponse.json(
         { success: false, message: "Database is niet geconfigureerd" },
         { status: 500 }
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
     const validatedData = activityFormSchema.parse(body);
 
     // Check for duplicate submissions (same title, date, and location)
-    const { data: existingActivities } = await supabaseAdmin
+    const { data: existingActivities } = await supabase
       .from("activities")
       .select("id, status")
       .eq("title", validatedData.title)
@@ -104,7 +106,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Insert into Supabase
-    const { data: activity, error: dbError } = await supabaseAdmin
+    const { data: activity, error: dbError } = await supabase
       .from("activities")
       .insert({
         title: validatedData.title,

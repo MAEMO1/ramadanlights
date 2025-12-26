@@ -1,18 +1,20 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
 // Server-side client with service role key (for API routes)
-// Returns null if environment variables are not configured
-function getSupabaseAdmin(): SupabaseClient | null {
+// Creates a new client on each call to ensure env vars are available at runtime
+export function getSupabaseAdmin(): SupabaseClient | null {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
   if (!supabaseUrl || !supabaseServiceKey) {
+    console.error("Supabase not configured:", { url: !!supabaseUrl, key: !!supabaseServiceKey });
     return null;
   }
   return createClient(supabaseUrl, supabaseServiceKey);
 }
 
-export const supabaseAdmin = getSupabaseAdmin();
+// Legacy export for backwards compatibility - creates client at runtime
+export const supabaseAdmin = null as SupabaseClient | null;
 
 // Type definitions for iftar_events table
 export interface IftarEvent {
