@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -30,7 +30,6 @@ import {
   List,
   type LucideIcon,
 } from "lucide-react";
-import { useRef } from "react";
 import Link from "next/link";
 import type { Activity, ActivityType } from "@/lib/activity-types";
 import type { FoodPartner, CuisineType, FoodPartnerCategory, DishType } from "@/lib/food-partner-types";
@@ -709,10 +708,11 @@ const dummyFoodPartners: FoodPartner[] = [
   },
 ];
 
-// Dummy activities for demonstration
+// Dummy activities for demonstration - at least 4 per category
 const dummyActivities: Activity[] = [
+  // ========== LECTURES (4) ==========
   {
-    id: "activity-1",
+    id: "lecture-1",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     title: "Ramadan Lezing: De spirituele reis",
@@ -752,7 +752,129 @@ const dummyActivities: Activity[] = [
     rejection_reason: null,
   },
   {
-    id: "activity-2",
+    id: "lecture-2",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Tafsir Al-Quran: Surat Al-Baqarah",
+    description: "Wekelijkse tafsir sessie over Surat Al-Baqarah. Verdiep je begrip van de Koran.",
+    activity_type: "lecture",
+    location_name: "Eyup Sultan Moskee",
+    address: "Dendermondsesteenweg 400",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0600,
+    longitude: 3.7500,
+    event_date: "2026-03-16",
+    start_time: "19:00",
+    end_time: "20:30",
+    is_recurring: true,
+    recurrence_pattern: "weekly",
+    recurrence_end_date: null,
+    organizer_name: "Eyup Sultan Moskee",
+    organizer_email: "info@eyupsultan.be",
+    organizer_phone: null,
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 150,
+    for_youth: true,
+    for_women: false,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "lecture-3",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "De rechten van de buren in Islam",
+    description: "Lezing over het belang van goede buurrelaties vanuit islamitisch perspectief.",
+    activity_type: "lecture",
+    location_name: "Al Fath Moskee",
+    address: "Bevrijdingslaan 110",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0400,
+    longitude: 3.7300,
+    event_date: "2026-03-18",
+    start_time: "20:30",
+    end_time: "22:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Al Fath Moskee",
+    organizer_email: "info@alfath.be",
+    organizer_phone: "+32 9 234 56 78",
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 100,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "lecture-4",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Zusters Lezing: Moeders van de gelovigen",
+    description: "Exclusieve lezing voor zusters over de vrouwen van de Profeet (vzmh).",
+    activity_type: "lecture",
+    location_name: "Islamitisch Centrum Gent",
+    address: "Forelstraat 91",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0443,
+    longitude: 3.7074,
+    event_date: "2026-03-20",
+    start_time: "14:00",
+    end_time: "16:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "ICG Zusters",
+    organizer_email: "zusters@icg.be",
+    organizer_phone: null,
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 80,
+    for_youth: false,
+    for_women: true,
+    for_men: false,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+
+  // ========== WORKSHOPS (4) ==========
+  {
+    id: "workshop-1",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     title: "Zusters Koran Cirkel",
@@ -792,7 +914,129 @@ const dummyActivities: Activity[] = [
     rejection_reason: null,
   },
   {
-    id: "activity-3",
+    id: "workshop-2",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Arabisch voor beginners",
+    description: "Leer de basis van de Arabische taal. Ideaal voor nieuwkomers die de Koran beter willen begrijpen.",
+    activity_type: "workshop",
+    location_name: "Cultureel Centrum De Centrale",
+    address: "Kraankindersstraat 2",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0510,
+    longitude: 3.7220,
+    event_date: "2026-03-17",
+    start_time: "10:00",
+    end_time: "12:00",
+    is_recurring: true,
+    recurrence_pattern: "weekly",
+    recurrence_end_date: null,
+    organizer_name: "Taalschool Al-Noor",
+    organizer_email: "info@alnoor-taal.be",
+    organizer_phone: "+32 9 345 67 89",
+    registration_url: "https://example.com/arabisch",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: false,
+    price: "€50 per maand",
+    capacity: 20,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "workshop-3",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Islamitische kalligrafie workshop",
+    description: "Ontdek de kunst van Arabische kalligrafie. Alle materialen worden voorzien.",
+    activity_type: "workshop",
+    location_name: "Kunstencentrum Vooruit",
+    address: "Sint-Pietersnieuwstraat 23",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0450,
+    longitude: 3.7250,
+    event_date: "2026-03-22",
+    start_time: "14:00",
+    end_time: "17:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Kalligrafie Meester Ahmed",
+    organizer_email: "ahmed@kalligrafie.be",
+    organizer_phone: null,
+    registration_url: "https://example.com/kalligrafie",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: false,
+    price: "€25",
+    capacity: 15,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "workshop-4",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Iftar koken: Marokkaanse specialiteiten",
+    description: "Leer authentieke Marokkaanse iftar gerechten bereiden. Harira, briwat en meer!",
+    activity_type: "workshop",
+    location_name: "Kookstudio De Smaak",
+    address: "Vlasmarkt 12",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0530,
+    longitude: 3.7200,
+    event_date: "2026-03-19",
+    start_time: "15:00",
+    end_time: "18:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Chef Karima",
+    organizer_email: "karima@koken.be",
+    organizer_phone: "+32 9 111 22 33",
+    registration_url: "https://example.com/koken",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: false,
+    price: "€35 incl. ingrediënten",
+    capacity: 12,
+    for_youth: false,
+    for_women: true,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+
+  // ========== CHARITY (4) ==========
+  {
+    id: "charity-1",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     title: "Voedselactie voor minderbedeelden",
@@ -832,7 +1076,291 @@ const dummyActivities: Activity[] = [
     rejection_reason: null,
   },
   {
-    id: "activity-4",
+    id: "charity-2",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Kledingactie voor vluchtelingen",
+    description: "Doneer warme kleding en dekens voor vluchtelingenfamilies in Gent.",
+    activity_type: "charity",
+    location_name: "Rode Kruis Gent",
+    address: "Gasmeterlaan 89",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0480,
+    longitude: 3.7400,
+    event_date: "2026-03-16",
+    start_time: "09:00",
+    end_time: "17:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Rode Kruis Gent",
+    organizer_email: "gent@rodekruis.be",
+    organizer_phone: "+32 9 222 33 44",
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: null,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "charity-3",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Zakat distributie - Ramadan 2026",
+    description: "Officiële zakat distributie via erkende instantie. Meld je aan als vrijwilliger.",
+    activity_type: "charity",
+    location_name: "Fatih Moskee",
+    address: "Sleepstraat 67",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0543,
+    longitude: 3.7174,
+    event_date: "2026-03-25",
+    start_time: "10:00",
+    end_time: "16:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Zakat Foundation Belgium",
+    organizer_email: "info@zakatbe.org",
+    organizer_phone: null,
+    registration_url: "https://example.com/zakat",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 50,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "charity-4",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Bloeddonatie actie",
+    description: "Geef bloed, red levens. Speciale bloeddonatie actie tijdens Ramadan.",
+    activity_type: "charity",
+    location_name: "UZ Gent",
+    address: "Corneel Heymanslaan 10",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0240,
+    longitude: 3.7300,
+    event_date: "2026-03-21",
+    start_time: "08:00",
+    end_time: "14:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Rode Kruis Vlaanderen",
+    organizer_email: "bloed@rodekruis.be",
+    organizer_phone: null,
+    registration_url: "https://example.com/bloed",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 100,
+    for_youth: false,
+    for_women: true,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+
+  // ========== COMMUNITY (4) ==========
+  {
+    id: "community-1",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Familie Iftar & Spelletjesavond",
+    description: "Gezellige iftar voor het hele gezin gevolgd door spelletjes en activiteiten voor kinderen.",
+    activity_type: "community",
+    location_name: "Cultureel Centrum De Centrale",
+    address: "Kraankindersstraat 2",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0510,
+    longitude: 3.7220,
+    event_date: "2026-03-25",
+    start_time: "18:30",
+    end_time: "21:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Gentse Moslim Families",
+    organizer_email: "info@gmf.be",
+    organizer_phone: "+32 9 777 88 99",
+    registration_url: "https://example.com/familie-iftar",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: false,
+    price: "€10 per gezin",
+    capacity: 100,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "community-2",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Multiculturele Iftar Gent",
+    description: "Iftar voor alle Gentenaars - ongeacht achtergrond. Ontmoet je buren!",
+    activity_type: "community",
+    location_name: "Stadhuis Gent",
+    address: "Botermarkt 1",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0535,
+    longitude: 3.7250,
+    event_date: "2026-03-23",
+    start_time: "19:00",
+    end_time: "21:30",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Stad Gent",
+    organizer_email: "diversiteit@stad.gent",
+    organizer_phone: null,
+    registration_url: "https://example.com/multicultureel",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 300,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "community-3",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Buurtiftar Wondelgem",
+    description: "Jaarlijkse buurtiftar voor alle inwoners van Wondelgem en omstreken.",
+    activity_type: "community",
+    location_name: "Gemeenschapscentrum Wondelgem",
+    address: "Botestraat 98",
+    city: "Gent",
+    postal_code: "9032",
+    latitude: 51.0700,
+    longitude: 3.7200,
+    event_date: "2026-03-27",
+    start_time: "18:00",
+    end_time: "21:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Buurtwerking Wondelgem",
+    organizer_email: "info@wondelgem.be",
+    organizer_phone: "+32 9 333 44 55",
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 150,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "community-4",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Open Moskee Dag",
+    description: "Kom kennismaken met de moskee. Rondleiding, thee, en gesprek met de imam.",
+    activity_type: "community",
+    location_name: "Al Fath Moskee",
+    address: "Bevrijdingslaan 110",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0400,
+    longitude: 3.7300,
+    event_date: "2026-03-29",
+    start_time: "14:00",
+    end_time: "17:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Al Fath Moskee",
+    organizer_email: "info@alfath.be",
+    organizer_phone: null,
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 50,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+
+  // ========== YOUTH (4) ==========
+  {
+    id: "youth-1",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     title: "Jongerenbijeenkomst: Ramadan Challenge",
@@ -872,35 +1400,319 @@ const dummyActivities: Activity[] = [
     rejection_reason: null,
   },
   {
-    id: "activity-5",
+    id: "youth-2",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    title: "Familie Iftar & Spelletjesavond",
-    description: "Gezellige iftar voor het hele gezin gevolgd door spelletjes en activiteiten voor kinderen.",
-    activity_type: "community",
-    location_name: "Cultureel Centrum De Centrale",
-    address: "Kraankindersstraat 2",
+    title: "Gaming Night - Halal Edition",
+    description: "Gezellige game-avond voor moslimjongeren. FIFA toernooi en meer!",
+    activity_type: "youth",
+    location_name: "Jeugdcentrum De Brug",
+    address: "Blekerijstraat 50",
     city: "Gent",
     postal_code: "9000",
-    latitude: 51.0510,
-    longitude: 3.7220,
-    event_date: "2026-03-25",
-    start_time: "18:30",
-    end_time: "21:00",
+    latitude: 51.0550,
+    longitude: 3.7150,
+    event_date: "2026-03-24",
+    start_time: "19:00",
+    end_time: "23:00",
     is_recurring: false,
     recurrence_pattern: null,
     recurrence_end_date: null,
-    organizer_name: "Gentse Moslim Families",
-    organizer_email: "info@gmf.be",
-    organizer_phone: "+32 9 777 88 99",
-    registration_url: "https://example.com/familie-iftar",
+    organizer_name: "Muslim Youth Gent",
+    organizer_email: "info@muslimy.be",
+    organizer_phone: null,
+    registration_url: "https://example.com/gaming",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 40,
+    for_youth: true,
+    for_women: false,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "youth-3",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Sisters Suhoor Hangout",
+    description: "Late night suhoor en gezelligheid voor zusters tussen 16-25 jaar.",
+    activity_type: "youth",
+    location_name: "Zusters Centrum Gent",
+    address: "Onderstraat 22",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0520,
+    longitude: 3.7180,
+    event_date: "2026-03-26",
+    start_time: "02:00",
+    end_time: "05:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Sisters United",
+    organizer_email: "info@sisters.be",
+    organizer_phone: null,
+    registration_url: "https://example.com/suhoor",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 25,
+    for_youth: true,
+    for_women: true,
+    for_men: false,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "youth-4",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Career Talk: Moslimjongeren in het bedrijfsleven",
+    description: "Inspirerende verhalen van succesvolle moslimprofessionals. Netwerkmogelijkheden.",
+    activity_type: "youth",
+    location_name: "UGent Campus Sterre",
+    address: "Krijgslaan 281",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0280,
+    longitude: 3.7100,
+    event_date: "2026-03-28",
+    start_time: "14:00",
+    end_time: "17:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Muslim Students Gent",
+    organizer_email: "info@msg.be",
+    organizer_phone: null,
+    registration_url: "https://example.com/career",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 100,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+
+  // ========== SPORTS (4) ==========
+  {
+    id: "sports-1",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Brothers Voetbaltoernooi",
+    description: "5x5 voetbaltoernooi voor broeders. Vorm je team en schrijf je in!",
+    activity_type: "sports",
+    location_name: "Sporthal Blaarmeersen",
+    address: "Zuiderlaan 14",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0350,
+    longitude: 3.6900,
+    event_date: "2026-03-21",
+    start_time: "14:00",
+    end_time: "18:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Muslim Sports Gent",
+    organizer_email: "info@muslimsports.be",
+    organizer_phone: "+32 9 444 55 66",
+    registration_url: "https://example.com/voetbal",
     website_url: null,
     facebook_url: null,
     instagram_url: null,
     cover_image_url: null,
     is_free: false,
-    price: "€10 per gezin",
-    capacity: 100,
+    price: "€5 per persoon",
+    capacity: 80,
+    for_youth: true,
+    for_women: false,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "sports-2",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Sisters Zwemmen - Alleen voor vrouwen",
+    description: "Zwemmen exclusief voor zusters. Volledig privacy gegarandeerd.",
+    activity_type: "sports",
+    location_name: "Zwembad Rozebroeken",
+    address: "Rozebroeken 101",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0600,
+    longitude: 3.7000,
+    event_date: "2026-03-23",
+    start_time: "10:00",
+    end_time: "12:00",
+    is_recurring: true,
+    recurrence_pattern: "weekly",
+    recurrence_end_date: null,
+    organizer_name: "Sisters Sports",
+    organizer_email: "info@sisterssports.be",
+    organizer_phone: null,
+    registration_url: "https://example.com/zwemmen",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: false,
+    price: "€8 per sessie",
+    capacity: 30,
+    for_youth: true,
+    for_women: true,
+    for_men: false,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "sports-3",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Ramadan Running Club",
+    description: "Ochtendloop voor fitnessliefhebbers. 5K route door het Citadelpark.",
+    activity_type: "sports",
+    location_name: "Citadelpark - Ingang",
+    address: "Charles de Kerckhovelaan",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0420,
+    longitude: 3.7180,
+    event_date: "2026-03-17",
+    start_time: "06:30",
+    end_time: "07:30",
+    is_recurring: true,
+    recurrence_pattern: "daily",
+    recurrence_end_date: null,
+    organizer_name: "Muslim Runners Belgium",
+    organizer_email: "info@muslimrunners.be",
+    organizer_phone: null,
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: null,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "sports-4",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Basketbal Brothers Night",
+    description: "Wekelijkse basketbaltraining en vriendschappelijke wedstrijden.",
+    activity_type: "sports",
+    location_name: "Sporthal Ledeberg",
+    address: "Sportpleinstraat 2",
+    city: "Gent",
+    postal_code: "9050",
+    latitude: 51.0380,
+    longitude: 3.7400,
+    event_date: "2026-03-19",
+    start_time: "20:00",
+    end_time: "22:00",
+    is_recurring: true,
+    recurrence_pattern: "weekly",
+    recurrence_end_date: null,
+    organizer_name: "Brothers Basketball",
+    organizer_email: "info@brosbasket.be",
+    organizer_phone: null,
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: false,
+    price: "€3 per avond",
+    capacity: 20,
+    for_youth: true,
+    for_women: false,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+
+  // ========== SHOPPING - WINKELS (4) ==========
+  {
+    id: "shopping-1",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Al-Noor Modest Fashion",
+    description: "Modeste kleding voor dames en heren. Abayas, thawbs, hijabs en meer. Ramadan collectie nu beschikbaar!",
+    activity_type: "shopping",
+    location_name: "Al-Noor Modest Fashion",
+    address: "Sleepstraat 45",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0540,
+    longitude: 3.7170,
+    event_date: "2026-03-15",
+    start_time: "10:00",
+    end_time: "19:00",
+    is_recurring: true,
+    recurrence_pattern: "daily",
+    recurrence_end_date: null,
+    organizer_name: "Al-Noor Fashion",
+    organizer_email: "info@alnoorfashion.be",
+    organizer_phone: "+32 9 123 11 22",
+    registration_url: null,
+    website_url: "https://example.com/alnoorfashion",
+    facebook_url: "https://facebook.com/alnoorfashion",
+    instagram_url: "https://instagram.com/alnoorfashion",
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: null,
     for_youth: true,
     for_women: true,
     for_men: true,
@@ -911,37 +1723,278 @@ const dummyActivities: Activity[] = [
     rejected_at: null,
     rejection_reason: null,
   },
-  // SHOPPING ACTIVITY
   {
-    id: "activity-6",
+    id: "shopping-2",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    title: "Ramadan Markt - Halal Shopping Event",
-    description: "Grote Ramadan markt met halal producten, kleding, boeken, parfums en meer. Ontdek diverse kramen van lokale ondernemers.",
+    title: "Istanbul Meubelen",
+    description: "Turkse en Marokkaanse meubelen, tapijten, en woondecoratie. Gratis levering in Gent.",
     activity_type: "shopping",
+    location_name: "Istanbul Meubelen",
+    address: "Brugsepoortstraat 150",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0500,
+    longitude: 3.7050,
+    event_date: "2026-03-15",
+    start_time: "10:00",
+    end_time: "18:00",
+    is_recurring: true,
+    recurrence_pattern: "daily",
+    recurrence_end_date: null,
+    organizer_name: "Istanbul Meubelen",
+    organizer_email: "info@istanbulmeubelen.be",
+    organizer_phone: "+32 9 234 55 66",
+    registration_url: null,
+    website_url: "https://example.com/istanbulmeubelen",
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: null,
+    for_youth: false,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "shopping-3",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Parfumerie Al-Oud",
+    description: "Arabische parfums, oud, bakhoor en attar. Premium kwaliteit uit Dubai en Saudi-Arabië.",
+    activity_type: "shopping",
+    location_name: "Parfumerie Al-Oud",
+    address: "Veldstraat 120",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0525,
+    longitude: 3.7220,
+    event_date: "2026-03-15",
+    start_time: "10:00",
+    end_time: "19:00",
+    is_recurring: true,
+    recurrence_pattern: "daily",
+    recurrence_end_date: null,
+    organizer_name: "Al-Oud Parfums",
+    organizer_email: "info@aloud.be",
+    organizer_phone: "+32 9 345 66 77",
+    registration_url: null,
+    website_url: "https://example.com/aloud",
+    facebook_url: null,
+    instagram_url: "https://instagram.com/aloudparfums",
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: null,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: false,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "shopping-4",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Kitab Boekhandel",
+    description: "Islamitische boeken, Korans, kinderboeken, en educatief materiaal. Groot assortiment in NL, AR en EN.",
+    activity_type: "shopping",
+    location_name: "Kitab Boekhandel",
+    address: "Wondelgemstraat 88",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0620,
+    longitude: 3.7250,
+    event_date: "2026-03-15",
+    start_time: "09:00",
+    end_time: "18:00",
+    is_recurring: true,
+    recurrence_pattern: "daily",
+    recurrence_end_date: null,
+    organizer_name: "Kitab Boekhandel",
+    organizer_email: "info@kitab.be",
+    organizer_phone: "+32 9 456 77 88",
+    registration_url: null,
+    website_url: "https://example.com/kitab",
+    facebook_url: "https://facebook.com/kitabgent",
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: null,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+
+  // ========== OTHER (4) ==========
+  {
+    id: "other-1",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Ramadan Lights Opening Ceremony",
+    description: "Officiële opening van Ramadan Lights 2026. Lichtshow, muziek en speeches.",
+    activity_type: "other",
+    location_name: "Korenmarkt",
+    address: "Korenmarkt",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0537,
+    longitude: 3.7231,
+    event_date: "2026-03-01",
+    start_time: "19:00",
+    end_time: "21:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "VGM",
+    organizer_email: "vzwvgm@gmail.com",
+    organizer_phone: null,
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: 1000,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "other-2",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Eid ul-Fitr Gebed - Flanders Expo",
+    description: "Groot Eid gebed voor de hele Gentse moslimgemeenschap.",
+    activity_type: "other",
     location_name: "Flanders Expo",
     address: "Maaltekouter 1",
     city: "Gent",
     postal_code: "9051",
     latitude: 51.0350,
     longitude: 3.7450,
-    event_date: "2026-03-28",
-    start_time: "10:00",
-    end_time: "20:00",
+    event_date: "2026-03-31",
+    start_time: "08:00",
+    end_time: "10:00",
     is_recurring: false,
     recurrence_pattern: null,
     recurrence_end_date: null,
-    organizer_name: "Ramadan Lights Events",
-    organizer_email: "events@ramadanlights.be",
-    organizer_phone: "+32 9 999 00 11",
+    organizer_name: "Executief Moslims België",
+    organizer_email: "info@emb.be",
+    organizer_phone: null,
     registration_url: null,
     website_url: null,
-    facebook_url: "https://facebook.com/ramadanmarkt",
-    instagram_url: "https://instagram.com/ramadanmarkt",
+    facebook_url: null,
+    instagram_url: null,
     cover_image_url: null,
     is_free: true,
     price: null,
-    capacity: 2000,
+    capacity: 5000,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "other-3",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Ramadan Fototentoonstelling",
+    description: "Fototentoonstelling over Ramadan tradities wereldwijd. Gratis toegang.",
+    activity_type: "other",
+    location_name: "STAM Gent",
+    address: "Godshuizenlaan 2",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0400,
+    longitude: 3.7100,
+    event_date: "2026-03-15",
+    start_time: "10:00",
+    end_time: "18:00",
+    is_recurring: true,
+    recurrence_pattern: "daily",
+    recurrence_end_date: null,
+    organizer_name: "STAM Museum",
+    organizer_email: "info@stam.gent",
+    organizer_phone: null,
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: null,
+    for_youth: true,
+    for_women: true,
+    for_men: true,
+    for_families: true,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  {
+    id: "other-4",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    title: "Nacht van de Kader",
+    description: "Speciale nachtelijke aanbidding op Laylat al-Qadr. Tarawih, dua en Koran recitatie.",
+    activity_type: "other",
+    location_name: "Alle Moskeeën in Gent",
+    address: "Diverse locaties",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0543,
+    longitude: 3.7174,
+    event_date: "2026-03-27",
+    start_time: "21:00",
+    end_time: "05:00",
+    is_recurring: false,
+    recurrence_pattern: null,
+    recurrence_end_date: null,
+    organizer_name: "Moskeeën Gent",
+    organizer_email: "info@moskeeengent.be",
+    organizer_phone: null,
+    registration_url: null,
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
+    cover_image_url: null,
+    is_free: true,
+    price: null,
+    capacity: null,
     for_youth: true,
     for_women: true,
     for_men: true,
@@ -1020,7 +2073,87 @@ export default function WatTeDoenPage() {
   });
 
   // Calendar view state for activities
-  const [showCalendarView, setShowCalendarView] = useState(false);
+  type ActivityViewMode = "list" | "3days" | "week" | "month";
+  const [activityViewMode, setActivityViewMode] = useState<ActivityViewMode>("list");
+  const [calendarStartDate, setCalendarStartDate] = useState(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+  });
+
+  const navigateCalendar = (direction: "prev" | "next") => {
+    const offset = activityViewMode === "3days" ? 3 : activityViewMode === "week" ? 7 : 30;
+    const newDate = new Date(calendarStartDate);
+    newDate.setDate(calendarStartDate.getDate() + (direction === "next" ? offset : -offset));
+    setCalendarStartDate(newDate);
+  };
+
+  const goToToday = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    setCalendarStartDate(today);
+  };
+
+  const getCalendarDays = () => {
+    if (activityViewMode === "month") {
+      // Show full month grid (35 days starting from start of week containing startDate)
+      const startOfMonth = new Date(calendarStartDate.getFullYear(), calendarStartDate.getMonth(), 1);
+      const firstDayOfWeek = (startOfMonth.getDay() + 6) % 7; // Monday = 0
+      const startDate = new Date(startOfMonth);
+      startDate.setDate(startDate.getDate() - firstDayOfWeek);
+
+      const days: Date[] = [];
+      for (let i = 0; i < 35; i++) {
+        const day = new Date(startDate);
+        day.setDate(startDate.getDate() + i);
+        days.push(day);
+      }
+      return days;
+    } else {
+      const numDays = activityViewMode === "3days" ? 3 : 7;
+      const result: Date[] = [];
+      for (let i = 0; i < numDays; i++) {
+        const day = new Date(calendarStartDate);
+        day.setDate(calendarStartDate.getDate() + i);
+        result.push(day);
+      }
+      return result;
+    }
+  };
+
+  const calendarDays = getCalendarDays();
+  const isToday = (date: Date): boolean => {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+  };
+
+  const MONTH_NAMES = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
+  const DAY_NAMES_FULL = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
+
+  // FAB menu state
+  const [showAddMenu, setShowAddMenu] = useState(false);
+
+  // CTA section ref and visibility state for floating FAB
+  const ctaSectionRef = useRef<HTMLDivElement>(null);
+  const [ctaInView, setCtaInView] = useState(false);
+
+  // Track CTA section visibility
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setCtaInView(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ctaSectionRef.current) {
+      observer.observe(ctaSectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   // Scroll refs for arrow navigation
   const foodFilterScrollRef = useRef<HTMLDivElement>(null);
@@ -1277,241 +2410,380 @@ export default function WatTeDoenPage() {
             // Food Partner Filters
             <div className="space-y-4">
               {/* Main filter bar with arrows */}
-              <div className="relative flex items-center">
-                {/* Left arrow */}
+              <div className="flex items-center gap-3">
+                {/* Fixed Filter Button */}
                 <button
-                  onClick={() => scrollFilters("left")}
-                  className="absolute left-0 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:shadow-lg transition-all -ml-2"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                    showFilters || hasActiveFoodFilters
+                      ? "bg-teal text-white"
+                      : "bg-gray-100 text-text-secondary hover:bg-gray-200"
+                  }`}
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <Filter className="w-4 h-4" />
+                  Filters
+                  {hasActiveFoodFilters && (
+                    <span className="w-5 h-5 bg-white text-teal text-xs font-bold rounded-full flex items-center justify-center">
+                      {(foodFilters.cuisineType ? 1 : 0) +
+                        (foodFilters.dishType ? 1 : 0) +
+                        (foodFilters.category ? 1 : 0) +
+                        (foodFilters.halalCertified ? 1 : 0) +
+                        (foodFilters.hasDelivery ? 1 : 0) +
+                        (foodFilters.hasTakeaway ? 1 : 0)}
+                    </span>
+                  )}
                 </button>
 
-                {/* Scrollable filter container */}
-                <div
-                  ref={foodFilterScrollRef}
-                  className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide mx-8 scroll-smooth"
-                >
+                <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
+                {/* Scrollable container with arrows */}
+                <div className="relative flex-1 flex items-center min-w-0">
+                  {/* Left arrow */}
                   <button
-                    onClick={() => setShowFilters(!showFilters)}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                      showFilters || hasActiveFoodFilters
-                        ? "bg-teal text-white"
-                        : "bg-gray-100 text-text-secondary hover:bg-gray-200"
-                    }`}
+                    onClick={() => scrollFilters("left")}
+                    className="absolute left-0 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:shadow-lg transition-all -ml-2"
                   >
-                    <Filter className="w-4 h-4" />
-                    Filters
-                    {hasActiveFoodFilters && (
-                      <span className="w-5 h-5 bg-white text-teal text-xs font-bold rounded-full flex items-center justify-center">
-                        {(foodFilters.cuisineType ? 1 : 0) +
-                          (foodFilters.dishType ? 1 : 0) +
-                          (foodFilters.category ? 1 : 0) +
-                          (foodFilters.halalCertified ? 1 : 0) +
-                          (foodFilters.hasDelivery ? 1 : 0) +
-                          (foodFilters.hasTakeaway ? 1 : 0)}
-                      </span>
-                    )}
+                    <ChevronLeft className="w-5 h-5" />
                   </button>
 
-                  <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+                  {/* Scrollable filter chips */}
+                  <div
+                    ref={foodFilterScrollRef}
+                    className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide mx-8 scroll-smooth"
+                  >
+                    {/* Quick dish type filters */}
+                    {(Object.keys(dishTypeLabels) as DishType[]).slice(0, 6).map((dishType) => {
+                      const dishInfo = dishTypeLabels[dishType];
+                      return (
+                        <FilterChip
+                          key={dishType}
+                          label={dishInfo.label}
+                          icon={<span className="text-base">{dishInfo.emoji}</span>}
+                          active={foodFilters.dishType === dishType}
+                          onClick={() =>
+                            setFoodFilters({
+                              ...foodFilters,
+                              dishType: foodFilters.dishType === dishType ? null : dishType,
+                            })
+                          }
+                        />
+                      );
+                    })}
 
-                  {/* Quick dish type filters */}
-                  {(Object.keys(dishTypeLabels) as DishType[]).slice(0, 6).map((dishType) => {
-                    const dishInfo = dishTypeLabels[dishType];
-                    return (
+                    <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
+                    {/* Quick cuisine filters */}
+                    {availableCuisineTypes.slice(0, 4).map((cuisineType) => (
                       <FilterChip
-                        key={dishType}
-                        label={dishInfo.label}
-                        icon={<span className="text-base">{dishInfo.emoji}</span>}
-                        active={foodFilters.dishType === dishType}
+                        key={cuisineType}
+                        label={cuisineTypeLabels[cuisineType]}
+                        icon={<span className="text-base">{cuisineIcons[cuisineType]}</span>}
+                        active={foodFilters.cuisineType === cuisineType}
                         onClick={() =>
                           setFoodFilters({
                             ...foodFilters,
-                            dishType: foodFilters.dishType === dishType ? null : dishType,
+                            cuisineType:
+                              foodFilters.cuisineType === cuisineType ? null : cuisineType,
                           })
                         }
                       />
-                    );
-                  })}
+                    ))}
 
-                  <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+                    <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
 
-                  {/* Quick cuisine filters */}
-                  {availableCuisineTypes.slice(0, 4).map((cuisineType) => (
+                    {/* Quick action filters */}
                     <FilterChip
-                      key={cuisineType}
-                      label={cuisineTypeLabels[cuisineType]}
-                      icon={<span className="text-base">{cuisineIcons[cuisineType]}</span>}
-                      active={foodFilters.cuisineType === cuisineType}
+                      label="Halal Gecertificeerd"
+                      icon={<Check className="w-4 h-4" />}
+                      active={foodFilters.halalCertified}
                       onClick={() =>
                         setFoodFilters({
                           ...foodFilters,
-                          cuisineType:
-                            foodFilters.cuisineType === cuisineType ? null : cuisineType,
+                          halalCertified: !foodFilters.halalCertified,
                         })
                       }
                     />
-                  ))}
+                    <FilterChip
+                      label="Bezorging"
+                      icon={<Truck className="w-4 h-4" />}
+                      active={foodFilters.hasDelivery}
+                      onClick={() =>
+                        setFoodFilters({
+                          ...foodFilters,
+                          hasDelivery: !foodFilters.hasDelivery,
+                        })
+                      }
+                    />
+                    <FilterChip
+                      label="Takeaway"
+                      icon={<ShoppingBag className="w-4 h-4" />}
+                      active={foodFilters.hasTakeaway}
+                      onClick={() =>
+                        setFoodFilters({
+                          ...foodFilters,
+                          hasTakeaway: !foodFilters.hasTakeaway,
+                        })
+                      }
+                    />
+                  </div>
 
-                  <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
-
-                  {/* Quick action filters */}
-                  <FilterChip
-                    label="Halal Gecertificeerd"
-                    icon={<Check className="w-4 h-4" />}
-                    active={foodFilters.halalCertified}
-                    onClick={() =>
-                      setFoodFilters({
-                        ...foodFilters,
-                        halalCertified: !foodFilters.halalCertified,
-                      })
-                    }
-                  />
-                  <FilterChip
-                    label="Bezorging"
-                    icon={<Truck className="w-4 h-4" />}
-                    active={foodFilters.hasDelivery}
-                    onClick={() =>
-                      setFoodFilters({
-                        ...foodFilters,
-                        hasDelivery: !foodFilters.hasDelivery,
-                      })
-                    }
-                  />
-                  <FilterChip
-                    label="Takeaway"
-                    icon={<ShoppingBag className="w-4 h-4" />}
-                    active={foodFilters.hasTakeaway}
-                    onClick={() =>
-                      setFoodFilters({
-                        ...foodFilters,
-                        hasTakeaway: !foodFilters.hasTakeaway,
-                      })
-                    }
-                  />
+                  {/* Right arrow */}
+                  <button
+                    onClick={() => scrollFilters("right")}
+                    className="absolute right-0 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:shadow-lg transition-all -mr-2"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
-
-                {/* Right arrow */}
-                <button
-                  onClick={() => scrollFilters("right")}
-                  className="absolute right-0 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:shadow-lg transition-all -mr-2"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
               </div>
 
-              {/* Expanded filter panel */}
+              {/* Expanded filter panel - Mobile overlay / Desktop inline */}
               <AnimatePresence>
                 {showFilters && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="bg-gray-50 rounded-2xl p-5 space-y-5"
-                  >
-                    {/* Cuisine Type Grid */}
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary mb-3">
-                        Type keuken
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {(Object.keys(cuisineTypeLabels) as CuisineType[]).map(
-                          (cuisineType) => (
-                            <FilterChip
-                              key={cuisineType}
-                              label={cuisineTypeLabels[cuisineType]}
-                              icon={
-                                <span className="text-base">
-                                  {cuisineIcons[cuisineType]}
-                                </span>
-                              }
-                              active={foodFilters.cuisineType === cuisineType}
-                              onClick={() =>
-                                setFoodFilters({
-                                  ...foodFilters,
-                                  cuisineType:
-                                    foodFilters.cuisineType === cuisineType
-                                      ? null
-                                      : cuisineType,
-                                })
-                              }
-                            />
-                          )
-                        )}
+                  <>
+                    {/* Mobile: Full screen overlay */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="md:hidden fixed inset-0 z-50 bg-white"
+                    >
+                      {/* Header */}
+                      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-text-primary">Filters</h3>
+                        <button
+                          onClick={() => setShowFilters(false)}
+                          className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-text-secondary hover:bg-gray-200 transition-all"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
                       </div>
-                    </div>
 
-                    {/* Dish Type Grid */}
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary mb-3">
-                        Type gerechten
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {(Object.keys(dishTypeLabels) as DishType[]).map(
-                          (dishType) => {
-                            const dishInfo = dishTypeLabels[dishType];
-                            return (
+                      {/* Scrollable content */}
+                      <div className="overflow-y-auto h-[calc(100vh-140px)] px-4 py-6 space-y-6">
+                        {/* Cuisine Type Grid */}
+                        <div>
+                          <p className="text-sm font-medium text-text-secondary mb-3">
+                            Type keuken
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {(Object.keys(cuisineTypeLabels) as CuisineType[]).map(
+                              (cuisineType) => (
+                                <FilterChip
+                                  key={cuisineType}
+                                  label={cuisineTypeLabels[cuisineType]}
+                                  icon={
+                                    <span className="text-base">
+                                      {cuisineIcons[cuisineType]}
+                                    </span>
+                                  }
+                                  active={foodFilters.cuisineType === cuisineType}
+                                  onClick={() =>
+                                    setFoodFilters({
+                                      ...foodFilters,
+                                      cuisineType:
+                                        foodFilters.cuisineType === cuisineType
+                                          ? null
+                                          : cuisineType,
+                                    })
+                                  }
+                                />
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Dish Type Grid */}
+                        <div>
+                          <p className="text-sm font-medium text-text-secondary mb-3">
+                            Type gerechten
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {(Object.keys(dishTypeLabels) as DishType[]).map(
+                              (dishType) => {
+                                const dishInfo = dishTypeLabels[dishType];
+                                return (
+                                  <FilterChip
+                                    key={dishType}
+                                    label={dishInfo.label}
+                                    icon={
+                                      <span className="text-base">
+                                        {dishInfo.emoji}
+                                      </span>
+                                    }
+                                    active={foodFilters.dishType === dishType}
+                                    onClick={() =>
+                                      setFoodFilters({
+                                        ...foodFilters,
+                                        dishType:
+                                          foodFilters.dishType === dishType
+                                            ? null
+                                            : dishType,
+                                      })
+                                    }
+                                  />
+                                );
+                              }
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Category Filter */}
+                        <div>
+                          <p className="text-sm font-medium text-text-secondary mb-3">
+                            Categorie
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {(Object.keys(categoryLabels) as FoodPartnerCategory[]).map(
+                              (category) => (
+                                <FilterChip
+                                  key={category}
+                                  label={categoryLabels[category]}
+                                  active={foodFilters.category === category}
+                                  onClick={() =>
+                                    setFoodFilters({
+                                      ...foodFilters,
+                                      category:
+                                        foodFilters.category === category ? null : category,
+                                    })
+                                  }
+                                />
+                              )
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Footer with apply/clear buttons */}
+                      <div className="sticky bottom-0 bg-white border-t border-gray-100 px-4 py-4 flex gap-3">
+                        {hasActiveFoodFilters && (
+                          <button
+                            onClick={clearFoodFilters}
+                            className="flex-1 px-4 py-3 border border-gray-300 text-text-secondary rounded-xl font-medium hover:bg-gray-50 transition-all"
+                          >
+                            Wissen
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setShowFilters(false)}
+                          className="flex-1 px-4 py-3 bg-teal text-white rounded-xl font-medium hover:bg-teal/90 transition-all"
+                        >
+                          Toon {filteredFoodPartners.length} resultaten
+                        </button>
+                      </div>
+                    </motion.div>
+
+                    {/* Desktop: Inline panel */}
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="hidden md:block bg-gray-50 rounded-2xl p-5 space-y-5"
+                    >
+                      {/* Cuisine Type Grid */}
+                      <div>
+                        <p className="text-sm font-medium text-text-secondary mb-3">
+                          Type keuken
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {(Object.keys(cuisineTypeLabels) as CuisineType[]).map(
+                            (cuisineType) => (
                               <FilterChip
-                                key={dishType}
-                                label={dishInfo.label}
+                                key={cuisineType}
+                                label={cuisineTypeLabels[cuisineType]}
                                 icon={
                                   <span className="text-base">
-                                    {dishInfo.emoji}
+                                    {cuisineIcons[cuisineType]}
                                   </span>
                                 }
-                                active={foodFilters.dishType === dishType}
+                                active={foodFilters.cuisineType === cuisineType}
                                 onClick={() =>
                                   setFoodFilters({
                                     ...foodFilters,
-                                    dishType:
-                                      foodFilters.dishType === dishType
+                                    cuisineType:
+                                      foodFilters.cuisineType === cuisineType
                                         ? null
-                                        : dishType,
+                                        : cuisineType,
                                   })
                                 }
                               />
-                            );
-                          }
-                        )}
+                            )
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Category Filter */}
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary mb-3">
-                        Categorie
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {(Object.keys(categoryLabels) as FoodPartnerCategory[]).map(
-                          (category) => (
-                            <FilterChip
-                              key={category}
-                              label={categoryLabels[category]}
-                              active={foodFilters.category === category}
-                              onClick={() =>
-                                setFoodFilters({
-                                  ...foodFilters,
-                                  category:
-                                    foodFilters.category === category ? null : category,
-                                })
-                              }
-                            />
-                          )
-                        )}
+                      {/* Dish Type Grid */}
+                      <div>
+                        <p className="text-sm font-medium text-text-secondary mb-3">
+                          Type gerechten
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {(Object.keys(dishTypeLabels) as DishType[]).map(
+                            (dishType) => {
+                              const dishInfo = dishTypeLabels[dishType];
+                              return (
+                                <FilterChip
+                                  key={dishType}
+                                  label={dishInfo.label}
+                                  icon={
+                                    <span className="text-base">
+                                      {dishInfo.emoji}
+                                    </span>
+                                  }
+                                  active={foodFilters.dishType === dishType}
+                                  onClick={() =>
+                                    setFoodFilters({
+                                      ...foodFilters,
+                                      dishType:
+                                        foodFilters.dishType === dishType
+                                          ? null
+                                          : dishType,
+                                    })
+                                  }
+                                />
+                              );
+                            }
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Clear filters */}
-                    {hasActiveFoodFilters && (
-                      <button
-                        onClick={clearFoodFilters}
-                        className="inline-flex items-center gap-1 text-sm text-teal hover:underline"
-                      >
-                        <X className="w-4 h-4" />
-                        Alle filters wissen
-                      </button>
-                    )}
-                  </motion.div>
+                      {/* Category Filter */}
+                      <div>
+                        <p className="text-sm font-medium text-text-secondary mb-3">
+                          Categorie
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {(Object.keys(categoryLabels) as FoodPartnerCategory[]).map(
+                            (category) => (
+                              <FilterChip
+                                key={category}
+                                label={categoryLabels[category]}
+                                active={foodFilters.category === category}
+                                onClick={() =>
+                                  setFoodFilters({
+                                    ...foodFilters,
+                                    category:
+                                      foodFilters.category === category ? null : category,
+                                  })
+                                }
+                              />
+                            )
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Clear filters */}
+                      {hasActiveFoodFilters && (
+                        <button
+                          onClick={clearFoodFilters}
+                          className="inline-flex items-center gap-1 text-sm text-teal hover:underline"
+                        >
+                          <X className="w-4 h-4" />
+                          Alle filters wissen
+                        </button>
+                      )}
+                    </motion.div>
+                  </>
                 )}
               </AnimatePresence>
             </div>
@@ -1592,9 +2864,9 @@ export default function WatTeDoenPage() {
                 {/* View toggle */}
                 <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1 flex-shrink-0">
                   <button
-                    onClick={() => setShowCalendarView(false)}
+                    onClick={() => setActivityViewMode("list")}
                     className={`p-2 rounded-full transition-all ${
-                      !showCalendarView
+                      activityViewMode === "list"
                         ? "bg-white shadow-sm text-teal"
                         : "text-text-muted hover:text-text-secondary"
                     }`}
@@ -1603,112 +2875,250 @@ export default function WatTeDoenPage() {
                     <List className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => setShowCalendarView(true)}
-                    className={`p-2 rounded-full transition-all ${
-                      showCalendarView
+                    onClick={() => setActivityViewMode("3days")}
+                    className={`px-2.5 py-1.5 rounded-full transition-all text-xs font-medium ${
+                      activityViewMode === "3days"
                         ? "bg-white shadow-sm text-teal"
                         : "text-text-muted hover:text-text-secondary"
                     }`}
-                    title="Kalender weergave"
+                    title="3 dagen weergave"
+                  >
+                    3D
+                  </button>
+                  <button
+                    onClick={() => setActivityViewMode("week")}
+                    className={`px-2.5 py-1.5 rounded-full transition-all text-xs font-medium ${
+                      activityViewMode === "week"
+                        ? "bg-white shadow-sm text-teal"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                    title="Week weergave"
+                  >
+                    W
+                  </button>
+                  <button
+                    onClick={() => setActivityViewMode("month")}
+                    className={`p-2 rounded-full transition-all ${
+                      activityViewMode === "month"
+                        ? "bg-white shadow-sm text-teal"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                    title="Maand weergave"
                   >
                     <CalendarDays className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              {/* Expanded filter panel */}
+              {/* Expanded filter panel - Mobile overlay / Desktop inline */}
               <AnimatePresence>
                 {showFilters && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="bg-gray-50 rounded-2xl p-5 space-y-5"
-                  >
-                    {/* Audience filters */}
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary mb-3">
-                        Doelgroep
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <FilterChip
-                          label="Voor mannen"
-                          active={activityFilters.forMen}
-                          onClick={() =>
-                            setActivityFilters({
-                              ...activityFilters,
-                              forMen: !activityFilters.forMen,
-                            })
-                          }
-                        />
-                        <FilterChip
-                          label="Voor vrouwen"
-                          active={activityFilters.forWomen}
-                          onClick={() =>
-                            setActivityFilters({
-                              ...activityFilters,
-                              forWomen: !activityFilters.forWomen,
-                            })
-                          }
-                        />
-                        <FilterChip
-                          label="Voor gezinnen"
-                          icon={<Users className="w-4 h-4" />}
-                          active={activityFilters.forFamilies}
-                          onClick={() =>
-                            setActivityFilters({
-                              ...activityFilters,
-                              forFamilies: !activityFilters.forFamilies,
-                            })
-                          }
-                        />
-                        <FilterChip
-                          label="Voor jeugd"
-                          icon={<Sparkles className="w-4 h-4" />}
-                          active={activityFilters.forYouth}
-                          onClick={() =>
-                            setActivityFilters({
-                              ...activityFilters,
-                              forYouth: !activityFilters.forYouth,
-                            })
-                          }
-                        />
+                  <>
+                    {/* Mobile: Full screen overlay */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="md:hidden fixed inset-0 z-50 bg-white"
+                    >
+                      {/* Header */}
+                      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-text-primary">Filters</h3>
+                        <button
+                          onClick={() => setShowFilters(false)}
+                          className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-text-secondary hover:bg-gray-200 transition-all"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
                       </div>
-                    </div>
 
-                    {/* Location filter */}
-                    <div>
-                      <p className="text-sm font-medium text-text-secondary mb-3">
-                        Locatie
-                      </p>
-                      <div className="relative max-w-xs">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                        <input
-                          type="text"
-                          value={activityFilters.city}
-                          onChange={(e) =>
-                            setActivityFilters({
-                              ...activityFilters,
-                              city: e.target.value,
-                            })
-                          }
-                          placeholder="Zoek op stad..."
-                          className="input-field pl-10 w-full"
-                        />
+                      {/* Scrollable content */}
+                      <div className="overflow-y-auto h-[calc(100vh-140px)] px-4 py-6 space-y-6">
+                        {/* Audience filters */}
+                        <div>
+                          <p className="text-sm font-medium text-text-secondary mb-3">
+                            Doelgroep
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            <FilterChip
+                              label="Voor mannen"
+                              active={activityFilters.forMen}
+                              onClick={() =>
+                                setActivityFilters({
+                                  ...activityFilters,
+                                  forMen: !activityFilters.forMen,
+                                })
+                              }
+                            />
+                            <FilterChip
+                              label="Voor vrouwen"
+                              active={activityFilters.forWomen}
+                              onClick={() =>
+                                setActivityFilters({
+                                  ...activityFilters,
+                                  forWomen: !activityFilters.forWomen,
+                                })
+                              }
+                            />
+                            <FilterChip
+                              label="Voor gezinnen"
+                              icon={<Users className="w-4 h-4" />}
+                              active={activityFilters.forFamilies}
+                              onClick={() =>
+                                setActivityFilters({
+                                  ...activityFilters,
+                                  forFamilies: !activityFilters.forFamilies,
+                                })
+                              }
+                            />
+                            <FilterChip
+                              label="Voor jeugd"
+                              icon={<Sparkles className="w-4 h-4" />}
+                              active={activityFilters.forYouth}
+                              onClick={() =>
+                                setActivityFilters({
+                                  ...activityFilters,
+                                  forYouth: !activityFilters.forYouth,
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        {/* Location filter */}
+                        <div>
+                          <p className="text-sm font-medium text-text-secondary mb-3">
+                            Locatie
+                          </p>
+                          <div className="relative">
+                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                            <input
+                              type="text"
+                              value={activityFilters.city}
+                              onChange={(e) =>
+                                setActivityFilters({
+                                  ...activityFilters,
+                                  city: e.target.value,
+                                })
+                              }
+                              placeholder="Zoek op stad..."
+                              className="input-field pl-10 w-full"
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Clear filters */}
-                    {hasActiveActivityFilters && (
-                      <button
-                        onClick={clearActivityFilters}
-                        className="inline-flex items-center gap-1 text-sm text-teal hover:underline"
-                      >
-                        <X className="w-4 h-4" />
-                        Alle filters wissen
-                      </button>
-                    )}
-                  </motion.div>
+                      {/* Footer with apply/clear buttons */}
+                      <div className="sticky bottom-0 bg-white border-t border-gray-100 px-4 py-4 flex gap-3">
+                        {hasActiveActivityFilters && (
+                          <button
+                            onClick={clearActivityFilters}
+                            className="flex-1 px-4 py-3 border border-gray-300 text-text-secondary rounded-xl font-medium hover:bg-gray-50 transition-all"
+                          >
+                            Wissen
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setShowFilters(false)}
+                          className="flex-1 px-4 py-3 bg-teal text-white rounded-xl font-medium hover:bg-teal/90 transition-all"
+                        >
+                          Toon {filteredActivities.length} resultaten
+                        </button>
+                      </div>
+                    </motion.div>
+
+                    {/* Desktop: Inline panel */}
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="hidden md:block bg-gray-50 rounded-2xl p-5 space-y-5"
+                    >
+                      {/* Audience filters */}
+                      <div>
+                        <p className="text-sm font-medium text-text-secondary mb-3">
+                          Doelgroep
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          <FilterChip
+                            label="Voor mannen"
+                            active={activityFilters.forMen}
+                            onClick={() =>
+                              setActivityFilters({
+                                ...activityFilters,
+                                forMen: !activityFilters.forMen,
+                              })
+                            }
+                          />
+                          <FilterChip
+                            label="Voor vrouwen"
+                            active={activityFilters.forWomen}
+                            onClick={() =>
+                              setActivityFilters({
+                                ...activityFilters,
+                                forWomen: !activityFilters.forWomen,
+                              })
+                            }
+                          />
+                          <FilterChip
+                            label="Voor gezinnen"
+                            icon={<Users className="w-4 h-4" />}
+                            active={activityFilters.forFamilies}
+                            onClick={() =>
+                              setActivityFilters({
+                                ...activityFilters,
+                                forFamilies: !activityFilters.forFamilies,
+                              })
+                            }
+                          />
+                          <FilterChip
+                            label="Voor jeugd"
+                            icon={<Sparkles className="w-4 h-4" />}
+                            active={activityFilters.forYouth}
+                            onClick={() =>
+                              setActivityFilters({
+                                ...activityFilters,
+                                forYouth: !activityFilters.forYouth,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      {/* Location filter */}
+                      <div>
+                        <p className="text-sm font-medium text-text-secondary mb-3">
+                          Locatie
+                        </p>
+                        <div className="relative max-w-xs">
+                          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                          <input
+                            type="text"
+                            value={activityFilters.city}
+                            onChange={(e) =>
+                              setActivityFilters({
+                                ...activityFilters,
+                                city: e.target.value,
+                              })
+                            }
+                            placeholder="Zoek op stad..."
+                            className="input-field pl-10 w-full"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Clear filters */}
+                      {hasActiveActivityFilters && (
+                        <button
+                          onClick={clearActivityFilters}
+                          className="inline-flex items-center gap-1 text-sm text-teal hover:underline"
+                        >
+                          <X className="w-4 h-4" />
+                          Alle filters wissen
+                        </button>
+                      )}
+                    </motion.div>
+                  </>
                 )}
               </AnimatePresence>
             </div>
@@ -1845,71 +3255,186 @@ export default function WatTeDoenPage() {
                     </Link>
                   )}
                 </div>
-              ) : showCalendarView ? (
-                // Calendar View
+              ) : activityViewMode !== "list" ? (
+                // Calendar Views (3 days, week, month)
                 <motion.div
-                  key={`activity-calendar-${selectedCategory}`}
+                  key={`activity-calendar-${selectedCategory}-${activityViewMode}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
                 >
-                  <div className="grid grid-cols-7 gap-2 mb-4">
-                    {["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"].map((day) => (
-                      <div key={day} className="text-center text-sm font-medium text-text-muted py-2">
-                        {day}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-7 gap-2">
-                    {/* Generate calendar days */}
-                    {Array.from({ length: 35 }, (_, i) => {
-                      const dayOffset = i - 3; // Start a few days before today
-                      const date = new Date();
-                      date.setDate(date.getDate() + dayOffset);
-                      const dateStr = date.toISOString().split("T")[0];
-                      const dayActivities = filteredActivities.filter(
-                        (a) => a.event_date === dateStr
-                      );
-                      const isToday = dayOffset === 0;
-                      const isPast = dayOffset < 0;
+                  {/* Calendar Navigation */}
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => navigateCalendar("prev")}
+                        className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                        aria-label="Vorige"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
 
-                      return (
-                        <div
-                          key={i}
-                          className={`min-h-[80px] p-2 rounded-xl border transition-all ${
-                            isToday
-                              ? "border-teal bg-teal/5"
-                              : isPast
-                              ? "border-gray-100 bg-gray-50 opacity-50"
-                              : "border-gray-100 hover:border-gray-200"
-                          }`}
-                        >
-                          <div className={`text-sm font-medium mb-1 ${isToday ? "text-teal" : "text-text-secondary"}`}>
-                            {date.getDate()}
+                      <button
+                        onClick={goToToday}
+                        className="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-sm font-medium"
+                      >
+                        Vandaag
+                      </button>
+
+                      <button
+                        onClick={() => navigateCalendar("next")}
+                        className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                        aria-label="Volgende"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {/* Date range display */}
+                    <div className="text-sm text-text-muted font-medium">
+                      {activityViewMode === "month"
+                        ? `${MONTH_NAMES[calendarStartDate.getMonth()]} ${calendarStartDate.getFullYear()}`
+                        : `${calendarDays[0].getDate()} ${MONTH_NAMES[calendarDays[0].getMonth()]} - ${calendarDays[calendarDays.length - 1].getDate()} ${MONTH_NAMES[calendarDays[calendarDays.length - 1].getMonth()]}`
+                      }
+                    </div>
+                  </div>
+
+                  {/* Month View */}
+                  {activityViewMode === "month" && (
+                    <>
+                      <div className="grid grid-cols-7 gap-2 mb-4">
+                        {["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"].map((day) => (
+                          <div key={day} className="text-center text-sm font-medium text-text-muted py-2">
+                            {day}
                           </div>
-                          {dayActivities.length > 0 && (
-                            <div className="space-y-1">
-                              {dayActivities.slice(0, 2).map((activity) => (
-                                <div
-                                  key={activity.id}
-                                  className="text-xs bg-teal/10 text-teal px-1.5 py-0.5 rounded truncate"
-                                  title={activity.title}
-                                >
-                                  {activity.title}
-                                </div>
-                              ))}
-                              {dayActivities.length > 2 && (
-                                <div className="text-xs text-text-muted">
-                                  +{dayActivities.length - 2} meer
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-2">
+                        {calendarDays.map((date, i) => {
+                          const dateStr = date.toISOString().split("T")[0];
+                          const dayActivities = filteredActivities.filter(
+                            (a) => a.event_date === dateStr
+                          );
+                          const dayIsToday = isToday(date);
+                          const isPast = date < new Date(new Date().setHours(0, 0, 0, 0));
+                          const isCurrentMonth = date.getMonth() === calendarStartDate.getMonth();
+
+                          return (
+                            <div
+                              key={i}
+                              className={`min-h-[80px] p-2 rounded-xl border transition-all ${
+                                dayIsToday
+                                  ? "border-teal bg-teal/5"
+                                  : isPast
+                                  ? "border-gray-100 bg-gray-50 opacity-50"
+                                  : !isCurrentMonth
+                                  ? "border-gray-50 bg-gray-25 opacity-40"
+                                  : "border-gray-100 hover:border-gray-200"
+                              }`}
+                            >
+                              <div className={`text-sm font-medium mb-1 ${dayIsToday ? "text-teal" : !isCurrentMonth ? "text-text-muted" : "text-text-secondary"}`}>
+                                {date.getDate()}
+                              </div>
+                              {dayActivities.length > 0 && (
+                                <div className="space-y-1">
+                                  {dayActivities.slice(0, 2).map((activity) => (
+                                    <div
+                                      key={activity.id}
+                                      className="text-xs bg-teal/10 text-teal px-1.5 py-0.5 rounded truncate"
+                                      title={activity.title}
+                                    >
+                                      {activity.title}
+                                    </div>
+                                  ))}
+                                  {dayActivities.length > 2 && (
+                                    <div className="text-xs text-text-muted">
+                                      +{dayActivities.length - 2} meer
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {/* List below calendar for selected activities */}
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+
+                  {/* 3 Days / Week View */}
+                  {(activityViewMode === "3days" || activityViewMode === "week") && (
+                    <div className={`grid gap-4 ${activityViewMode === "3days" ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-4 lg:grid-cols-7"}`}>
+                      {calendarDays.map((date) => {
+                        const dateStr = date.toISOString().split("T")[0];
+                        const dayActivities = filteredActivities.filter(
+                          (a) => a.event_date === dateStr
+                        );
+                        const dayIsToday = isToday(date);
+
+                        return (
+                          <div
+                            key={date.toISOString()}
+                            className={`rounded-2xl border-2 p-4 transition-all ${
+                              dayIsToday
+                                ? "border-teal bg-teal/5"
+                                : "border-gray-100 bg-white hover:border-gray-200"
+                            }`}
+                          >
+                            {/* Day header */}
+                            <div className="text-center mb-3 pb-3 border-b border-gray-100">
+                              <div className={`text-xs font-medium uppercase tracking-wide ${dayIsToday ? "text-teal" : "text-text-muted"}`}>
+                                {DAY_NAMES_FULL[date.getDay()]}
+                              </div>
+                              <div className={`text-2xl font-bold ${dayIsToday ? "text-teal" : "text-text-primary"}`}>
+                                {date.getDate()}
+                              </div>
+                              <div className="text-xs text-text-muted">
+                                {MONTH_NAMES[date.getMonth()]}
+                              </div>
+                            </div>
+
+                            {/* Activities for this day */}
+                            <div className="space-y-2">
+                              {dayActivities.length === 0 ? (
+                                <p className="text-xs text-text-muted text-center py-2">
+                                  Geen activiteiten
+                                </p>
+                              ) : (
+                                dayActivities.map((activity) => (
+                                  <div
+                                    key={activity.id}
+                                    className="w-full p-2 bg-gray-50 rounded-lg text-xs text-left hover:bg-teal/10 hover:ring-1 hover:ring-teal/30 transition-all cursor-pointer"
+                                  >
+                                    <div className="font-semibold text-text-primary truncate">
+                                      {activity.title}
+                                    </div>
+                                    {activity.start_time && (
+                                      <div className="flex items-center gap-1 text-text-muted mt-1">
+                                        <span>{activity.start_time.slice(0, 5)}</span>
+                                      </div>
+                                    )}
+                                    <div className="text-text-muted truncate mt-1">
+                                      {activity.location_name}
+                                    </div>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+
+                            {/* Count badge */}
+                            {dayActivities.length > 0 && (
+                              <div className="mt-3 pt-2 border-t border-gray-100 text-center">
+                                <span className="text-xs font-medium text-teal">
+                                  {dayActivities.length} activiteit{dayActivities.length !== 1 ? "en" : ""}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* List below calendar for all activities */}
                   <div className="mt-6 pt-6 border-t border-gray-100">
                     <h4 className="font-medium text-text-secondary mb-4">Alle activiteiten</h4>
                     <div className="space-y-3">
@@ -1960,8 +3485,8 @@ export default function WatTeDoenPage() {
         </section>
       </div>
 
-      {/* CTA Section */}
-      <section className="bg-[#0f2d2d] section-padding">
+      {/* CTA Section with FAB */}
+      <section ref={ctaSectionRef} className="bg-[#0f2d2d] section-padding">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -1975,30 +3500,162 @@ export default function WatTeDoenPage() {
             <p className="text-lg text-white/70 mb-8">
               Voeg uw activiteit of etablissement toe aan Ramadan Lights Gent.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
-              <Link
-                href="/wat-te-doen/activiteit-toevoegen"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-white text-[#0f2d2d] hover:bg-white/90 transition-all"
+
+            {/* FAB Button in CTA */}
+            <div className="relative inline-block">
+              <AnimatePresence>
+                {showAddMenu && ctaInView && (
+                  <>
+                    {/* Backdrop */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 bg-black/40 z-[59]"
+                      onClick={() => setShowAddMenu(false)}
+                    />
+
+                    {/* Menu Options - Above the button */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                      className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col gap-3 items-center z-[61]"
+                    >
+                      <Link
+                        href="/wat-te-doen/activiteit-toevoegen"
+                        className="flex items-center gap-3 pl-4 pr-5 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all group"
+                        onClick={() => setShowAddMenu(false)}
+                      >
+                        <span className="w-10 h-10 bg-teal/10 text-teal rounded-full flex items-center justify-center group-hover:bg-teal group-hover:text-white transition-all">
+                          <Calendar className="w-5 h-5" />
+                        </span>
+                        <span className="font-medium text-text-primary whitespace-nowrap">Activiteit toevoegen</span>
+                      </Link>
+
+                      <Link
+                        href="/word-food-partner"
+                        className="flex items-center gap-3 pl-4 pr-5 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all group"
+                        onClick={() => setShowAddMenu(false)}
+                      >
+                        <span className="w-10 h-10 bg-gold/10 text-gold rounded-full flex items-center justify-center group-hover:bg-gold group-hover:text-white transition-all">
+                          <Utensils className="w-5 h-5" />
+                        </span>
+                        <span className="font-medium text-text-primary whitespace-nowrap">Word Food Partner</span>
+                      </Link>
+
+                      <Link
+                        href="/word-shop-partner"
+                        className="flex items-center gap-3 pl-4 pr-5 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all group"
+                        onClick={() => setShowAddMenu(false)}
+                      >
+                        <span className="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-all">
+                          <Store className="w-5 h-5" />
+                        </span>
+                        <span className="font-medium text-text-primary whitespace-nowrap">Word Shop Partner</span>
+                      </Link>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+
+              {/* FAB Button */}
+              <motion.button
+                onClick={() => setShowAddMenu(!showAddMenu)}
+                className={`relative z-[62] w-16 h-16 rounded-full shadow-lg flex items-center justify-center transition-all ${
+                  showAddMenu
+                    ? "bg-white/20 text-white rotate-45"
+                    : "bg-white text-teal hover:bg-white/90 hover:shadow-xl"
+                }`}
+                whileTap={{ scale: 0.95 }}
               >
-                <Plus className="w-5 h-5 mr-2" />
-                Activiteit toevoegen
-              </Link>
-              <Link
-                href="/word-food-partner"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium border-2 border-gold text-gold hover:bg-gold hover:text-gray-900 transition-all"
-              >
-                Word Food Partner
-              </Link>
-              <Link
-                href="/word-shop-partner"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium border-2 border-pink-400 text-pink-400 hover:bg-pink-500 hover:text-white hover:border-pink-500 transition-all"
-              >
-                Word Shop Partner
-              </Link>
+                <Plus className="w-8 h-8" />
+              </motion.button>
             </div>
           </motion.div>
         </div>
       </section>
+
+      {/* Floating FAB - Hidden when CTA section is in view */}
+      <AnimatePresence>
+        {!ctaInView && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed bottom-6 right-6 z-[60]"
+          >
+            <AnimatePresence>
+              {showAddMenu && (
+                <>
+                  {/* Backdrop */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/40 z-[59]"
+                    onClick={() => setShowAddMenu(false)}
+                  />
+
+                  {/* Menu Options */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                    className="absolute bottom-16 right-0 flex flex-col gap-3 items-end z-[61]"
+                  >
+                    <Link
+                      href="/wat-te-doen/activiteit-toevoegen"
+                      className="flex items-center gap-3 pl-4 pr-5 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all group"
+                      onClick={() => setShowAddMenu(false)}
+                    >
+                      <span className="w-10 h-10 bg-teal/10 text-teal rounded-full flex items-center justify-center group-hover:bg-teal group-hover:text-white transition-all">
+                        <Calendar className="w-5 h-5" />
+                      </span>
+                      <span className="font-medium text-text-primary whitespace-nowrap">Activiteit toevoegen</span>
+                    </Link>
+
+                    <Link
+                      href="/word-food-partner"
+                      className="flex items-center gap-3 pl-4 pr-5 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all group"
+                      onClick={() => setShowAddMenu(false)}
+                    >
+                      <span className="w-10 h-10 bg-gold/10 text-gold rounded-full flex items-center justify-center group-hover:bg-gold group-hover:text-white transition-all">
+                        <Utensils className="w-5 h-5" />
+                      </span>
+                      <span className="font-medium text-text-primary whitespace-nowrap">Word Food Partner</span>
+                    </Link>
+
+                    <Link
+                      href="/word-shop-partner"
+                      className="flex items-center gap-3 pl-4 pr-5 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all group"
+                      onClick={() => setShowAddMenu(false)}
+                    >
+                      <span className="w-10 h-10 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-all">
+                        <Store className="w-5 h-5" />
+                      </span>
+                      <span className="font-medium text-text-primary whitespace-nowrap">Word Shop Partner</span>
+                    </Link>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+
+            {/* FAB Button */}
+            <motion.button
+              onClick={() => setShowAddMenu(!showAddMenu)}
+              className={`relative z-[62] w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all ${
+                showAddMenu
+                  ? "bg-gray-700 text-white rotate-45"
+                  : "bg-teal text-white hover:bg-teal/90 hover:shadow-xl"
+              }`}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Plus className="w-7 h-7" />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </main>
