@@ -18,7 +18,7 @@ export async function GET() {
 
     const { data: foodPartners, error } = await supabase
       .from("food_partners")
-      .select("id, name, slug, description, address, city, postal_code, latitude, longitude, category, cuisine_type, is_halal_certified, halal_certification_info, partner_tier, tier_expires_at, iftar_special, iftar_special_price, contact_phone, website_url, menu_url, reservation_url, facebook_url, instagram_url, uber_eats_url, deliveroo_url, logo_url, cover_image_url, opening_hours, created_at")
+      .select("*")
       .eq("status", "approved")
       .order("partner_tier", { ascending: false })
       .order("name", { ascending: true });

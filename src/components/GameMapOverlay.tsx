@@ -64,9 +64,11 @@ function isNearRoute(lat: number, lng: number): boolean {
   return false;
 }
 
-function offsetMarkerPosition(lat: number, lng: number, index: number): [number, number] {
+function offsetMarkerPosition(lat: number, lng: number, index: number): { position: [number, number]; original: [number, number]; wasOffset: boolean } {
+  const original: [number, number] = [lat, lng];
+
   if (!isNearRoute(lat, lng)) {
-    return [lat, lng];
+    return { position: original, original, wasOffset: false };
   }
 
   // Offset ALL markers near routes to the EAST (right side) to keep routes visible
@@ -76,7 +78,7 @@ function offsetMarkerPosition(lat: number, lng: number, index: number): [number,
   const offsetLng = lng + baseOffset + variation;
   const offsetLat = lat + ((index % 3) * 0.0003 - 0.00045); // Slight lat variation
 
-  return [offsetLat, offsetLng];
+  return { position: [offsetLat, offsetLng], original, wasOffset: true };
 }
 
 // Professional 2D SVG icons for each category
@@ -99,8 +101,8 @@ const categoryIcons: Record<string, string> = {
   tech: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>`,
   other: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>`,
 
-  // Mosque icon - Beautiful silhouette with dome and minaret
-  mosque: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-2.5 0-4.5 1.5-4.5 3.5 0 .5.1 1 .3 1.5H5v2h1v11H4v2h16v-2h-2V9h1V7h-2.8c.2-.5.3-1 .3-1.5C16.5 3.5 14.5 2 12 2zm0 2c1.4 0 2.5.7 2.5 1.5S13.4 7 12 7s-2.5-.7-2.5-1.5S10.6 4 12 4z"/><path d="M8 9h8v11H8V9zm2 2v3h4v-3h-4zm0 5v2h1.5v-2H10zm2.5 0v2H14v-2h-1.5z" opacity="0.3"/><path d="M19 4v3h1V4h-1zm0 4v12h1V8h-1z" opacity="0.7"/></svg>`,
+  // Mosque icon - Clear dome and minaret silhouette
+  mosque: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 .8.2 1.5.5 2.1V10H6v10h12V10h-2V8.6c.3-.6.5-1.3.5-2.1C16.5 4 14.5 2 12 2zm0 2c1.9 0 3.5 1.6 3.5 3.5 0 1.1-.5 2-1.2 2.7-.4.4-.8.6-.8.8v1h-3v-1c0-.2-.4-.4-.8-.8-.7-.7-1.2-1.6-1.2-2.7C8.5 5.6 10.1 4 12 4z"/><path d="M10 12h4v6h-4z" opacity="0.3"/><rect x="3" y="6" width="2" height="14" rx="1"/><path d="M4 3l1.5 3H2.5L4 3z"/></svg>`,
 };
 
 // Size configurations based on tier
@@ -292,6 +294,7 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
   const containerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const routeLayersRef = useRef<L.Polyline[]>([]);
+  const connectorLinesRef = useRef<L.Polyline[]>([]);
   const [mapReady, setMapReady] = useState(false);
 
   // Initialize map when overlay opens
