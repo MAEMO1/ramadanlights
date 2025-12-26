@@ -558,17 +558,24 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
               className="absolute bottom-6 left-6 z-[9999]"
             >
               <div className="bg-[#0f2d2d]/90 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 shadow-2xl">
-                <div className="flex items-center gap-4 text-xs">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+                  {/* Illuminated streets */}
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#10B981]" />
+                    <div className="w-6 h-1 rounded-full bg-gradient-to-r from-[#FFD700]/60 via-[#FFD700] to-[#FFD700]/60" style={{ boxShadow: '0 0 6px #FFD700' }} />
+                    <span className="text-white/70">Verlichte straten</span>
+                  </div>
+                  <div className="w-px h-4 bg-white/20 hidden sm:block" />
+                  {/* Markers */}
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#10B981]" style={{ boxShadow: '0 0 6px #10B981' }} />
                     <span className="text-white/70">Moskee</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#FFD700]" />
+                    <div className="w-3 h-3 rounded-full bg-[#FFD700]" style={{ boxShadow: '0 0 6px #FFD700' }} />
                     <span className="text-white/70">Premium</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#14B8A6]" />
+                    <div className="w-3 h-3 rounded-full bg-[#14B8A6]" style={{ boxShadow: '0 0 6px #14B8A6' }} />
                     <span className="text-white/70">Uitgelicht</span>
                   </div>
                 </div>
