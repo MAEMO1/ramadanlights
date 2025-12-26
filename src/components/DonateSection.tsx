@@ -92,7 +92,7 @@ export function DonateSection() {
               transition={{ delay: 0.1 }}
               className="heading-section mb-6"
             >
-              Doneer aan Ramadan Lights
+              Verlicht Ramadan
             </motion.h2>
 
             <motion.p
@@ -196,7 +196,7 @@ export function DonateSection() {
               ) : (
                 <>
                   <Heart className="w-5 h-5 mr-2" />
-                  Doneer €{getFinalAmount() || 0}
+                  Light up Ramadan - €{getFinalAmount() || 0}
                 </>
               )}
             </button>
