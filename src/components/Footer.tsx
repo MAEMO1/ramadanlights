@@ -9,7 +9,7 @@ const links = [
   { label: "Iftarkaart", href: "/iftar" },
   { label: "Moskeeën", href: "/moskeeen" },
   { label: "Sponsors", href: "/#sponsors" },
-  { label: "Doneren", href: "/#doneren" },
+  { label: "#LightUpRamadan", href: "/#doneren" },
   { label: "Word Sponsor", href: "/#sponsor-form" },
 ];
 

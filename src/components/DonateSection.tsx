@@ -196,7 +196,7 @@ export function DonateSection() {
               ) : (
                 <>
                   <Heart className="w-5 h-5 mr-2" />
-                  Light up Ramadan - €{getFinalAmount() || 0}
+                  #LightUpRamadan - €{getFinalAmount() || 0}
                 </>
               )}
             </button>

@@ -12,7 +12,7 @@ const navLinks = [
   { href: "/iftar", label: "Iftarkaart", highlight: true },
   { href: "/moskeeen", label: "Moskeeën", highlight: true },
   { href: "/#sponsors", label: "Sponsors" },
-  { href: "/#doneren", label: "Doneren" },
+  { href: "/#doneren", label: "#LightUpRamadan" },
 ];
 
 export function Navbar() {
