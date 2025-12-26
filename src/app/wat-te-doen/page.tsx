@@ -2,8 +2,15 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Navbar } from "@/components/Navbar";
+import { Navbar, OPEN_GAME_MAP_EVENT } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import dynamic from "next/dynamic";
+
+// Dynamically import GameMapOverlay to avoid SSR issues with Leaflet
+const GameMapOverlay = dynamic(
+  () => import("@/components/GameMapOverlay").then((mod) => mod.GameMapOverlay),
+  { ssr: false }
+);
 import { FoodPartnerCard } from "@/components/FoodPartnerCard";
 import { ShopPartnerCard } from "@/components/ShopPartnerCard";
 import { ActivityCard } from "@/components/ActivityCard";
@@ -2295,6 +2302,17 @@ export default function WatTeDoenPage() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryId>("food");
   const [showFilters, setShowFilters] = useState(false);
   const [partnerViewMode, setPartnerViewMode] = useState<"list" | "map">("list");
+  const [isGameMapOpen, setIsGameMapOpen] = useState(false);
+
+  // Listen for game map open event from navbar
+  useEffect(() => {
+    const handleOpenGameMap = () => {
+      setIsGameMapOpen(true);
+    };
+
+    window.addEventListener(OPEN_GAME_MAP_EVENT, handleOpenGameMap);
+    return () => window.removeEventListener(OPEN_GAME_MAP_EVENT, handleOpenGameMap);
+  }, []);
 
   // Lock body scroll when filter overlay is open on mobile
   useEffect(() => {
@@ -4230,6 +4248,14 @@ export default function WatTeDoenPage() {
       )}
 
       <Footer />
+
+      {/* Game Map Overlay */}
+      <GameMapOverlay
+        isOpen={isGameMapOpen}
+        onClose={() => setIsGameMapOpen(false)}
+        foodPartners={foodPartners}
+        shopPartners={shopPartners}
+      />
     </main>
   );
 }

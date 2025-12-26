@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, MapIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+// Custom event for opening the game map
+export const OPEN_GAME_MAP_EVENT = "openGameMap";
 
 const navLinks = [
   { href: "/#verhaal", label: "Het project", gold: true },
@@ -117,6 +120,82 @@ export function Navbar() {
                 </Link>
               ))}
 
+              {/* Game Map Button - Flickering Arrow */}
+              <motion.button
+                onClick={() => window.dispatchEvent(new CustomEvent(OPEN_GAME_MAP_EVENT))}
+                className={`
+                  relative ml-1 p-2.5 rounded-lg transition-colors group
+                  ${isScrolled
+                    ? "bg-gradient-to-br from-amber-100 to-amber-50 hover:from-amber-200 hover:to-amber-100"
+                    : "bg-gradient-to-br from-gold/30 to-gold/20 hover:from-gold/40 hover:to-gold/30"
+                  }
+                `}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Open Sponsor Kaart"
+              >
+                {/* Outer glow ring */}
+                <motion.div
+                  className={`absolute inset-0 rounded-lg ${
+                    isScrolled ? "bg-gold/20" : "bg-gold/30"
+                  }`}
+                  animate={{
+                    scale: [1, 1.15, 1],
+                    opacity: [0.5, 0, 0.5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+
+                {/* Inner pulsing glow */}
+                <motion.div
+                  className="absolute inset-0 rounded-lg bg-gold/40"
+                  animate={{
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+
+                {/* Map icon with subtle bounce */}
+                <motion.div
+                  animate={{
+                    y: [0, -2, 0],
+                  }}
+                  transition={{
+                    duration: 1.2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="relative z-10"
+                >
+                  <MapIcon className={`w-4 h-4 ${isScrolled ? "text-amber-700" : "text-gold"}`} />
+                </motion.div>
+
+                {/* Sparkle effect */}
+                <motion.div
+                  className="absolute -top-0.5 -right-0.5 text-[10px]"
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0.8, 1, 0.8],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.5,
+                  }}
+                >
+                  ✨
+                </motion.div>
+              </motion.button>
+
               <div className={`w-px h-5 mx-3 ${isScrolled ? "bg-gray-200" : "bg-white/30"}`} />
 
               <Link
@@ -224,6 +303,44 @@ export function Navbar() {
                       {link.label}
                     </Link>
                   ))}
+                  {/* Game Map Button - Mobile */}
+                  <motion.button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      window.dispatchEvent(new CustomEvent(OPEN_GAME_MAP_EVENT));
+                    }}
+                    className="relative w-full flex items-center justify-center gap-3 py-3 px-4 text-[15px] font-medium rounded-md bg-gradient-to-r from-amber-100 to-gold/20 text-amber-800 hover:from-amber-200 hover:to-gold/30 transition-all overflow-hidden"
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {/* Pulsing background */}
+                    <motion.div
+                      className="absolute inset-0 bg-gold/20"
+                      animate={{
+                        opacity: [0.2, 0.4, 0.2],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    />
+                    <MapIcon className="w-5 h-5 relative z-10" />
+                    <span className="relative z-10">Ontdek de Sponsor Kaart</span>
+                    <motion.span
+                      className="text-sm relative z-10"
+                      animate={{
+                        opacity: [0.5, 1, 0.5],
+                        scale: [0.9, 1.1, 0.9],
+                      }}
+                      transition={{
+                        duration: 1.2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      ✨
+                    </motion.span>
+                  </motion.button>
                 </div>
 
                 <div className="py-4 border-t border-gray-100 space-y-2">
