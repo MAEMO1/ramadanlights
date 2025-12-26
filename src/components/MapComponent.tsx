@@ -60,13 +60,13 @@ export default function MapComponent({ center, zoom, routes, activeLocation }: M
     });
     routeLayersRef.current = [];
 
-    // Add new routes with subtle glow effect (matching game map style)
+    // Add new routes with glow effect
     routes.forEach((route) => {
-      // Outer glow layer (widest, most transparent)
-      const outerGlowLayer = L.polyline(route, {
+      // Outer glow layer (wider, semi-transparent)
+      const glowLayer = L.polyline(route, {
         color: "#FFD700",
-        weight: 16,
-        opacity: 0.15,
+        weight: 20,
+        opacity: 0.3,
         lineCap: "round",
         lineJoin: "round",
       });
@@ -74,36 +74,26 @@ export default function MapComponent({ center, zoom, routes, activeLocation }: M
       // Middle glow layer
       const midGlowLayer = L.polyline(route, {
         color: "#FFD700",
-        weight: 10,
-        opacity: 0.3,
+        weight: 14,
+        opacity: 0.5,
         lineCap: "round",
         lineJoin: "round",
       });
 
-      // Inner glow layer
-      const innerGlowLayer = L.polyline(route, {
-        color: "#FFD700",
-        weight: 5,
-        opacity: 0.6,
-        lineCap: "round",
-        lineJoin: "round",
-      });
-
-      // Core route layer (bright, solid center)
+      // Core route layer (bright, solid)
       const coreLayer = L.polyline(route, {
-        color: "#FFFACD",
-        weight: 2,
+        color: "#FFD700",
+        weight: 8,
         opacity: 1,
         lineCap: "round",
         lineJoin: "round",
       });
 
       if (mapRef.current) {
-        outerGlowLayer.addTo(mapRef.current);
+        glowLayer.addTo(mapRef.current);
         midGlowLayer.addTo(mapRef.current);
-        innerGlowLayer.addTo(mapRef.current);
         coreLayer.addTo(mapRef.current);
-        routeLayersRef.current.push(outerGlowLayer, midGlowLayer, innerGlowLayer, coreLayer);
+        routeLayersRef.current.push(glowLayer, midGlowLayer, coreLayer);
       }
     });
 

@@ -16,6 +16,7 @@ interface Mosque {
   name: string;
   address: string;
   city: string;
+  fullAddress?: string;
   latitude: number | null;
   longitude: number | null;
 }
@@ -47,6 +48,36 @@ const routes = {
     [51.0605, 3.702], [51.0615, 3.7005], [51.0625, 3.699], [51.0634869, 3.6959922]
   ] as [number, number][],
 };
+
+// Check if a point is near a route and offset it to the side
+const ROUTE_PROXIMITY_THRESHOLD = 0.0015; // ~150m in degrees
+const OFFSET_DISTANCE = 0.0008; // ~80m offset to the side
+
+function isNearRoute(lat: number, lng: number): boolean {
+  const allRoutePoints = [...routes.wondelgemstraat, ...routes.bevrijdingslaanPhoenix];
+  for (const [routeLat, routeLng] of allRoutePoints) {
+    const distance = Math.sqrt(Math.pow(lat - routeLat, 2) + Math.pow(lng - routeLng, 2));
+    if (distance < ROUTE_PROXIMITY_THRESHOLD) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function offsetMarkerPosition(lat: number, lng: number, index: number): [number, number] {
+  if (!isNearRoute(lat, lng)) {
+    return [lat, lng];
+  }
+
+  // Offset markers to the side of the route
+  // Alternate left/right based on index to spread them out
+  const direction = index % 2 === 0 ? 1 : -1;
+  const offsetLng = lng + (OFFSET_DISTANCE * direction);
+  // Add slight lat variation based on index to prevent stacking
+  const offsetLat = lat + ((index % 5) * 0.0002 - 0.0004);
+
+  return [offsetLat, offsetLng];
+}
 
 // Professional 2D SVG icons for each category
 const categoryIcons: Record<string, string> = {
@@ -387,7 +418,7 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
           tier: "mosque",
           lat: m.latitude,
           lng: m.longitude,
-          address: `${m.address}, ${m.city}`,
+          address: m.fullAddress || `${m.address}, ${m.city}`,
           description: null,
         });
       }
@@ -397,10 +428,11 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
     const tierOrder: Record<PartnerTier | "mosque", number> = { free: 0, partner: 1, partner_plus: 2, mosque: 3, premium: 4 };
     allMarkers.sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier]);
 
-    // Add markers
-    allMarkers.forEach(item => {
+    // Add markers with offset for those near illuminated streets
+    allMarkers.forEach((item, index) => {
       const icon = createGameMarker(item.category, item.tier);
-      const marker = L.marker([item.lat, item.lng], {
+      const [offsetLat, offsetLng] = offsetMarkerPosition(item.lat, item.lng, index);
+      const marker = L.marker([offsetLat, offsetLng], {
         icon,
         zIndexOffset: tierSizes[item.tier].zIndex,
       });
@@ -558,26 +590,9 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
               className="absolute bottom-6 left-6 z-[9999]"
             >
               <div className="bg-[#0f2d2d]/90 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 shadow-2xl">
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
-                  {/* Illuminated streets */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-1 rounded-full bg-gradient-to-r from-[#FFD700]/60 via-[#FFD700] to-[#FFD700]/60" style={{ boxShadow: '0 0 6px #FFD700' }} />
-                    <span className="text-white/70">Verlichte straten</span>
-                  </div>
-                  <div className="w-px h-4 bg-white/20 hidden sm:block" />
-                  {/* Markers */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#10B981]" style={{ boxShadow: '0 0 6px #10B981' }} />
-                    <span className="text-white/70">Moskee</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#FFD700]" style={{ boxShadow: '0 0 6px #FFD700' }} />
-                    <span className="text-white/70">Premium</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#14B8A6]" style={{ boxShadow: '0 0 6px #14B8A6' }} />
-                    <span className="text-white/70">Uitgelicht</span>
-                  </div>
+                <div className="flex items-center gap-2 text-xs">
+                  <div className="w-8 h-1.5 rounded-full bg-gradient-to-r from-[#FFD700]/40 via-[#FFD700] to-[#FFD700]/40" style={{ boxShadow: '0 0 8px #FFD700, 0 0 16px #FFD700' }} />
+                  <span className="text-white/80 font-medium">Verlichte straten</span>
                 </div>
               </div>
             </motion.div>

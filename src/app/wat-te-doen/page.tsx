@@ -29,10 +29,8 @@ import {
   ChevronRight,
   CalendarDays,
   List,
-  Map,
   type LucideIcon,
 } from "lucide-react";
-import { SponsorMap } from "@/components/SponsorMap";
 import Link from "next/link";
 import type { Activity, ActivityType } from "@/lib/activity-types";
 import type { FoodPartner, CuisineType, FoodPartnerCategory, DishType } from "@/lib/food-partner-types";
@@ -2294,7 +2292,6 @@ export default function WatTeDoenPage() {
   const [isLoadingShopPartners, setIsLoadingShopPartners] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<CategoryId>("food");
   const [showFilters, setShowFilters] = useState(false);
-  const [partnerViewMode, setPartnerViewMode] = useState<"list" | "map">("list");
 
   // Lock body scroll when filter overlay is open on mobile
   useEffect(() => {
@@ -2664,53 +2661,6 @@ export default function WatTeDoenPage() {
                 Ontdek halal eten & drinken en activiteiten in Gent tijdens Ramadan.
               </p>
             </motion.div>
-
-            {/* View Mode Toggle - Like Mosques Page */}
-            {(selectedCategory === "food" || selectedCategory === "shopping") && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="inline-flex p-1 bg-white/10 rounded-lg backdrop-blur-sm self-start sm:self-auto"
-              >
-                <button
-                  onClick={() => setPartnerViewMode("map")}
-                  className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-all duration-200 ${
-                    partnerViewMode === "map"
-                      ? "text-white"
-                      : "text-white/50 hover:text-white/70"
-                  }`}
-                >
-                  {partnerViewMode === "map" && (
-                    <motion.div
-                      layoutId="viewModeTab"
-                      className="absolute inset-0 bg-teal rounded-md"
-                      transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-                    />
-                  )}
-                  <Map className="w-4 h-4 relative z-10" />
-                  <span className="relative z-10">Kaart</span>
-                </button>
-                <button
-                  onClick={() => setPartnerViewMode("list")}
-                  className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-all duration-200 ${
-                    partnerViewMode === "list"
-                      ? "text-white"
-                      : "text-white/50 hover:text-white/70"
-                  }`}
-                >
-                  {partnerViewMode === "list" && (
-                    <motion.div
-                      layoutId="viewModeTab"
-                      className="absolute inset-0 bg-teal rounded-md"
-                      transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-                    />
-                  )}
-                  <List className="w-4 h-4 relative z-10" />
-                  <span className="relative z-10">Lijst</span>
-                </button>
-              </motion.div>
-            )}
           </div>
         </div>
       </section>
@@ -2776,28 +2726,6 @@ export default function WatTeDoenPage() {
         </div>
       </section>
 
-      {/* Full Page Map View for Food/Shop Partners */}
-      {partnerViewMode === "map" && (selectedCategory === "food" || selectedCategory === "shopping") ? (
-        <section className="bg-[#0f2d2d]" style={{ height: "calc(100vh - 280px)", minHeight: "500px" }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key="sponsor-map"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="h-full"
-            >
-              <SponsorMap
-                foodPartners={selectedCategory === "food" ? filteredFoodPartners : []}
-                shopPartners={selectedCategory === "shopping" ? filteredShopPartners : []}
-                showOnlyPaid={false}
-                className="h-full"
-              />
-            </motion.div>
-          </AnimatePresence>
-        </section>
-      ) : (
       <>
       {/* Filters Section - Takeaway.com Style */}
       <section className="bg-white border-b border-gray-100 sticky top-16 z-30">
@@ -3689,21 +3617,6 @@ export default function WatTeDoenPage() {
                 <div className="flex justify-center py-12">
                   <div className="w-12 h-12 border-2 border-teal/30 border-t-teal rounded-full animate-spin" />
                 </div>
-              ) : partnerViewMode === "map" ? (
-                // Map View for Food Partners
-                <motion.div
-                  key="food-map"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="h-[600px] rounded-2xl overflow-hidden shadow-lg"
-                >
-                  <SponsorMap
-                    foodPartners={filteredFoodPartners}
-                    shopPartners={[]}
-                    showOnlyPaid={false}
-                    className="h-full"
-                  />
-                </motion.div>
               ) : filteredFoodPartners.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-text-muted text-lg">
@@ -3745,21 +3658,6 @@ export default function WatTeDoenPage() {
                 <div className="flex justify-center py-12">
                   <div className="w-12 h-12 border-2 border-pink-300 border-t-pink-500 rounded-full animate-spin" />
                 </div>
-              ) : partnerViewMode === "map" ? (
-                // Map View for Shop Partners
-                <motion.div
-                  key="shop-map"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="h-[600px] rounded-2xl overflow-hidden shadow-lg"
-                >
-                  <SponsorMap
-                    foodPartners={[]}
-                    shopPartners={filteredShopPartners}
-                    showOnlyPaid={false}
-                    className="h-full"
-                  />
-                </motion.div>
               ) : filteredShopPartners.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-text-muted text-lg">
@@ -4227,7 +4125,6 @@ export default function WatTeDoenPage() {
         )}
       </AnimatePresence>
       </>
-      )}
 
       <Footer />
     </main>

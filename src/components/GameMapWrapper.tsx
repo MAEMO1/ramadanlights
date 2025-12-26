@@ -17,6 +17,7 @@ interface Mosque {
   name: string;
   address: string;
   city: string;
+  fullAddress?: string;
   latitude: number | null;
   longitude: number | null;
 }
@@ -310,7 +311,8 @@ function GameMapContent() {
           const apiShop = shopData.partners || [];
           setFoodPartners([...dummyFoodPartners, ...apiFood]);
           setShopPartners([...dummyShopPartners, ...apiShop]);
-          setMosques(mosqueData.mosques || []);
+          // API returns 'data' key for mosques
+          setMosques(mosqueData.data || mosqueData.mosques || []);
           setDataLoaded(true);
         })
         .catch((error) => {
