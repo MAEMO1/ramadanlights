@@ -2293,6 +2293,18 @@ export default function WatTeDoenPage() {
   const [selectedCategory, setSelectedCategory] = useState<CategoryId>("food");
   const [showFilters, setShowFilters] = useState(false);
 
+  // Lock body scroll when filter overlay is open on mobile
+  useEffect(() => {
+    if (showFilters) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showFilters]);
+
   // Food partner filters
   const [foodFilters, setFoodFilters] = useState({
     cuisineType: null as CuisineType | null,
@@ -2844,16 +2856,17 @@ export default function WatTeDoenPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="md:hidden fixed inset-0 z-50 bg-white"
+                      className="md:hidden fixed inset-0 z-50 bg-white flex flex-col"
                     >
                       {/* Header */}
-                      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between">
+                      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-text-primary">Filters</h3>
                         <button
                           onClick={() => setShowFilters(false)}
-                          className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-text-secondary hover:bg-gray-200 transition-all"
+                          className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-text-primary hover:bg-gray-200 transition-all active:scale-95"
+                          aria-label="Sluiten"
                         >
-                          <X className="w-5 h-5" />
+                          <X className="w-6 h-6" />
                         </button>
                       </div>
 
@@ -3288,16 +3301,17 @@ export default function WatTeDoenPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="md:hidden fixed inset-0 z-50 bg-white"
+                      className="md:hidden fixed inset-0 z-50 bg-white flex flex-col"
                     >
                       {/* Header */}
-                      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between">
+                      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-text-primary">Filters</h3>
                         <button
                           onClick={() => setShowFilters(false)}
-                          className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-text-secondary hover:bg-gray-200 transition-all"
+                          className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-text-primary hover:bg-gray-200 transition-all active:scale-95"
+                          aria-label="Sluiten"
                         >
-                          <X className="w-5 h-5" />
+                          <X className="w-6 h-6" />
                         </button>
                       </div>
 
