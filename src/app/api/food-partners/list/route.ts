@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
+// Force dynamic - don't cache this route
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // Return empty list if Supabase is not configured
