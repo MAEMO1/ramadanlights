@@ -5,10 +5,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { Loader2, Send, Globe, Facebook, Instagram, MapPin, Utensils, Check, ImageIcon, Truck } from "lucide-react";
+import { Loader2, Send, Globe, Facebook, Instagram, MapPin, Utensils, Check, ImageIcon, Truck, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { foodPartnerFormSchema, FoodPartnerFormData } from "@/lib/food-partner-validations";
-import { categoryLabels, FoodPartnerCategory } from "@/lib/food-partner-types";
+import { categoryLabels, FoodPartnerCategory, cuisineTypeLabels, CuisineType } from "@/lib/food-partner-types";
+import { ImageUpload } from "./ImageUpload";
 
 interface AddressSuggestion {
   display_name: string;
@@ -68,6 +69,7 @@ export function FoodPartnerForm() {
       instagram_url: "",
       uber_eats_url: "",
       deliveroo_url: "",
+      takeaway_url: "",
       logo_url: "",
       cover_image_url: "",
     },
@@ -232,12 +234,14 @@ export function FoodPartnerForm() {
               <label className="block text-sm font-medium text-text-secondary mb-2">
                 Type keuken
               </label>
-              <input
-                type="text"
-                {...register("cuisine_type")}
-                className="input-field w-full"
-                placeholder="Turks, Marokkaans, Arabisch, etc."
-              />
+              <select {...register("cuisine_type")} className="input-field w-full">
+                <option value="">Selecteer type keuken</option>
+                {(Object.keys(cuisineTypeLabels) as CuisineType[]).map((cuisine) => (
+                  <option key={cuisine} value={cuisine}>
+                    {cuisineTypeLabels[cuisine]}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Address with autocomplete */}
@@ -539,17 +543,29 @@ export function FoodPartnerForm() {
           </div>
         </div>
 
-        {/* Delivery Links (Plus & Premium) */}
+        {/* Delivery & Takeaway Links */}
         <div className="card">
           <h3 className="text-lg font-display font-semibold text-text-primary mb-2 flex items-center gap-2">
             <Truck className="w-5 h-5 text-teal" />
-            Delivery Apps
+            Delivery & Takeaway
           </h3>
           <p className="text-sm text-text-muted mb-6">
-            Alleen voor Plus & Premium partners - vul in als je op delivery platforms staat
+            Voor betaalde partners - vul in als je op delivery platforms staat of takeaway aanbiedt
           </p>
 
           <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-2">
+                <ShoppingBag className="w-4 h-4 inline mr-1" />
+                Takeaway.com / Thuisbezorgd
+              </label>
+              <input
+                type="url"
+                {...register("takeaway_url")}
+                className="input-field w-full"
+                placeholder="https://www.takeaway.com/..."
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-text-secondary mb-2">
@@ -577,45 +593,31 @@ export function FoodPartnerForm() {
           </div>
         </div>
 
-        {/* Images (Plus & Premium) */}
+        {/* Images (All paid partners) */}
         <div className="card">
           <h3 className="text-lg font-display font-semibold text-text-primary mb-2 flex items-center gap-2">
             <ImageIcon className="w-5 h-5 text-amber-600" />
             Afbeeldingen
           </h3>
           <p className="text-sm text-text-muted mb-6">
-            Alleen voor Plus & Premium partners - voeg afbeeldingen toe voor meer zichtbaarheid
+            Voor alle betaalde partners - voeg afbeeldingen toe voor meer zichtbaarheid
           </p>
 
-          <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">
-                Logo URL
-              </label>
-              <input
-                type="url"
-                {...register("logo_url")}
-                className="input-field w-full"
-                placeholder="https://example.com/logo.png"
-              />
-              <p className="text-xs text-text-muted mt-1">
-                Aanbevolen formaat: vierkant, minimaal 200x200 pixels
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">
-                Cover afbeelding URL
-              </label>
-              <input
-                type="url"
-                {...register("cover_image_url")}
-                className="input-field w-full"
-                placeholder="https://example.com/cover.jpg"
-              />
-              <p className="text-xs text-text-muted mt-1">
-                Aanbevolen formaat: 16:9 (bijv. 1200x675 pixels)
-              </p>
-            </div>
+          <div className="space-y-6">
+            <ImageUpload
+              value={watch("logo_url") || ""}
+              onChange={(url) => setValue("logo_url", url)}
+              folder="logos"
+              label="Logo (vierkant, min. 200x200 pixels)"
+              aspectRatio="square"
+            />
+            <ImageUpload
+              value={watch("cover_image_url") || ""}
+              onChange={(url) => setValue("cover_image_url", url)}
+              folder="covers"
+              label="Cover afbeelding (16:9, bijv. 1200x675 pixels)"
+              aspectRatio="wide"
+            />
           </div>
         </div>
 

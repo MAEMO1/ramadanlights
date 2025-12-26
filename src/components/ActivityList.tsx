@@ -3,10 +3,37 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useState, useMemo } from "react";
-import { Search, Filter, X, Calendar } from "lucide-react";
+import {
+  Search,
+  Filter,
+  X,
+  Calendar,
+  GraduationCap,
+  Wrench,
+  Heart,
+  Users,
+  Sparkles,
+  Dumbbell,
+  ShoppingBag,
+  LayoutGrid,
+  type LucideIcon
+} from "lucide-react";
 import type { Activity, ActivityType } from "@/lib/activity-types";
 import { activityTypeLabels, isActivityToday, isActivityThisWeekend } from "@/lib/activity-types";
 import { ActivityCard } from "./ActivityCard";
+
+// Eventbrite-style activity type icons with colors
+const activityTypeConfig: Record<"all" | ActivityType, { icon: LucideIcon; color: string; bgColor: string }> = {
+  all: { icon: LayoutGrid, color: "text-gray-600", bgColor: "bg-gray-100" },
+  lecture: { icon: GraduationCap, color: "text-blue-600", bgColor: "bg-blue-100" },
+  workshop: { icon: Wrench, color: "text-purple-600", bgColor: "bg-purple-100" },
+  charity: { icon: Heart, color: "text-red-600", bgColor: "bg-red-100" },
+  community: { icon: Users, color: "text-teal-600", bgColor: "bg-teal-100" },
+  youth: { icon: Sparkles, color: "text-orange-600", bgColor: "bg-orange-100" },
+  sports: { icon: Dumbbell, color: "text-green-600", bgColor: "bg-green-100" },
+  shopping: { icon: ShoppingBag, color: "text-pink-600", bgColor: "bg-pink-100" },
+  other: { icon: Calendar, color: "text-gray-600", bgColor: "bg-gray-100" },
+};
 
 interface ActivityListProps {
   activities: Activity[];
@@ -193,7 +220,49 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
         ))}
       </motion.div>
 
-      {/* Filter Panel */}
+      {/* Eventbrite-style Category Icons */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.25 }}
+        className="mb-8"
+      >
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+          {(["all", ...Object.keys(activityTypeLabels)] as Array<"all" | ActivityType>).map((type) => {
+            const config = activityTypeConfig[type];
+            const Icon = config.icon;
+            const isActive = filters.type === type;
+            const label = type === "all" ? "Alles" : activityTypeLabels[type as ActivityType];
+
+            return (
+              <button
+                key={type}
+                onClick={() => setFilters({ ...filters, type })}
+                className="flex flex-col items-center gap-2 group"
+              >
+                <div
+                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition-all ${
+                    isActive
+                      ? "bg-teal text-white ring-4 ring-teal/30 scale-105"
+                      : `${config.bgColor} ${config.color} hover:scale-105 hover:shadow-md`
+                  }`}
+                >
+                  <Icon className="w-7 h-7 sm:w-8 sm:h-8" />
+                </div>
+                <span
+                  className={`text-xs sm:text-sm font-medium transition-colors ${
+                    isActive ? "text-teal" : "text-text-secondary group-hover:text-text-primary"
+                  }`}
+                >
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      {/* Filter Panel (Additional filters) */}
       {showFilters && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -202,40 +271,11 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
           className="bg-gray-50 rounded-2xl p-5 mb-6"
         >
           <div className="space-y-4">
-            {/* Type filters */}
-            <div>
-              <p className="text-sm font-medium text-text-secondary mb-3">
-                Type activiteit
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setFilters({ ...filters, type: "all" })}
-                  className={`px-4 py-2 rounded-full text-sm transition-all ${
-                    filters.type === "all"
-                      ? "bg-teal text-white font-medium"
-                      : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
-                  }`}
-                >
-                  Alle
-                </button>
-                {(Object.keys(activityTypeLabels) as ActivityType[]).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setFilters({ ...filters, type })}
-                    className={`px-4 py-2 rounded-full text-sm transition-all ${
-                      filters.type === type
-                        ? "bg-teal text-white font-medium"
-                        : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
-                    }`}
-                  >
-                    {activityTypeLabels[type]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Youth filter */}
             <div>
+              <p className="text-sm font-medium text-text-secondary mb-3">
+                Extra filters
+              </p>
               <button
                 onClick={() => setFilters({ ...filters, for_youth: !filters.for_youth })}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-all ${
@@ -244,6 +284,7 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
                     : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
                 }`}
               >
+                <Sparkles className="w-4 h-4" />
                 Voor Jeugd
               </button>
             </div>

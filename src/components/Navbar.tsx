@@ -11,9 +11,9 @@ const navLinks = [
   { href: "/#verhaal", label: "Het project", gold: true },
   { href: "/wat-te-doen", label: "Wat te doen", highlight: true },
   { href: "/iftar", label: "Iftarkaart", highlight: true },
-  { href: "/moskeeen", label: "Moskeeën" },
+  { href: "/moskeeen", label: "Moskeeën", highlight: true },
   { href: "/#sponsors", label: "Sponsors" },
-  { href: "/#doneren", label: "#LightUpRamadan" },
+  { href: "/#doneren", label: "#LightUpRamadan", gold: true },
 ];
 
 export function Navbar() {

@@ -80,6 +80,7 @@ export const foodPartnerFormSchema = z.object({
   instagram_url: z.string().url("Ongeldige URL").optional().or(z.literal("")),
   uber_eats_url: z.string().url("Ongeldige URL").optional().or(z.literal("")),
   deliveroo_url: z.string().url("Ongeldige URL").optional().or(z.literal("")),
+  takeaway_url: z.string().url("Ongeldige URL").optional().or(z.literal("")),
 
   // Images (URLs - upload handled separately)
   logo_url: z.string().url("Ongeldige URL").optional().or(z.literal("")),

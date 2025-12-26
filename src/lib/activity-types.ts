@@ -6,6 +6,7 @@ export type ActivityType =
   | "community"
   | "youth"
   | "sports"
+  | "shopping"
   | "other";
 
 // Recurrence pattern types
@@ -84,6 +85,7 @@ export const activityTypeLabels: Record<ActivityType, string> = {
   community: "Community",
   youth: "Jeugd",
   sports: "Sport",
+  shopping: "Shopping",
   other: "Overig",
 };
 
@@ -93,8 +95,9 @@ export const activityTypeIcons: Record<ActivityType, string> = {
   workshop: "Wrench",
   charity: "Heart",
   community: "Users",
-  youth: "Baby",
+  youth: "Sparkles",
   sports: "Dumbbell",
+  shopping: "ShoppingBag",
   other: "Calendar",
 };
 

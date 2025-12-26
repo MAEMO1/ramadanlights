@@ -8,6 +8,37 @@ export type FoodPartnerCategory =
   | "cafe"
   | "other";
 
+// Cuisine type options (like Takeaway.com/UberEats)
+export type CuisineType =
+  | "turkish"
+  | "moroccan"
+  | "middle_eastern"
+  | "indian_pakistani"
+  | "indonesian"
+  | "african"
+  | "mediterranean"
+  | "lebanese"
+  | "persian"
+  | "asian"
+  | "international"
+  | "other";
+
+// Cuisine type labels (Dutch)
+export const cuisineTypeLabels: Record<CuisineType, string> = {
+  turkish: "Turks",
+  moroccan: "Marokkaans",
+  middle_eastern: "Midden-Oosters",
+  indian_pakistani: "Indiaas/Pakistaans",
+  indonesian: "Indonesisch",
+  african: "Afrikaans",
+  mediterranean: "Mediterraans",
+  lebanese: "Libanees",
+  persian: "Perzisch",
+  asian: "Aziatisch",
+  international: "Internationaal",
+  other: "Overig",
+};
+
 // Partner tier types
 export type PartnerTier = "free" | "partner" | "partner_plus" | "premium";
 
@@ -34,7 +65,7 @@ export interface FoodPartner {
 
   // Category
   category: FoodPartnerCategory;
-  cuisine_type: string | null;
+  cuisine_type: CuisineType | null;
 
   // Halal Status
   is_halal_certified: boolean;
@@ -61,6 +92,7 @@ export interface FoodPartner {
   instagram_url: string | null;
   uber_eats_url: string | null;
   deliveroo_url: string | null;
+  takeaway_url: string | null;
 
   // Images
   logo_url: string | null;
