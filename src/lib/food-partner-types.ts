@@ -9,7 +9,7 @@ export type FoodPartnerCategory =
   | "other";
 
 // Partner tier types
-export type PartnerTier = "free" | "partner" | "partner_plus";
+export type PartnerTier = "free" | "partner" | "partner_plus" | "premium";
 
 // Status types
 export type FoodPartnerStatus = "pending" | "approved" | "rejected";
@@ -93,6 +93,7 @@ export const tierLabels: Record<PartnerTier, string> = {
   free: "Gratis",
   partner: "Food Partner",
   partner_plus: "Food Partner Plus",
+  premium: "Premium Partner",
 };
 
 // Helper function to get tier badge info
@@ -101,22 +102,28 @@ export function getTierBadgeInfo(tier: PartnerTier): {
   className: string;
 } | null {
   switch (tier) {
-    case "partner_plus":
+    case "premium":
       return {
         label: "Sponsor",
         className: "bg-gold text-gray-900 font-bold",
       };
-    case "partner":
+    case "partner_plus":
       return {
         label: "Uitgelicht",
         className: "bg-teal text-white font-medium",
       };
+    case "partner":
     default:
       return null;
   }
 }
 
-// Helper function to check if partner is featured
+// Helper function to check if partner is featured (paid tiers)
 export function isFeaturedPartner(tier: PartnerTier): boolean {
-  return tier === "partner" || tier === "partner_plus";
+  return tier === "partner" || tier === "partner_plus" || tier === "premium";
+}
+
+// Helper function to check if partner has premium features (plus or premium)
+export function isPremiumPartner(tier: PartnerTier): boolean {
+  return tier === "partner_plus" || tier === "premium";
 }

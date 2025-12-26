@@ -121,7 +121,7 @@ export default function WordFoodPartnerPage() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {paidTiers.map(({ tier, config }, index) => (
               <motion.div
                 key={tier}
@@ -129,7 +129,9 @@ export default function WordFoodPartnerPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className={`rounded-2xl overflow-hidden ${config.cardStyle}`}
+                className={`rounded-2xl overflow-hidden ${config.cardStyle} ${
+                  tier === "premium" ? "md:scale-105 md:shadow-xl" : ""
+                }`}
               >
                 {/* Header */}
                 <div className="p-6 pb-4">
@@ -140,35 +142,38 @@ export default function WordFoodPartnerPage() {
                       {config.badge}
                     </span>
                   )}
-                  <h3 className="text-2xl font-display font-semibold text-text-primary">
+                  {!config.badge && <div className="h-8 mb-4" />}
+                  <h3 className="text-xl font-display font-semibold text-text-primary">
                     {config.name}
                   </h3>
                   <div className="mt-2">
-                    <span className="text-4xl font-bold text-text-primary">
+                    <span className="text-3xl font-bold text-text-primary">
                       {config.price}
                     </span>
-                    <span className="text-text-muted ml-2">+ btw</span>
+                    <span className="text-text-muted text-sm ml-2">+ btw</span>
                   </div>
-                  <p className="text-sm text-text-muted mt-1">
+                  <p className="text-xs text-text-muted mt-1">
                     Voor de hele Ramadan periode
                   </p>
                 </div>
 
                 {/* Features */}
                 <div className="p-6 pt-2">
-                  <ul className="space-y-3">
+                  <ul className="space-y-2">
                     {config.features.map((feature, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-text-secondary">{feature}</span>
+                      <li key={i} className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-xs text-text-secondary">{feature}</span>
                       </li>
                     ))}
                   </ul>
 
                   <Link
                     href="/word-food-partner/aanmelden"
-                    className={`mt-6 w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-medium transition-all ${
-                      tier === "partner_plus"
+                    className={`mt-6 w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-medium transition-all text-sm ${
+                      tier === "premium"
+                        ? "bg-gold text-gray-900 hover:bg-gold/90"
+                        : tier === "partner_plus"
                         ? "bg-gray-900 text-white hover:bg-gray-800"
                         : "bg-teal text-white hover:bg-teal/90"
                     }`}

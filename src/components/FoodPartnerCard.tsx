@@ -12,7 +12,7 @@ import {
   Check,
 } from "lucide-react";
 import type { FoodPartner } from "@/lib/food-partner-types";
-import { categoryLabels, getTierBadgeInfo, isFeaturedPartner } from "@/lib/food-partner-types";
+import { categoryLabels, getTierBadgeInfo, isFeaturedPartner, isPremiumPartner } from "@/lib/food-partner-types";
 import { getTierConfig } from "@/lib/partner-config";
 
 interface FoodPartnerCardProps {
@@ -29,7 +29,8 @@ export function FoodPartnerCard({
   const tierConfig = getTierConfig(partner.partner_tier);
   const badgeInfo = getTierBadgeInfo(partner.partner_tier);
   const isFeatured = isFeaturedPartner(partner.partner_tier);
-  const isTopTier = partner.partner_tier === "partner_plus";
+  const hasPremiumFeatures = isPremiumPartner(partner.partner_tier);
+  const isPremium = partner.partner_tier === "premium";
 
   return (
     <motion.div
@@ -47,8 +48,8 @@ export function FoodPartnerCard({
         </div>
       )}
 
-      {/* Cover Image (for partner_plus tier) */}
-      {isTopTier && partner.cover_image_url && (
+      {/* Cover Image (for partner_plus and premium tiers) */}
+      {hasPremiumFeatures && partner.cover_image_url && (
         <div className="relative h-40 w-full">
           <img
             src={partner.cover_image_url}
@@ -208,8 +209,8 @@ export function FoodPartnerCard({
             </div>
           )}
 
-        {/* Delivery Links (for partner_plus) */}
-        {isTopTier &&
+        {/* Delivery Links (for partner_plus and premium) */}
+        {hasPremiumFeatures &&
           (partner.uber_eats_url || partner.deliveroo_url) && (
             <div className="flex gap-2 mt-3">
               {partner.uber_eats_url && (

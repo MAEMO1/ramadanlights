@@ -10,14 +10,31 @@ import {
   Globe,
   Facebook,
   Instagram,
+  GraduationCap,
+  Wrench,
+  Heart,
+  Baby,
+  Dumbbell,
+  LucideIcon,
 } from "lucide-react";
-import type { Activity } from "@/lib/activity-types";
+import type { Activity, ActivityType } from "@/lib/activity-types";
 import {
   activityTypeLabels,
   formatActivityDate,
   formatActivityTime,
   isActivityToday,
 } from "@/lib/activity-types";
+
+// Icon map for activity types
+const activityTypeIconMap: Record<ActivityType, LucideIcon> = {
+  lecture: GraduationCap,
+  workshop: Wrench,
+  charity: Heart,
+  community: Users,
+  youth: Baby,
+  sports: Dumbbell,
+  other: Calendar,
+};
 
 interface ActivityCardProps {
   activity: Activity;
@@ -31,6 +48,7 @@ export function ActivityCard({
   isInView = true,
 }: ActivityCardProps) {
   const isToday = isActivityToday(activity.event_date);
+  const TypeIcon = activityTypeIconMap[activity.activity_type];
 
   return (
     <motion.div
@@ -60,7 +78,8 @@ export function ActivityCard({
 
       {/* Type Badge & Today Badge */}
       <div className="flex items-center gap-2 mb-3">
-        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-teal/10 text-teal">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-teal/10 text-teal">
+          <TypeIcon className="w-3 h-3" />
           {activityTypeLabels[activity.activity_type]}
         </span>
         {isToday && (

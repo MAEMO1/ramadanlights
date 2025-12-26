@@ -87,6 +87,17 @@ export const activityTypeLabels: Record<ActivityType, string> = {
   other: "Overig",
 };
 
+// Icon names for activity types (to be used with lucide-react)
+export const activityTypeIcons: Record<ActivityType, string> = {
+  lecture: "GraduationCap",
+  workshop: "Wrench",
+  charity: "Heart",
+  community: "Users",
+  youth: "Baby",
+  sports: "Dumbbell",
+  other: "Calendar",
+};
+
 // Labels for recurrence patterns (Dutch)
 export const recurrenceLabels: Record<RecurrencePattern, string> = {
   daily: "Dagelijks",

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { Loader2, Send, Globe, Facebook, Instagram, MapPin, Utensils, Check } from "lucide-react";
+import { Loader2, Send, Globe, Facebook, Instagram, MapPin, Utensils, Check, ImageIcon, Truck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { foodPartnerFormSchema, FoodPartnerFormData } from "@/lib/food-partner-validations";
 import { categoryLabels, FoodPartnerCategory } from "@/lib/food-partner-types";
@@ -535,6 +535,86 @@ export function FoodPartnerForm() {
                   placeholder="https://instagram.com/..."
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Delivery Links (Plus & Premium) */}
+        <div className="card">
+          <h3 className="text-lg font-display font-semibold text-text-primary mb-2 flex items-center gap-2">
+            <Truck className="w-5 h-5 text-teal" />
+            Delivery Apps
+          </h3>
+          <p className="text-sm text-text-muted mb-6">
+            Alleen voor Plus & Premium partners - vul in als je op delivery platforms staat
+          </p>
+
+          <div className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-2">
+                  Uber Eats
+                </label>
+                <input
+                  type="url"
+                  {...register("uber_eats_url")}
+                  className="input-field w-full"
+                  placeholder="https://www.ubereats.com/..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-2">
+                  Deliveroo
+                </label>
+                <input
+                  type="url"
+                  {...register("deliveroo_url")}
+                  className="input-field w-full"
+                  placeholder="https://deliveroo.be/..."
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Images (Plus & Premium) */}
+        <div className="card">
+          <h3 className="text-lg font-display font-semibold text-text-primary mb-2 flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-amber-600" />
+            Afbeeldingen
+          </h3>
+          <p className="text-sm text-text-muted mb-6">
+            Alleen voor Plus & Premium partners - voeg afbeeldingen toe voor meer zichtbaarheid
+          </p>
+
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-2">
+                Logo URL
+              </label>
+              <input
+                type="url"
+                {...register("logo_url")}
+                className="input-field w-full"
+                placeholder="https://example.com/logo.png"
+              />
+              <p className="text-xs text-text-muted mt-1">
+                Aanbevolen formaat: vierkant, minimaal 200x200 pixels
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-2">
+                Cover afbeelding URL
+              </label>
+              <input
+                type="url"
+                {...register("cover_image_url")}
+                className="input-field w-full"
+                placeholder="https://example.com/cover.jpg"
+              />
+              <p className="text-xs text-text-muted mt-1">
+                Aanbevolen formaat: 16:9 (bijv. 1200x675 pixels)
+              </p>
             </div>
           </div>
         </div>
