@@ -6,10 +6,12 @@ import { Mail, MapPin, Instagram, Facebook } from "lucide-react";
 
 const links = [
   { label: "Het project", href: "/#verhaal" },
+  { label: "Wat te doen", href: "/wat-te-doen" },
   { label: "Iftarkaart", href: "/iftar" },
   { label: "Moskeeën", href: "/moskeeen" },
+  { label: "Halal gids", href: "/wat-te-doen#eten-drinken" },
+  { label: "Word Food Partner", href: "/word-food-partner" },
   { label: "Sponsors", href: "/#sponsors" },
-  { label: "#LightUpRamadan", href: "/#doneren" },
   { label: "Word Sponsor", href: "/#sponsor-form" },
 ];
 
