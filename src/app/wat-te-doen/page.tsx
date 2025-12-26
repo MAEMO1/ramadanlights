@@ -29,8 +29,10 @@ import {
   ChevronRight,
   CalendarDays,
   List,
+  Map,
   type LucideIcon,
 } from "lucide-react";
+import { SponsorMap } from "@/components/SponsorMap";
 import Link from "next/link";
 import type { Activity, ActivityType } from "@/lib/activity-types";
 import type { FoodPartner, CuisineType, FoodPartnerCategory, DishType } from "@/lib/food-partner-types";
@@ -2292,6 +2294,7 @@ export default function WatTeDoenPage() {
   const [isLoadingShopPartners, setIsLoadingShopPartners] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<CategoryId>("food");
   const [showFilters, setShowFilters] = useState(false);
+  const [partnerViewMode, setPartnerViewMode] = useState<"list" | "map">("list");
 
   // Lock body scroll when filter overlay is open on mobile
   useEffect(() => {
@@ -2757,6 +2760,34 @@ export default function WatTeDoenPage() {
 
                 <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
 
+                {/* View Mode Toggle */}
+                <div className="flex items-center bg-gray-100 rounded-full p-1 flex-shrink-0">
+                  <button
+                    onClick={() => setPartnerViewMode("list")}
+                    className={`p-2 rounded-full transition-all ${
+                      partnerViewMode === "list"
+                        ? "bg-white shadow-sm text-teal"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                    title="Lijstweergave"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setPartnerViewMode("map")}
+                    className={`p-2 rounded-full transition-all ${
+                      partnerViewMode === "map"
+                        ? "bg-white shadow-sm text-teal"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                    title="Kaartweergave"
+                  >
+                    <Map className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
                 {/* Scrollable container with arrows */}
                 <div className="relative flex-1 flex items-center min-w-0">
                   {/* Left arrow */}
@@ -3132,6 +3163,34 @@ export default function WatTeDoenPage() {
                     </span>
                   )}
                 </button>
+
+                <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
+                {/* View Mode Toggle */}
+                <div className="flex items-center bg-gray-100 rounded-full p-1 flex-shrink-0">
+                  <button
+                    onClick={() => setPartnerViewMode("list")}
+                    className={`p-2 rounded-full transition-all ${
+                      partnerViewMode === "list"
+                        ? "bg-white shadow-sm text-pink-500"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                    title="Lijstweergave"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setPartnerViewMode("map")}
+                    className={`p-2 rounded-full transition-all ${
+                      partnerViewMode === "map"
+                        ? "bg-white shadow-sm text-pink-500"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                    title="Kaartweergave"
+                  >
+                    <Map className="w-4 h-4" />
+                  </button>
+                </div>
 
                 <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
 
@@ -3614,6 +3673,21 @@ export default function WatTeDoenPage() {
                 <div className="flex justify-center py-12">
                   <div className="w-12 h-12 border-2 border-teal/30 border-t-teal rounded-full animate-spin" />
                 </div>
+              ) : partnerViewMode === "map" ? (
+                // Map View for Food Partners
+                <motion.div
+                  key="food-map"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="h-[600px] rounded-2xl overflow-hidden shadow-lg"
+                >
+                  <SponsorMap
+                    foodPartners={filteredFoodPartners}
+                    shopPartners={[]}
+                    showOnlyPaid={false}
+                    className="h-full"
+                  />
+                </motion.div>
               ) : filteredFoodPartners.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-text-muted text-lg">
@@ -3655,6 +3729,21 @@ export default function WatTeDoenPage() {
                 <div className="flex justify-center py-12">
                   <div className="w-12 h-12 border-2 border-pink-300 border-t-pink-500 rounded-full animate-spin" />
                 </div>
+              ) : partnerViewMode === "map" ? (
+                // Map View for Shop Partners
+                <motion.div
+                  key="shop-map"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="h-[600px] rounded-2xl overflow-hidden shadow-lg"
+                >
+                  <SponsorMap
+                    foodPartners={[]}
+                    shopPartners={filteredShopPartners}
+                    showOnlyPaid={false}
+                    className="h-full"
+                  />
+                </motion.div>
               ) : filteredShopPartners.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-text-muted text-lg">
