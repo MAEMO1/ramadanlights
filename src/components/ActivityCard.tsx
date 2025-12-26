@@ -15,6 +15,7 @@ import {
   Heart,
   Baby,
   Dumbbell,
+  ShoppingBag,
   LucideIcon,
 } from "lucide-react";
 import type { Activity, ActivityType } from "@/lib/activity-types";
@@ -33,6 +34,7 @@ const activityTypeIconMap: Record<ActivityType, LucideIcon> = {
   community: Users,
   youth: Baby,
   sports: Dumbbell,
+  shopping: ShoppingBag,
   other: Calendar,
 };
 

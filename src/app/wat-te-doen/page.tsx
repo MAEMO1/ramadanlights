@@ -1359,6 +1359,14 @@ export default function WatTeDoenPage() {
                   Word Food Partner
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
+              ) : selectedCategory === "shopping" ? (
+                <Link
+                  href="/word-shop-partner"
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-full font-medium bg-pink-500 text-white hover:bg-pink-600 transition-all"
+                >
+                  Word Shop Partner
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
               ) : (
                 <Link
                   href="/wat-te-doen/activiteit-toevoegen"
@@ -1481,7 +1489,7 @@ export default function WatTeDoenPage() {
             <p className="text-lg text-white/70 mb-8">
               Voeg uw activiteit of etablissement toe aan Ramadan Lights Gent.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
               <Link
                 href="/wat-te-doen/activiteit-toevoegen"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-white text-[#0f2d2d] hover:bg-white/90 transition-all"
@@ -1494,6 +1502,12 @@ export default function WatTeDoenPage() {
                 className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium border-2 border-gold text-gold hover:bg-gold hover:text-gray-900 transition-all"
               >
                 Word Food Partner
+              </Link>
+              <Link
+                href="/word-shop-partner"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium border-2 border-pink-400 text-pink-400 hover:bg-pink-500 hover:text-white hover:border-pink-500 transition-all"
+              >
+                Word Shop Partner
               </Link>
             </div>
           </motion.div>
