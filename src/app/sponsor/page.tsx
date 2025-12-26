@@ -365,11 +365,11 @@ export default function SponsorPage() {
               Neem gerust contact met ons op voor meer informatie over sponsormogelijkheden.
             </p>
             <a
-              href="mailto:info@ramadanlights.be?subject=Sponsoring%20informatie"
+              href="mailto:vzwvgm@gmail.com?subject=Sponsoring%20informatie"
               className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-gold text-gray-900 hover:bg-gold/90 transition-all"
             >
               <Mail className="w-5 h-5 mr-2" />
-              info@ramadanlights.be
+              vzwvgm@gmail.com
             </a>
           </motion.div>
         </div>

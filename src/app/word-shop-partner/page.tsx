@@ -89,7 +89,7 @@ export default function WordShopPartnerPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="mailto:info@ramadanlights.be?subject=Shop%20Partner%20aanmelding"
+                href="mailto:vzwvgm@gmail.com?subject=Shop%20Partner%20aanmelding"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-pink-500 text-white hover:bg-pink-600 transition-all"
               >
                 <Mail className="w-5 h-5 mr-2" />
@@ -281,11 +281,11 @@ export default function WordShopPartnerPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="mailto:info@ramadanlights.be?subject=Shop%20Partner%20aanmelding"
+                href="mailto:vzwvgm@gmail.com?subject=Shop%20Partner%20aanmelding"
                 className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-pink-500 text-white hover:bg-pink-600 transition-all"
               >
                 <Mail className="w-5 h-5 mr-2" />
-                info@ramadanlights.be
+                vzwvgm@gmail.com
               </a>
             </div>
 

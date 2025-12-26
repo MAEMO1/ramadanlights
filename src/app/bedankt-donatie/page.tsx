@@ -100,11 +100,11 @@ export default function BedanktDonatiePage() {
             className="flex justify-center mb-8"
           >
             <a
-              href="mailto:info@vgm.be"
+              href="mailto:vzwvgm@gmail.com"
               className="flex items-center justify-center gap-2 text-text-muted hover:text-primary transition-colors text-sm"
             >
               <Mail className="w-4 h-4" />
-              info@vgm.be
+              vzwvgm@gmail.com
             </a>
           </motion.div>
 
