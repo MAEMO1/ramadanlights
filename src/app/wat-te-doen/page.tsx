@@ -218,6 +218,7 @@ const dummyFoodPartners: FoodPartner[] = [
     longitude: 3.7200,
     category: "restaurant",
     cuisine_type: "indian_pakistani",
+    dish_types: ["chicken", "rice", "grill", "vegetarian", "bread"],
     is_halal_certified: true,
     halal_certification_info: "Halal Certified",
     partner_tier: "partner",
@@ -259,6 +260,7 @@ const dummyFoodPartners: FoodPartner[] = [
     longitude: 3.7230,
     category: "cafe",
     cuisine_type: "turkish",
+    dish_types: ["soup", "bread", "snacks", "desserts"],
     is_halal_certified: false,
     halal_certification_info: null,
     partner_tier: "partner",
@@ -300,6 +302,7 @@ const dummyFoodPartners: FoodPartner[] = [
     longitude: 3.7280,
     category: "restaurant",
     cuisine_type: "turkish",
+    dish_types: ["kebab", "grill", "chicken", "rice", "salads"],
     is_halal_certified: true,
     halal_certification_info: "Halal Certified",
     partner_tier: "partner",
@@ -341,6 +344,7 @@ const dummyFoodPartners: FoodPartner[] = [
     longitude: 3.7180,
     category: "restaurant",
     cuisine_type: "middle_eastern",
+    dish_types: ["shawarma", "wraps", "chicken", "salads", "snacks"],
     is_halal_certified: true,
     halal_certification_info: "100% Halal",
     partner_tier: "partner",
@@ -382,6 +386,7 @@ const dummyFoodPartners: FoodPartner[] = [
     longitude: 3.7074,
     category: "butcher",
     cuisine_type: "middle_eastern",
+    dish_types: ["grill", "chicken"],
     is_halal_certified: true,
     halal_certification_info: "Halal certified",
     partner_tier: "free",
@@ -423,6 +428,7 @@ const dummyFoodPartners: FoodPartner[] = [
     longitude: 3.7100,
     category: "supermarket",
     cuisine_type: null,
+    dish_types: null,
     is_halal_certified: false,
     halal_certification_info: null,
     partner_tier: "free",
@@ -745,6 +751,7 @@ export default function WatTeDoenPage() {
   // Food partner filters
   const [foodFilters, setFoodFilters] = useState({
     cuisineType: null as CuisineType | null,
+    dishType: null as DishType | null,
     category: null as FoodPartnerCategory | null,
     halalCertified: false,
     hasDelivery: false,
@@ -759,6 +766,22 @@ export default function WatTeDoenPage() {
     forYouth: false,
     city: "",
   });
+
+  // Calendar view state for activities
+  const [showCalendarView, setShowCalendarView] = useState(false);
+
+  // Scroll refs for arrow navigation
+  const foodFilterScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollFilters = (direction: "left" | "right") => {
+    if (foodFilterScrollRef.current) {
+      const scrollAmount = 200;
+      foodFilterScrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
 
   useEffect(() => {
     async function fetchActivities() {
@@ -802,6 +825,7 @@ export default function WatTeDoenPage() {
   // Check if any filter is active
   const hasActiveFoodFilters =
     foodFilters.cuisineType !== null ||
+    foodFilters.dishType !== null ||
     foodFilters.category !== null ||
     foodFilters.halalCertified ||
     foodFilters.hasDelivery ||
@@ -820,6 +844,9 @@ export default function WatTeDoenPage() {
 
     if (foodFilters.cuisineType) {
       result = result.filter((p) => p.cuisine_type === foodFilters.cuisineType);
+    }
+    if (foodFilters.dishType) {
+      result = result.filter((p) => p.dish_types?.includes(foodFilters.dishType!));
     }
     if (foodFilters.category) {
       result = result.filter((p) => p.category === foodFilters.category);
@@ -886,6 +913,7 @@ export default function WatTeDoenPage() {
   const clearFoodFilters = () => {
     setFoodFilters({
       cuisineType: null,
+      dishType: null,
       category: null,
       halalCertified: false,
       hasDelivery: false,
@@ -996,84 +1024,128 @@ export default function WatTeDoenPage() {
           {selectedCategory === "food" ? (
             // Food Partner Filters
             <div className="space-y-4">
-              {/* Main filter bar */}
-              <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {/* Main filter bar with arrows */}
+              <div className="relative flex items-center">
+                {/* Left arrow */}
                 <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                    showFilters || hasActiveFoodFilters
-                      ? "bg-teal text-white"
-                      : "bg-gray-100 text-text-secondary hover:bg-gray-200"
-                  }`}
+                  onClick={() => scrollFilters("left")}
+                  className="absolute left-0 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:shadow-lg transition-all -ml-2"
                 >
-                  <Filter className="w-4 h-4" />
-                  Filters
-                  {hasActiveFoodFilters && (
-                    <span className="w-5 h-5 bg-white text-teal text-xs font-bold rounded-full flex items-center justify-center">
-                      {(foodFilters.cuisineType ? 1 : 0) +
-                        (foodFilters.category ? 1 : 0) +
-                        (foodFilters.halalCertified ? 1 : 0) +
-                        (foodFilters.hasDelivery ? 1 : 0) +
-                        (foodFilters.hasTakeaway ? 1 : 0)}
-                    </span>
-                  )}
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
 
-                <div className="h-6 w-px bg-gray-200" />
+                {/* Scrollable filter container */}
+                <div
+                  ref={foodFilterScrollRef}
+                  className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide mx-8 scroll-smooth"
+                >
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                      showFilters || hasActiveFoodFilters
+                        ? "bg-teal text-white"
+                        : "bg-gray-100 text-text-secondary hover:bg-gray-200"
+                    }`}
+                  >
+                    <Filter className="w-4 h-4" />
+                    Filters
+                    {hasActiveFoodFilters && (
+                      <span className="w-5 h-5 bg-white text-teal text-xs font-bold rounded-full flex items-center justify-center">
+                        {(foodFilters.cuisineType ? 1 : 0) +
+                          (foodFilters.dishType ? 1 : 0) +
+                          (foodFilters.category ? 1 : 0) +
+                          (foodFilters.halalCertified ? 1 : 0) +
+                          (foodFilters.hasDelivery ? 1 : 0) +
+                          (foodFilters.hasTakeaway ? 1 : 0)}
+                      </span>
+                    )}
+                  </button>
 
-                {/* Quick cuisine filters */}
-                {availableCuisineTypes.slice(0, 4).map((cuisineType) => (
+                  <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
+                  {/* Quick dish type filters */}
+                  {(Object.keys(dishTypeLabels) as DishType[]).slice(0, 6).map((dishType) => {
+                    const dishInfo = dishTypeLabels[dishType];
+                    return (
+                      <FilterChip
+                        key={dishType}
+                        label={dishInfo.label}
+                        icon={<span className="text-base">{dishInfo.emoji}</span>}
+                        active={foodFilters.dishType === dishType}
+                        onClick={() =>
+                          setFoodFilters({
+                            ...foodFilters,
+                            dishType: foodFilters.dishType === dishType ? null : dishType,
+                          })
+                        }
+                      />
+                    );
+                  })}
+
+                  <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
+                  {/* Quick cuisine filters */}
+                  {availableCuisineTypes.slice(0, 4).map((cuisineType) => (
+                    <FilterChip
+                      key={cuisineType}
+                      label={cuisineTypeLabels[cuisineType]}
+                      icon={<span className="text-base">{cuisineIcons[cuisineType]}</span>}
+                      active={foodFilters.cuisineType === cuisineType}
+                      onClick={() =>
+                        setFoodFilters({
+                          ...foodFilters,
+                          cuisineType:
+                            foodFilters.cuisineType === cuisineType ? null : cuisineType,
+                        })
+                      }
+                    />
+                  ))}
+
+                  <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
+                  {/* Quick action filters */}
                   <FilterChip
-                    key={cuisineType}
-                    label={cuisineTypeLabels[cuisineType]}
-                    icon={<span className="text-base">{cuisineIcons[cuisineType]}</span>}
-                    active={foodFilters.cuisineType === cuisineType}
+                    label="Halal Gecertificeerd"
+                    icon={<Check className="w-4 h-4" />}
+                    active={foodFilters.halalCertified}
                     onClick={() =>
                       setFoodFilters({
                         ...foodFilters,
-                        cuisineType:
-                          foodFilters.cuisineType === cuisineType ? null : cuisineType,
+                        halalCertified: !foodFilters.halalCertified,
                       })
                     }
                   />
-                ))}
+                  <FilterChip
+                    label="Bezorging"
+                    icon={<Truck className="w-4 h-4" />}
+                    active={foodFilters.hasDelivery}
+                    onClick={() =>
+                      setFoodFilters({
+                        ...foodFilters,
+                        hasDelivery: !foodFilters.hasDelivery,
+                      })
+                    }
+                  />
+                  <FilterChip
+                    label="Takeaway"
+                    icon={<ShoppingBag className="w-4 h-4" />}
+                    active={foodFilters.hasTakeaway}
+                    onClick={() =>
+                      setFoodFilters({
+                        ...foodFilters,
+                        hasTakeaway: !foodFilters.hasTakeaway,
+                      })
+                    }
+                  />
+                </div>
 
-                <div className="h-6 w-px bg-gray-200" />
-
-                {/* Quick action filters */}
-                <FilterChip
-                  label="Halal Gecertificeerd"
-                  icon={<Check className="w-4 h-4" />}
-                  active={foodFilters.halalCertified}
-                  onClick={() =>
-                    setFoodFilters({
-                      ...foodFilters,
-                      halalCertified: !foodFilters.halalCertified,
-                    })
-                  }
-                />
-                <FilterChip
-                  label="Bezorging"
-                  icon={<Truck className="w-4 h-4" />}
-                  active={foodFilters.hasDelivery}
-                  onClick={() =>
-                    setFoodFilters({
-                      ...foodFilters,
-                      hasDelivery: !foodFilters.hasDelivery,
-                    })
-                  }
-                />
-                <FilterChip
-                  label="Takeaway"
-                  icon={<ShoppingBag className="w-4 h-4" />}
-                  active={foodFilters.hasTakeaway}
-                  onClick={() =>
-                    setFoodFilters({
-                      ...foodFilters,
-                      hasTakeaway: !foodFilters.hasTakeaway,
-                    })
-                  }
-                />
+                {/* Right arrow */}
+                <button
+                  onClick={() => scrollFilters("right")}
+                  className="absolute right-0 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:shadow-lg transition-all -mr-2"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
 
               {/* Expanded filter panel */}
@@ -1113,6 +1185,41 @@ export default function WatTeDoenPage() {
                               }
                             />
                           )
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Dish Type Grid */}
+                    <div>
+                      <p className="text-sm font-medium text-text-secondary mb-3">
+                        Type gerechten
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {(Object.keys(dishTypeLabels) as DishType[]).map(
+                          (dishType) => {
+                            const dishInfo = dishTypeLabels[dishType];
+                            return (
+                              <FilterChip
+                                key={dishType}
+                                label={dishInfo.label}
+                                icon={
+                                  <span className="text-base">
+                                    {dishInfo.emoji}
+                                  </span>
+                                }
+                                active={foodFilters.dishType === dishType}
+                                onClick={() =>
+                                  setFoodFilters({
+                                    ...foodFilters,
+                                    dishType:
+                                      foodFilters.dishType === dishType
+                                        ? null
+                                        : dishType,
+                                  })
+                                }
+                              />
+                            );
+                          }
                         )}
                       </div>
                     </div>
@@ -1160,73 +1267,101 @@ export default function WatTeDoenPage() {
             // Activity Filters
             <div className="space-y-4">
               {/* Main filter bar */}
-              <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                    showFilters || hasActiveActivityFilters
-                      ? "bg-teal text-white"
-                      : "bg-gray-100 text-text-secondary hover:bg-gray-200"
-                  }`}
-                >
-                  <Filter className="w-4 h-4" />
-                  Filters
-                  {hasActiveActivityFilters && (
-                    <span className="w-5 h-5 bg-white text-teal text-xs font-bold rounded-full flex items-center justify-center">
-                      {(activityFilters.forMen ? 1 : 0) +
-                        (activityFilters.forWomen ? 1 : 0) +
-                        (activityFilters.forFamilies ? 1 : 0) +
-                        (activityFilters.forYouth ? 1 : 0) +
-                        (activityFilters.city ? 1 : 0)}
-                    </span>
-                  )}
-                </button>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide flex-1">
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                      showFilters || hasActiveActivityFilters
+                        ? "bg-teal text-white"
+                        : "bg-gray-100 text-text-secondary hover:bg-gray-200"
+                    }`}
+                  >
+                    <Filter className="w-4 h-4" />
+                    Filters
+                    {hasActiveActivityFilters && (
+                      <span className="w-5 h-5 bg-white text-teal text-xs font-bold rounded-full flex items-center justify-center">
+                        {(activityFilters.forMen ? 1 : 0) +
+                          (activityFilters.forWomen ? 1 : 0) +
+                          (activityFilters.forFamilies ? 1 : 0) +
+                          (activityFilters.forYouth ? 1 : 0) +
+                          (activityFilters.city ? 1 : 0)}
+                      </span>
+                    )}
+                  </button>
 
-                <div className="h-6 w-px bg-gray-200" />
+                  <div className="h-6 w-px bg-gray-200" />
 
-                {/* Quick audience filters */}
-                <FilterChip
-                  label="Voor mannen"
-                  active={activityFilters.forMen}
-                  onClick={() =>
-                    setActivityFilters({
-                      ...activityFilters,
-                      forMen: !activityFilters.forMen,
-                    })
-                  }
-                />
-                <FilterChip
-                  label="Voor vrouwen"
-                  active={activityFilters.forWomen}
-                  onClick={() =>
-                    setActivityFilters({
-                      ...activityFilters,
-                      forWomen: !activityFilters.forWomen,
-                    })
-                  }
-                />
-                <FilterChip
-                  label="Gezinnen"
-                  icon={<Users className="w-4 h-4" />}
-                  active={activityFilters.forFamilies}
-                  onClick={() =>
-                    setActivityFilters({
-                      ...activityFilters,
-                      forFamilies: !activityFilters.forFamilies,
-                    })
-                  }
-                />
-                <FilterChip
-                  label="Jeugd"
-                  icon={<Sparkles className="w-4 h-4" />}
-                  active={activityFilters.forYouth}
-                  onClick={() =>
-                    setActivityFilters({
-                      ...activityFilters,
-                      forYouth: !activityFilters.forYouth,
-                    })
-                  }
-                />
+                  {/* Quick audience filters */}
+                  <FilterChip
+                    label="Voor mannen"
+                    active={activityFilters.forMen}
+                    onClick={() =>
+                      setActivityFilters({
+                        ...activityFilters,
+                        forMen: !activityFilters.forMen,
+                      })
+                    }
+                  />
+                  <FilterChip
+                    label="Voor vrouwen"
+                    active={activityFilters.forWomen}
+                    onClick={() =>
+                      setActivityFilters({
+                        ...activityFilters,
+                        forWomen: !activityFilters.forWomen,
+                      })
+                    }
+                  />
+                  <FilterChip
+                    label="Gezinnen"
+                    icon={<Users className="w-4 h-4" />}
+                    active={activityFilters.forFamilies}
+                    onClick={() =>
+                      setActivityFilters({
+                        ...activityFilters,
+                        forFamilies: !activityFilters.forFamilies,
+                      })
+                    }
+                  />
+                  <FilterChip
+                    label="Jeugd"
+                    icon={<Sparkles className="w-4 h-4" />}
+                    active={activityFilters.forYouth}
+                    onClick={() =>
+                      setActivityFilters({
+                        ...activityFilters,
+                        forYouth: !activityFilters.forYouth,
+                      })
+                    }
+                  />
+                </div>
+
+                {/* View toggle */}
+                <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1 flex-shrink-0">
+                  <button
+                    onClick={() => setShowCalendarView(false)}
+                    className={`p-2 rounded-full transition-all ${
+                      !showCalendarView
+                        ? "bg-white shadow-sm text-teal"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                    title="Lijst weergave"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setShowCalendarView(true)}
+                    className={`p-2 rounded-full transition-all ${
+                      showCalendarView
+                        ? "bg-white shadow-sm text-teal"
+                        : "text-text-muted hover:text-text-secondary"
+                    }`}
+                    title="Kalender weergave"
+                  >
+                    <CalendarDays className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Expanded filter panel */}
@@ -1458,7 +1593,98 @@ export default function WatTeDoenPage() {
                     </Link>
                   )}
                 </div>
+              ) : showCalendarView ? (
+                // Calendar View
+                <motion.div
+                  key={`activity-calendar-${selectedCategory}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+                >
+                  <div className="grid grid-cols-7 gap-2 mb-4">
+                    {["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"].map((day) => (
+                      <div key={day} className="text-center text-sm font-medium text-text-muted py-2">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-2">
+                    {/* Generate calendar days */}
+                    {Array.from({ length: 35 }, (_, i) => {
+                      const dayOffset = i - 3; // Start a few days before today
+                      const date = new Date();
+                      date.setDate(date.getDate() + dayOffset);
+                      const dateStr = date.toISOString().split("T")[0];
+                      const dayActivities = filteredActivities.filter(
+                        (a) => a.event_date === dateStr
+                      );
+                      const isToday = dayOffset === 0;
+                      const isPast = dayOffset < 0;
+
+                      return (
+                        <div
+                          key={i}
+                          className={`min-h-[80px] p-2 rounded-xl border transition-all ${
+                            isToday
+                              ? "border-teal bg-teal/5"
+                              : isPast
+                              ? "border-gray-100 bg-gray-50 opacity-50"
+                              : "border-gray-100 hover:border-gray-200"
+                          }`}
+                        >
+                          <div className={`text-sm font-medium mb-1 ${isToday ? "text-teal" : "text-text-secondary"}`}>
+                            {date.getDate()}
+                          </div>
+                          {dayActivities.length > 0 && (
+                            <div className="space-y-1">
+                              {dayActivities.slice(0, 2).map((activity) => (
+                                <div
+                                  key={activity.id}
+                                  className="text-xs bg-teal/10 text-teal px-1.5 py-0.5 rounded truncate"
+                                  title={activity.title}
+                                >
+                                  {activity.title}
+                                </div>
+                              ))}
+                              {dayActivities.length > 2 && (
+                                <div className="text-xs text-text-muted">
+                                  +{dayActivities.length - 2} meer
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* List below calendar for selected activities */}
+                  <div className="mt-6 pt-6 border-t border-gray-100">
+                    <h4 className="font-medium text-text-secondary mb-4">Alle activiteiten</h4>
+                    <div className="space-y-3">
+                      {filteredActivities.map((activity) => (
+                        <div key={activity.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                          <div className="w-12 h-12 bg-teal/10 rounded-xl flex flex-col items-center justify-center flex-shrink-0">
+                            <span className="text-xs text-teal font-medium">
+                              {new Date(activity.event_date).toLocaleDateString("nl-BE", { weekday: "short" })}
+                            </span>
+                            <span className="text-lg font-bold text-teal">
+                              {new Date(activity.event_date).getDate()}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-text-primary truncate">{activity.title}</p>
+                            <p className="text-sm text-text-muted truncate">{activity.location_name}</p>
+                          </div>
+                          {activity.start_time && (
+                            <span className="text-sm text-text-muted flex-shrink-0">{activity.start_time.slice(0, 5)}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
               ) : (
+                // List View
                 <motion.div
                   key={`activity-list-${selectedCategory}`}
                   initial={{ opacity: 0 }}

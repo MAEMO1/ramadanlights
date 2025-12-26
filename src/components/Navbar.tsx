@@ -101,7 +101,9 @@ export function Navbar() {
                     ${link.highlight
                       ? "px-4 py-2 bg-teal-600 text-white font-medium rounded-md hover:bg-teal-700"
                       : link.gold
-                        ? "px-4 py-2 bg-gold text-white font-medium rounded-md hover:bg-gold-dark"
+                        ? isScrolled
+                          ? "text-gold font-semibold hover:text-gold-dark px-3 py-2"
+                          : "text-gold-light font-semibold hover:text-gold px-3 py-2"
                         : isScrolled
                           ? isActive(link.href)
                             ? "text-gray-900 font-semibold px-3 py-2"
@@ -206,7 +208,7 @@ export function Navbar() {
                         ${link.highlight
                           ? "bg-teal-600 text-white font-medium"
                           : link.gold
-                            ? "bg-gold text-white font-medium"
+                            ? "text-gold font-semibold hover:bg-gold/10"
                             : isActive(link.href)
                               ? "text-gray-900 font-semibold bg-gray-50"
                               : "text-gray-600 hover:bg-gray-50"
