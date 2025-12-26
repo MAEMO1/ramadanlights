@@ -132,7 +132,7 @@ export function Navbar() {
                 `}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                aria-label="Open Sponsor Kaart"
+                aria-label="Open Ramadan Lights Kaart"
               >
                 {/* Outer glow ring */}
                 <motion.div
@@ -325,7 +325,7 @@ export function Navbar() {
                       }}
                     />
                     <MapIcon className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">Ontdek de Sponsor Kaart</span>
+                    <span className="relative z-10">Ramadan Lights Kaart</span>
                     <motion.span
                       className="text-sm relative z-10"
                       animate={{

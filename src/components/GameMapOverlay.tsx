@@ -50,8 +50,8 @@ const routes = {
 };
 
 // Check if a point is near a route and offset it to the side
-const ROUTE_PROXIMITY_THRESHOLD = 0.0015; // ~150m in degrees
-const OFFSET_DISTANCE = 0.0008; // ~80m offset to the side
+const ROUTE_PROXIMITY_THRESHOLD = 0.002; // ~200m in degrees
+const OFFSET_DISTANCE = 0.0025; // ~250m offset to the side - ensure markers don't cover routes
 
 function isNearRoute(lat: number, lng: number): boolean {
   const allRoutePoints = [...routes.wondelgemstraat, ...routes.bevrijdingslaanPhoenix];
@@ -69,12 +69,12 @@ function offsetMarkerPosition(lat: number, lng: number, index: number): [number,
     return [lat, lng];
   }
 
-  // Offset markers to the side of the route
-  // Alternate left/right based on index to spread them out
-  const direction = index % 2 === 0 ? 1 : -1;
-  const offsetLng = lng + (OFFSET_DISTANCE * direction);
-  // Add slight lat variation based on index to prevent stacking
-  const offsetLat = lat + ((index % 5) * 0.0002 - 0.0004);
+  // Offset ALL markers near routes to the EAST (right side) to keep routes visible
+  // Add slight variation based on index to prevent complete stacking
+  const baseOffset = OFFSET_DISTANCE;
+  const variation = (index % 4) * 0.0004; // Small variation to spread markers
+  const offsetLng = lng + baseOffset + variation;
+  const offsetLat = lat + ((index % 3) * 0.0003 - 0.00045); // Slight lat variation
 
   return [offsetLat, offsetLng];
 }
@@ -90,7 +90,7 @@ const categoryIcons: Record<string, string> = {
   cafe: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>`,
 
   // Shop categories - Professional retail icons
-  decor: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`,
+  decor: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L8 6v2H6v2h2v10h8V10h2V8h-2V6l-4-4zm0 2.83L14 7v1h-4V7l2-2.17zM10 12h4v6h-4v-6z"/><path d="M11 14h2v3h-2z" opacity="0.5"/></svg>`,
   clothing: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 18.2L13 11.75v-.91c1.65-.49 2.8-2.17 2.43-4.05-.26-1.31-1.3-2.4-2.61-2.7C10.54 3.57 8.5 5.3 8.5 7.5h2c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5c0 .84-.69 1.52-1.53 1.5-.54-.01-.97.45-.97.99v1.76L2.4 18.2c-.77.58-.36 1.8.6 1.8h18c.96 0 1.37-1.22.6-1.8zM6 18l6-4.5 6 4.5H6z"/></svg>`,
   spiritual: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1.06 13.54L7.4 12l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41-5.64 5.66z"/></svg>`,
   gifts: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>`,
@@ -99,8 +99,8 @@ const categoryIcons: Record<string, string> = {
   tech: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>`,
   other: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>`,
 
-  // Mosque icon
-  mosque: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.24 2 7 3.51 7 6v1H5v2h1v10H3v2h18v-2h-3V9h1V7h-2V6c0-2.49-2.24-4-5-4zm-3 7h2v4H9V9zm4 0h2v4h-2V9zm-3 6v4H8v-4h2zm4 0v4h-2v-4h2zm4 0v4h-2v-4h2z"/><path d="M12 3c1.66 0 3 .9 3 2v1H9V5c0-1.1 1.34-2 3-2z" opacity="0.6"/></svg>`,
+  // Mosque icon - Beautiful silhouette with dome and minaret
+  mosque: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-2.5 0-4.5 1.5-4.5 3.5 0 .5.1 1 .3 1.5H5v2h1v11H4v2h16v-2h-2V9h1V7h-2.8c.2-.5.3-1 .3-1.5C16.5 3.5 14.5 2 12 2zm0 2c1.4 0 2.5.7 2.5 1.5S13.4 7 12 7s-2.5-.7-2.5-1.5S10.6 4 12 4z"/><path d="M8 9h8v11H8V9zm2 2v3h4v-3h-4zm0 5v2h1.5v-2H10zm2.5 0v2H14v-2h-1.5z" opacity="0.3"/><path d="M19 4v3h1V4h-1zm0 4v12h1V8h-1z" opacity="0.7"/></svg>`,
 };
 
 // Size configurations based on tier
