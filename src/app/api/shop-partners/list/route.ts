@@ -18,32 +18,9 @@ export async function GET() {
 
     const { data: shopPartners, error } = await supabase
       .from("shop_partners")
-      .select(
-        `
-        id,
-        name,
-        slug,
-        description,
-        address,
-        city,
-        postal_code,
-        latitude,
-        longitude,
-        category,
-        partner_tier,
-        tier_expires_at,
-        ramadan_special,
-        ramadan_special_discount,
-        website_url,
-        facebook_url,
-        instagram_url,
-        logo_url,
-        cover_image_url,
-        opening_hours
-      `
-      )
+      .select("id, name, slug, description, address, city, postal_code, latitude, longitude, category, partner_tier, tier_expires_at, ramadan_special, ramadan_special_discount, website_url, facebook_url, instagram_url, logo_url, cover_image_url, opening_hours")
       .eq("status", "approved")
-      .order("partner_tier", { ascending: false }) // Premium/Partner first
+      .order("partner_tier", { ascending: false })
       .order("name", { ascending: true });
 
     if (error) {
