@@ -66,8 +66,8 @@ export const partnerTiers: Record<PartnerTier, TierConfig> = {
   },
   premium: {
     name: "Premium Partner",
-    price: "€1000",
-    priceNumeric: 1000,
+    price: "€1500",
+    priceNumeric: 1500,
     features: [
       "Alles van Food Partner Plus",
       "\"Sponsor\" badge (goud)",

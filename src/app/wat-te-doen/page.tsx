@@ -24,12 +24,17 @@ import {
   ShoppingBag,
   Store,
   MapPin,
+  ChevronLeft,
+  ChevronRight,
+  CalendarDays,
+  List,
   type LucideIcon,
 } from "lucide-react";
+import { useRef } from "react";
 import Link from "next/link";
 import type { Activity, ActivityType } from "@/lib/activity-types";
-import type { FoodPartner, CuisineType, FoodPartnerCategory } from "@/lib/food-partner-types";
-import { cuisineTypeLabels, categoryLabels } from "@/lib/food-partner-types";
+import type { FoodPartner, CuisineType, FoodPartnerCategory, DishType } from "@/lib/food-partner-types";
+import { cuisineTypeLabels, categoryLabels, dishTypeLabels } from "@/lib/food-partner-types";
 
 // Category configuration with icons and colors
 type CategoryId = "food" | ActivityType;
@@ -87,6 +92,7 @@ const dummyFoodPartners: FoodPartner[] = [
     longitude: 3.7250,
     category: "restaurant",
     cuisine_type: "lebanese",
+    dish_types: ["grill", "rice", "shawarma", "salads", "desserts"],
     is_halal_certified: true,
     halal_certification_info: "HMC Certified - Premium Quality",
     partner_tier: "premium",
@@ -128,6 +134,7 @@ const dummyFoodPartners: FoodPartner[] = [
     longitude: 3.7174,
     category: "restaurant",
     cuisine_type: "moroccan",
+    dish_types: ["grill", "rice", "soup", "bread", "desserts"],
     is_halal_certified: true,
     halal_certification_info: "HMC Certified",
     partner_tier: "partner_plus",
@@ -169,6 +176,7 @@ const dummyFoodPartners: FoodPartner[] = [
     longitude: 3.7274,
     category: "bakery",
     cuisine_type: "turkish",
+    dish_types: ["bread", "pizza", "snacks", "desserts"],
     is_halal_certified: true,
     halal_certification_info: null,
     partner_tier: "partner",

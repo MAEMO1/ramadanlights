@@ -8,7 +8,7 @@ import { useInView } from "framer-motion";
 import { Loader2, Send, Globe, Facebook, Instagram, MapPin, Utensils, Check, ImageIcon, Truck, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { foodPartnerFormSchema, FoodPartnerFormData } from "@/lib/food-partner-validations";
-import { categoryLabels, FoodPartnerCategory, cuisineTypeLabels, CuisineType } from "@/lib/food-partner-types";
+import { categoryLabels, FoodPartnerCategory, cuisineTypeLabels, CuisineType, dishTypeLabels, DishType } from "@/lib/food-partner-types";
 import { ImageUpload } from "./ImageUpload";
 
 interface AddressSuggestion {
@@ -58,6 +58,7 @@ export function FoodPartnerForm() {
       contact_phone: "",
       description: "",
       cuisine_type: "",
+      dish_types: [],
       is_halal_certified: false,
       halal_certification_info: "",
       iftar_special: "",
@@ -242,6 +243,46 @@ export function FoodPartnerForm() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Dish Types - Multi-select */}
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-2">
+                Type gerechten
+              </label>
+              <p className="text-xs text-text-muted mb-3">
+                Selecteer alle gerechttypes die je aanbiedt
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {(Object.keys(dishTypeLabels) as DishType[]).map((dish) => {
+                  const dishInfo = dishTypeLabels[dish];
+                  const currentDishTypes = watch("dish_types") || [];
+                  const isSelected = currentDishTypes.includes(dish);
+
+                  return (
+                    <button
+                      key={dish}
+                      type="button"
+                      onClick={() => {
+                        const current = watch("dish_types") || [];
+                        if (current.includes(dish)) {
+                          setValue("dish_types", current.filter(d => d !== dish));
+                        } else {
+                          setValue("dish_types", [...current, dish]);
+                        }
+                      }}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all ${
+                        isSelected
+                          ? "bg-teal text-white"
+                          : "bg-gray-100 text-text-secondary hover:bg-gray-200"
+                      }`}
+                    >
+                      <span className="text-base">{dishInfo.emoji}</span>
+                      <span>{dishInfo.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Address with autocomplete */}

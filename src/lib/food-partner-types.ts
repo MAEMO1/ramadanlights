@@ -39,6 +39,45 @@ export const cuisineTypeLabels: Record<CuisineType, string> = {
   other: "Overig",
 };
 
+// Dish type options (like Uber Eats/Deliveroo/Takeaway)
+export type DishType =
+  | "burgers"
+  | "pizza"
+  | "kebab"
+  | "chicken"
+  | "shawarma"
+  | "grill"
+  | "pasta"
+  | "rice"
+  | "soup"
+  | "bread"
+  | "wraps"
+  | "fish"
+  | "vegetarian"
+  | "salads"
+  | "desserts"
+  | "snacks";
+
+// Dish type labels with emoji icons (Dutch)
+export const dishTypeLabels: Record<DishType, { label: string; emoji: string }> = {
+  burgers: { label: "Burgers", emoji: "🍔" },
+  pizza: { label: "Pizza", emoji: "🍕" },
+  kebab: { label: "Kebab/Döner", emoji: "🥙" },
+  chicken: { label: "Kip", emoji: "🍗" },
+  shawarma: { label: "Shawarma", emoji: "🌯" },
+  grill: { label: "Grillgerechten", emoji: "🥩" },
+  pasta: { label: "Pasta", emoji: "🍝" },
+  rice: { label: "Rijstgerechten", emoji: "🍚" },
+  soup: { label: "Soep", emoji: "🍲" },
+  bread: { label: "Brood/Pide", emoji: "🥖" },
+  wraps: { label: "Wraps", emoji: "🌮" },
+  fish: { label: "Vis", emoji: "🐟" },
+  vegetarian: { label: "Vegetarisch", emoji: "🥗" },
+  salads: { label: "Salades", emoji: "🥬" },
+  desserts: { label: "Desserts", emoji: "🍰" },
+  snacks: { label: "Snacks", emoji: "🍟" },
+};
+
 // Partner tier types
 export type PartnerTier = "free" | "partner" | "partner_plus" | "premium";
 
@@ -66,6 +105,7 @@ export interface FoodPartner {
   // Category
   category: FoodPartnerCategory;
   cuisine_type: CuisineType | null;
+  dish_types: DishType[] | null;
 
   // Halal Status
   is_halal_certified: boolean;

@@ -53,6 +53,27 @@ export const foodPartnerFormSchema = z.object({
     .max(100, "Keuken type mag maximaal 100 tekens bevatten")
     .optional()
     .or(z.literal("")),
+  dish_types: z
+    .array(z.enum([
+      "burgers",
+      "pizza",
+      "kebab",
+      "chicken",
+      "shawarma",
+      "grill",
+      "pasta",
+      "rice",
+      "soup",
+      "bread",
+      "wraps",
+      "fish",
+      "vegetarian",
+      "salads",
+      "desserts",
+      "snacks",
+    ]))
+    .optional()
+    .default([]),
   is_halal_certified: z.boolean().default(false),
   halal_certification_info: z
     .string()

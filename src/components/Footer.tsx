@@ -11,6 +11,7 @@ const links = [
   { label: "Moskeeën", href: "/moskeeen" },
   { label: "Halal gids", href: "/wat-te-doen#eten-drinken" },
   { label: "Word Food Partner", href: "/word-food-partner" },
+  { label: "Word Shop Partner", href: "/word-shop-partner" },
   { label: "Sponsors", href: "/#sponsors" },
   { label: "Word Sponsor", href: "/#sponsor-form" },
 ];
