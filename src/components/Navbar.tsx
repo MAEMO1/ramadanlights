@@ -120,7 +120,7 @@ export function Navbar() {
               <div className={`w-px h-5 mx-3 ${isScrolled ? "bg-gray-200" : "bg-white/30"}`} />
 
               <Link
-                href="/#sponsor-form"
+                href="/sponsor"
                 className={`
                   px-4 py-2 text-sm font-medium rounded-md transition-colors
                   ${isScrolled
@@ -228,7 +228,7 @@ export function Navbar() {
 
                 <div className="py-4 border-t border-gray-100 space-y-2">
                   <Link
-                    href="/#sponsor-form"
+                    href="/sponsor"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="
                       block w-full py-3 text-center text-[15px] font-medium

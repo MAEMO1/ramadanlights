@@ -76,7 +76,7 @@ export function SponsorGrid() {
               <p className="text-body mb-8">
                 Word sponsor van Ramadan Lights Gent en versterk uw zichtbaarheid in de gemeenschap.
               </p>
-              <a href="#sponsor-form" className="btn-primary">
+              <a href="/sponsor" className="btn-primary">
                 Word Partner
               </a>
             </div>
