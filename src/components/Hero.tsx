@@ -69,7 +69,7 @@ export function Hero() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <a href="#sponsor-form" className="btn-primary">
+              <a href="/sponsor" className="btn-primary">
                 Word Sponsor
                 <ArrowRight className="w-4 h-4 ml-2" />
               </a>
