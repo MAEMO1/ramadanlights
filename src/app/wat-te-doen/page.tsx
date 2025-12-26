@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FoodPartnerCard } from "@/components/FoodPartnerCard";
+import { ShopPartnerCard } from "@/components/ShopPartnerCard";
 import { ActivityCard } from "@/components/ActivityCard";
 import {
   ArrowRight,
@@ -34,6 +35,8 @@ import Link from "next/link";
 import type { Activity, ActivityType } from "@/lib/activity-types";
 import type { FoodPartner, CuisineType, FoodPartnerCategory, DishType } from "@/lib/food-partner-types";
 import { cuisineTypeLabels, categoryLabels, dishTypeLabels } from "@/lib/food-partner-types";
+import type { ShopPartner, ShopCategory } from "@/lib/shop-partner-types";
+import { shopCategoryLabels, shopCategoryIcons } from "@/lib/shop-partner-types";
 
 // Category configuration with icons and colors
 type CategoryId = "food" | ActivityType;
@@ -697,6 +700,241 @@ const dummyFoodPartners: FoodPartner[] = [
     uber_eats_url: null,
     deliveroo_url: null,
     takeaway_url: null,
+    logo_url: null,
+    cover_image_url: null,
+    opening_hours: null,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+];
+
+// Dummy shop partners for demonstration
+const dummyShopPartners: ShopPartner[] = [
+  // PREMIUM - Decoratie
+  {
+    id: "shop-premium-1",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    name: "Arabesque Home",
+    slug: "arabesque-home",
+    description: "Exclusieve Arabische interieur decoratie, handgemaakte lantaarns, kussens en wanddecoratie. Creëer de perfecte Ramadan sfeer in uw huis.",
+    address: "Veldstraat 45",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0530,
+    longitude: 3.7210,
+    category: "decor",
+    partner_tier: "premium",
+    tier_expires_at: null,
+    ramadan_special: "Ramadan Collectie 2026 - Complete sfeer pakketten met lantaarns, lichtsnoeren en tafelversiering",
+    ramadan_special_discount: "15% korting op complete sets",
+    contact_name: "Fatima El-Amrani",
+    contact_email: "info@arabesquehome.be",
+    contact_phone: "+32 9 111 22 33",
+    website_url: "https://example.com/arabesquehome",
+    facebook_url: "https://facebook.com/arabesquehome",
+    instagram_url: "https://instagram.com/arabesquehome",
+    logo_url: "https://images.unsplash.com/photo-1600166898405-da9535204843?w=200&h=200&fit=crop",
+    cover_image_url: "https://images.unsplash.com/photo-1600166898405-da9535204843?w=800&h=400&fit=crop",
+    opening_hours: null,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  // PARTNER PLUS - Kleding
+  {
+    id: "shop-plus-1",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    name: "Modest Fashion Gent",
+    slug: "modest-fashion-gent",
+    description: "Trendy modest fashion voor dames. Abayas, hijabs, jumpsuits en meer. Van casual tot feestelijk.",
+    address: "Langemunt 12",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0560,
+    longitude: 3.7200,
+    category: "clothing",
+    partner_tier: "partner_plus",
+    tier_expires_at: null,
+    ramadan_special: "Eid Collectie Preview - Nieuwe festive wear voor Eid ul-Fitr",
+    ramadan_special_discount: "20% early bird korting",
+    contact_name: "Amina Bakker",
+    contact_email: "info@modestfashion.be",
+    contact_phone: "+32 9 222 33 44",
+    website_url: "https://example.com/modestfashion",
+    facebook_url: "https://facebook.com/modestfashiongent",
+    instagram_url: "https://instagram.com/modestfashiongent",
+    logo_url: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop",
+    cover_image_url: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=400&fit=crop",
+    opening_hours: null,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  // PARTNER - Spiritueel
+  {
+    id: "shop-partner-1",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    name: "Barakah Books",
+    slug: "barakah-books",
+    description: "Islamitische boekhandel met Korans, religieuze boeken, gebedskleding en spirituele artikelen.",
+    address: "Brabantdam 78",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0510,
+    longitude: 3.7280,
+    category: "spiritual",
+    partner_tier: "partner",
+    tier_expires_at: null,
+    ramadan_special: "Ramadan Reading Pack - Koran + Tafsir + Dua boekje",
+    ramadan_special_discount: "€35 (normaal €45)",
+    contact_name: "Ahmed Mansour",
+    contact_email: "info@barakahbooks.be",
+    contact_phone: "+32 9 333 44 55",
+    website_url: "https://example.com/barakahbooks",
+    facebook_url: "https://facebook.com/barakahbooks",
+    instagram_url: null,
+    logo_url: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=200&h=200&fit=crop",
+    cover_image_url: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=400&fit=crop",
+    opening_hours: null,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  // PARTNER - Geschenken
+  {
+    id: "shop-partner-2",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    name: "Eid Gifts & More",
+    slug: "eid-gifts",
+    description: "Unieke cadeaus voor Eid en speciale gelegenheden. Gepersonaliseerde items, gift boxes en meer.",
+    address: "Sint-Pietersnieuwstraat 88",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0420,
+    longitude: 3.7180,
+    category: "gifts",
+    partner_tier: "partner",
+    tier_expires_at: null,
+    ramadan_special: "Ramadan Gift Boxes - Gevuld met dadels, chocolade en attar",
+    ramadan_special_discount: "Vanaf €25",
+    contact_name: "Sara Yilmaz",
+    contact_email: "info@eidgifts.be",
+    contact_phone: "+32 9 444 55 66",
+    website_url: "https://example.com/eidgifts",
+    facebook_url: null,
+    instagram_url: "https://instagram.com/eidgifts",
+    logo_url: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=200&h=200&fit=crop",
+    cover_image_url: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&h=400&fit=crop",
+    opening_hours: null,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  // PARTNER - Beauty
+  {
+    id: "shop-partner-3",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    name: "Noor Beauty",
+    slug: "noor-beauty",
+    description: "Halal cosmetica en huidverzorging. Natuurlijke producten, attar parfums en beauty accessoires.",
+    address: "Kouter 15",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0500,
+    longitude: 3.7250,
+    category: "beauty",
+    partner_tier: "partner",
+    tier_expires_at: null,
+    ramadan_special: "Ramadan Glow Set - Complete huidverzorging routine",
+    ramadan_special_discount: "25% korting",
+    contact_name: "Layla Hassan",
+    contact_email: "info@noorbeauty.be",
+    contact_phone: "+32 9 555 66 77",
+    website_url: "https://example.com/noorbeauty",
+    facebook_url: "https://facebook.com/noorbeauty",
+    instagram_url: "https://instagram.com/noorbeauty",
+    logo_url: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=200&h=200&fit=crop",
+    cover_image_url: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&h=400&fit=crop",
+    opening_hours: null,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  // FREE - Kids
+  {
+    id: "shop-free-1",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    name: "Kidz Corner",
+    slug: "kidz-corner",
+    description: "Speelgoed, boeken en kleding voor moslim kinderen. Educatief speelgoed en Islamitische kinderboe ken.",
+    address: "Wondelgemstraat 22",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0643,
+    longitude: 3.7274,
+    category: "kids",
+    partner_tier: "free",
+    tier_expires_at: null,
+    ramadan_special: null,
+    ramadan_special_discount: null,
+    contact_name: "Mariam Ouali",
+    contact_email: "info@kidzcorner.be",
+    contact_phone: "+32 9 666 77 88",
+    website_url: "https://example.com/kidzcorner",
+    facebook_url: null,
+    instagram_url: null,
+    logo_url: null,
+    cover_image_url: null,
+    opening_hours: null,
+    status: "approved",
+    approval_token: "xxx",
+    approved_at: new Date().toISOString(),
+    rejected_at: null,
+    rejection_reason: null,
+  },
+  // FREE - Tech
+  {
+    id: "shop-free-2",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    name: "Tech Halal",
+    slug: "tech-halal",
+    description: "Elektronica en gadgets. Telefoons, tablets, accessoires en smart home producten.",
+    address: "Overpoortstraat 55",
+    city: "Gent",
+    postal_code: "9000",
+    latitude: 51.0380,
+    longitude: 3.7230,
+    category: "tech",
+    partner_tier: "free",
+    tier_expires_at: null,
+    ramadan_special: null,
+    ramadan_special_discount: null,
+    contact_name: "Yusuf Ahmed",
+    contact_email: "info@techhalal.be",
+    contact_phone: "+32 9 777 88 99",
+    website_url: null,
+    facebook_url: null,
+    instagram_url: null,
     logo_url: null,
     cover_image_url: null,
     opening_hours: null,
@@ -2048,8 +2286,10 @@ function FilterChip({
 export default function WatTeDoenPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [foodPartners, setFoodPartners] = useState<FoodPartner[]>([]);
+  const [shopPartners, setShopPartners] = useState<ShopPartner[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
   const [isLoadingPartners, setIsLoadingPartners] = useState(true);
+  const [isLoadingShopPartners, setIsLoadingShopPartners] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<CategoryId>("food");
   const [showFilters, setShowFilters] = useState(false);
 
@@ -2061,6 +2301,12 @@ export default function WatTeDoenPage() {
     halalCertified: false,
     hasDelivery: false,
     hasTakeaway: false,
+  });
+
+  // Shop partner filters
+  const [shopFilters, setShopFilters] = useState({
+    category: null as ShopCategory | null,
+    hasRamadanSpecial: false,
   });
 
   // Activity filters
@@ -2203,8 +2449,26 @@ export default function WatTeDoenPage() {
       }
     }
 
+    async function fetchShopPartners() {
+      try {
+        const response = await fetch("/api/shop-partners/list");
+        const data = await response.json();
+        if (data.success && data.data.length > 0) {
+          setShopPartners(data.data);
+        } else {
+          setShopPartners(dummyShopPartners);
+        }
+      } catch (error) {
+        console.error("Error fetching shop partners:", error);
+        setShopPartners(dummyShopPartners);
+      } finally {
+        setIsLoadingShopPartners(false);
+      }
+    }
+
     fetchActivities();
     fetchFoodPartners();
+    fetchShopPartners();
   }, []);
 
   // Check if any filter is active
@@ -2222,6 +2486,10 @@ export default function WatTeDoenPage() {
     activityFilters.forFamilies ||
     activityFilters.forYouth ||
     activityFilters.city !== "";
+
+  const hasActiveShopFilters =
+    shopFilters.category !== null ||
+    shopFilters.hasRamadanSpecial;
 
   // Filter food partners
   const filteredFoodPartners = useMemo(() => {
@@ -2257,7 +2525,7 @@ export default function WatTeDoenPage() {
 
   // Filter activities by selected category and filters
   const filteredActivities = useMemo(() => {
-    if (selectedCategory === "food") return [];
+    if (selectedCategory === "food" || selectedCategory === "shopping") return [];
 
     let result = activities.filter(
       (activity) => activity.activity_type === selectedCategory
@@ -2284,6 +2552,24 @@ export default function WatTeDoenPage() {
 
     return result;
   }, [activities, selectedCategory, activityFilters]);
+
+  // Filter shop partners
+  const filteredShopPartners = useMemo(() => {
+    let result = [...shopPartners];
+
+    if (shopFilters.category) {
+      result = result.filter((p) => p.category === shopFilters.category);
+    }
+    if (shopFilters.hasRamadanSpecial) {
+      result = result.filter((p) => p.ramadan_special);
+    }
+
+    // Sort by tier (premium first)
+    const tierOrder = { premium: 0, partner_plus: 1, partner: 2, free: 3 };
+    result.sort((a, b) => tierOrder[a.partner_tier] - tierOrder[b.partner_tier]);
+
+    return result;
+  }, [shopPartners, shopFilters]);
 
   // Get unique cuisine types from food partners
   const availableCuisineTypes = useMemo(() => {
@@ -2313,6 +2599,13 @@ export default function WatTeDoenPage() {
       forFamilies: false,
       forYouth: false,
       city: "",
+    });
+  };
+
+  const clearShopFilters = () => {
+    setShopFilters({
+      category: null,
+      hasRamadanSpecial: false,
     });
   };
 
@@ -2371,8 +2664,13 @@ export default function WatTeDoenPage() {
                       // Clear filters when switching categories
                       if (category.id === "food") {
                         clearActivityFilters();
+                        clearShopFilters();
+                      } else if (category.id === "shopping") {
+                        clearFoodFilters();
+                        clearActivityFilters();
                       } else {
                         clearFoodFilters();
+                        clearShopFilters();
                       }
                     }}
                     className="flex flex-col items-center gap-2 group"
@@ -2787,6 +3085,77 @@ export default function WatTeDoenPage() {
                 )}
               </AnimatePresence>
             </div>
+          ) : selectedCategory === "shopping" ? (
+            // Shop Partner Filters
+            <div className="space-y-4">
+              {/* Main filter bar */}
+              <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                    showFilters || hasActiveShopFilters
+                      ? "bg-pink-500 text-white"
+                      : "bg-gray-100 text-text-secondary hover:bg-gray-200"
+                  }`}
+                >
+                  <Filter className="w-4 h-4" />
+                  Filters
+                  {hasActiveShopFilters && (
+                    <span className="w-5 h-5 bg-white text-pink-500 text-xs font-bold rounded-full flex items-center justify-center">
+                      {(shopFilters.category ? 1 : 0) +
+                        (shopFilters.hasRamadanSpecial ? 1 : 0)}
+                    </span>
+                  )}
+                </button>
+
+                <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
+                {/* Shop category filters */}
+                {(Object.keys(shopCategoryLabels) as ShopCategory[]).map((category) => {
+                  const Icon = shopCategoryIcons[category];
+                  return (
+                    <FilterChip
+                      key={category}
+                      label={shopCategoryLabels[category]}
+                      icon={<Icon className="w-4 h-4" />}
+                      active={shopFilters.category === category}
+                      onClick={() =>
+                        setShopFilters({
+                          ...shopFilters,
+                          category: shopFilters.category === category ? null : category,
+                        })
+                      }
+                    />
+                  );
+                })}
+
+                <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
+                {/* Ramadan special filter */}
+                <FilterChip
+                  label="Heeft Ramadan actie"
+                  icon={<Sparkles className="w-4 h-4" />}
+                  active={shopFilters.hasRamadanSpecial}
+                  onClick={() =>
+                    setShopFilters({
+                      ...shopFilters,
+                      hasRamadanSpecial: !shopFilters.hasRamadanSpecial,
+                    })
+                  }
+                />
+
+                {/* Clear filters */}
+                {hasActiveShopFilters && (
+                  <button
+                    onClick={clearShopFilters}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium text-pink-600 hover:bg-pink-50 transition-all whitespace-nowrap flex-shrink-0"
+                  >
+                    <X className="w-4 h-4" />
+                    Wissen
+                  </button>
+                )}
+              </div>
+            </div>
           ) : (
             // Activity Filters
             <div className="space-y-4">
@@ -3141,6 +3510,8 @@ export default function WatTeDoenPage() {
                 >
                   {selectedCategory === "food"
                     ? "Halal Eten & Drinken"
+                    : selectedCategory === "shopping"
+                    ? "Shopping"
                     : selectedCategoryConfig?.label}
                 </motion.h2>
                 <motion.p
@@ -3152,6 +3523,8 @@ export default function WatTeDoenPage() {
                 >
                   {selectedCategory === "food"
                     ? `${filteredFoodPartners.length} ${filteredFoodPartners.length === 1 ? "resultaat" : "resultaten"} in Gent`
+                    : selectedCategory === "shopping"
+                    ? `${filteredShopPartners.length} ${filteredShopPartners.length === 1 ? "winkel" : "winkels"} in Gent`
                     : `${filteredActivities.length} ${filteredActivities.length === 1 ? "activiteit" : "activiteiten"} gevonden`}
                 </motion.p>
               </div>
@@ -3221,6 +3594,47 @@ export default function WatTeDoenPage() {
                       transition={{ delay: index * 0.05 }}
                     >
                       <FoodPartnerCard partner={partner} index={index} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )
+            ) : selectedCategory === "shopping" ? (
+              // Shop Partners
+              isLoadingShopPartners ? (
+                <div className="flex justify-center py-12">
+                  <div className="w-12 h-12 border-2 border-pink-300 border-t-pink-500 rounded-full animate-spin" />
+                </div>
+              ) : filteredShopPartners.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-text-muted text-lg">
+                    {hasActiveShopFilters
+                      ? "Geen winkels met de huidige filters"
+                      : "Nog geen shop partners beschikbaar"}
+                  </p>
+                  {hasActiveShopFilters && (
+                    <button
+                      onClick={clearShopFilters}
+                      className="mt-4 text-pink-500 hover:underline"
+                    >
+                      Filters wissen
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <motion.div
+                  key="shop-list"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col gap-4"
+                >
+                  {filteredShopPartners.map((partner, index) => (
+                    <motion.div
+                      key={partner.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <ShopPartnerCard partner={partner} index={index} />
                     </motion.div>
                   ))}
                 </motion.div>
@@ -3515,12 +3929,12 @@ export default function WatTeDoenPage() {
                       onClick={() => setShowAddMenu(false)}
                     />
 
-                    {/* Menu Options - Above the button */}
+                    {/* Menu Options - Fixed center on screen */}
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.8, y: 20 }}
-                      className="absolute bottom-20 left-1/2 -translate-x-1/2 flex flex-col gap-3 items-center z-[61]"
+                      className="fixed inset-x-0 bottom-32 flex flex-col gap-3 items-center z-[61] px-4"
                     >
                       <Link
                         href="/wat-te-doen/activiteit-toevoegen"

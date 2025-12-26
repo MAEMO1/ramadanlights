@@ -87,9 +87,9 @@ export function FoodPartnerCard({
           className={`group relative rounded-2xl overflow-hidden transition-all hover:shadow-xl bg-white ${tierConfig.cardStyle}`}
         >
           <div className="flex flex-col sm:flex-row">
-            {/* LEFT: Portrait Image */}
+            {/* LEFT: Portrait Image - Keep portrait aspect on mobile too */}
             <div
-              className="relative w-full sm:w-[280px] h-[200px] sm:h-auto sm:min-h-[320px] flex-shrink-0 cursor-pointer"
+              className="relative w-full sm:w-[280px] aspect-[4/3] sm:aspect-auto sm:h-auto sm:min-h-[320px] flex-shrink-0 cursor-pointer"
               onClick={() => galleryImages.length > 0 && setShowGallery(true)}
             >
               {galleryImages.length > 0 ? (
