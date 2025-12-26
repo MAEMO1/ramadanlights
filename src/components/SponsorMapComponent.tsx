@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import type { FoodPartner } from "@/lib/food-partner-types";
-import type { ShopPartner } from "@/lib/shop-partner-types";
 import type { PartnerTier } from "@/lib/food-partner-types";
 
 // Combined sponsor type for the map
@@ -31,6 +29,7 @@ interface SponsorMapComponentProps {
   zoom?: number;
   onSponsorClick?: (sponsor: MapSponsor) => void;
   showRoutes?: boolean;
+  selectedSponsorId?: string | null;
 }
 
 // Verlichtingsroutes
@@ -53,97 +52,138 @@ const routes = {
   ] as [number, number][],
 };
 
-// Custom marker SVGs per tier - cartoon style with different sizes
-const createMarkerIcon = (tier: PartnerTier, type: "food" | "shop") => {
+// Beautiful cartoon-style marker SVGs
+const createMarkerSVG = (tier: PartnerTier, type: "food" | "shop", isSelected: boolean) => {
+  const scale = isSelected ? 1.3 : 1;
+
   const configs = {
     premium: {
-      size: 56,
-      color: "#FFD700", // Gold
-      bgColor: "#FFF8DC",
-      borderColor: "#B8860B",
-      icon: "👑",
-      shadowSize: 8,
+      width: Math.round(48 * scale),
+      height: Math.round(60 * scale),
+      mainColor: "#FFD700",
+      glowColor: "#FFA500",
     },
     partner_plus: {
-      size: 44,
-      color: "#14B8A6", // Teal
-      bgColor: "#CCFBF1",
-      borderColor: "#0D9488",
-      icon: "⭐",
-      shadowSize: 6,
+      width: Math.round(42 * scale),
+      height: Math.round(52 * scale),
+      mainColor: "#14B8A6",
+      glowColor: "#0D9488",
     },
     partner: {
-      size: 36,
-      color: "#6366F1", // Indigo
-      bgColor: "#E0E7FF",
-      borderColor: "#4F46E5",
-      icon: type === "food" ? "🍽️" : "🛍️",
-      shadowSize: 4,
+      width: Math.round(36 * scale),
+      height: Math.round(44 * scale),
+      mainColor: "#8B5CF6",
+      glowColor: "#7C3AED",
     },
     free: {
-      size: 28,
-      color: "#9CA3AF", // Gray
-      bgColor: "#F3F4F6",
-      borderColor: "#6B7280",
-      icon: type === "food" ? "🍴" : "🏪",
-      shadowSize: 3,
+      width: Math.round(30 * scale),
+      height: Math.round(38 * scale),
+      mainColor: "#6B7280",
+      glowColor: "#4B5563",
     },
   };
 
   const config = configs[tier];
-  const { size, color, bgColor, borderColor, icon, shadowSize } = config;
+  const { mainColor, glowColor } = config;
 
-  return L.divIcon({
-    className: "custom-sponsor-marker",
-    html: `
-      <div class="sponsor-marker-wrapper" style="
-        width: ${size}px;
-        height: ${size + 12}px;
-        position: relative;
-        cursor: pointer;
-        filter: drop-shadow(0 ${shadowSize}px ${shadowSize * 1.5}px rgba(0,0,0,0.3));
-        transition: transform 0.2s ease, filter 0.2s ease;
-      ">
-        <svg width="${size}" height="${size + 12}" viewBox="0 0 ${size} ${size + 12}" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Pin shape -->
-          <path d="
-            M${size / 2} ${size + 10}
-            C${size / 2} ${size + 10} ${size * 0.15} ${size * 0.7} ${size * 0.15} ${size * 0.45}
-            C${size * 0.15} ${size * 0.2} ${size * 0.3} 2 ${size / 2} 2
-            C${size * 0.7} 2 ${size * 0.85} ${size * 0.2} ${size * 0.85} ${size * 0.45}
-            C${size * 0.85} ${size * 0.7} ${size / 2} ${size + 10} ${size / 2} ${size + 10}
-            Z
-          " fill="${bgColor}" stroke="${borderColor}" stroke-width="3"/>
-          <!-- Inner circle -->
-          <circle cx="${size / 2}" cy="${size * 0.42}" r="${size * 0.3}" fill="${color}" opacity="0.2"/>
-          <!-- Decorative ring -->
-          <circle cx="${size / 2}" cy="${size * 0.42}" r="${size * 0.25}" fill="none" stroke="${color}" stroke-width="2" stroke-dasharray="${tier === 'premium' ? '0' : tier === 'partner_plus' ? '4 2' : '0'}"/>
-        </svg>
-        <!-- Emoji icon -->
-        <div style="
-          position: absolute;
-          top: ${size * 0.18}px;
-          left: 50%;
-          transform: translateX(-50%);
-          font-size: ${size * 0.4}px;
-          line-height: 1;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        ">${icon}</div>
-        ${tier === 'premium' ? `
-          <!-- Sparkle effect for premium -->
-          <div style="
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            font-size: 14px;
-            animation: sparkle 1.5s ease-in-out infinite;
-          ">✨</div>
-        ` : ''}
-      </div>
-    `,
-    iconSize: [size, size + 12],
-    iconAnchor: [size / 2, size + 12],
-    popupAnchor: [0, -size],
+  // Icon based on tier and type
+  let iconContent = "";
+  if (tier === "premium") {
+    // Crown icon
+    iconContent = `<path d="M12 4l3 6 6 2-4.5 4.5 1 6.5L12 20l-5.5 3 1-6.5L3 12l6-2z" fill="white" stroke="none"/>`;
+  } else if (tier === "partner_plus") {
+    // Star icon
+    iconContent = `<path d="M12 3l2.5 6H21l-5 4 2 6.5-6-4-6 4 2-6.5-5-4h6.5z" fill="white" stroke="none"/>`;
+  } else if (type === "food") {
+    // Fork and knife
+    iconContent = `
+      <circle cx="12" cy="12" r="7" fill="white"/>
+      <path d="M9 8v8M12 7v10M15 8v8" stroke="${mainColor}" stroke-width="1.5" stroke-linecap="round"/>
+    `;
+  } else {
+    // Shopping bag
+    iconContent = `
+      <rect x="6" y="10" width="12" height="9" rx="2" fill="white"/>
+      <path d="M6 10l2-5h8l2 5" fill="none" stroke="white" stroke-width="2"/>
+      <circle cx="9" cy="14" r="1.5" fill="${mainColor}"/>
+      <circle cx="15" cy="14" r="1.5" fill="${mainColor}"/>
+    `;
+  }
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="60" viewBox="0 0 48 60">
+      <defs>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="${isSelected ? 4 : 2}" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <linearGradient id="pinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:${mainColor}"/>
+          <stop offset="100%" style="stop-color:${glowColor}"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Shadow -->
+      <ellipse cx="24" cy="56" rx="${isSelected ? 10 : 7}" ry="${isSelected ? 3 : 2}" fill="rgba(0,0,0,0.4)"/>
+
+      <!-- Pin body -->
+      <path d="M24 54c0 0-18-20-18-34C6 10 14 2 24 2s18 8 18 18c0 14-18 34-18 34z"
+            fill="url(#pinGrad)"
+            stroke="white"
+            stroke-width="2.5"
+            filter="url(#glow)"/>
+
+      <!-- Inner glow circle -->
+      <circle cx="24" cy="20" r="11" fill="rgba(255,255,255,0.15)"/>
+
+      <!-- Icon -->
+      <g transform="translate(12, 8)">
+        ${iconContent}
+      </g>
+
+      ${tier === "premium" && isSelected ? `
+        <!-- Animated sparkles for premium -->
+        <circle cx="6" cy="10" r="2" fill="#FFF">
+          <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="42" cy="14" r="1.5" fill="#FFF">
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="10" cy="35" r="1" fill="#FFF">
+          <animate attributeName="opacity" values="0.5;1;0.5" dur="0.8s" repeatCount="indefinite"/>
+        </circle>
+      ` : ""}
+    </svg>
+  `.trim();
+
+  return svg;
+};
+
+// Create Leaflet icon
+const createMarkerIcon = (tier: PartnerTier, type: "food" | "shop", isSelected: boolean) => {
+  const scale = isSelected ? 1.3 : 1;
+  const sizes = {
+    premium: { width: 48, height: 60 },
+    partner_plus: { width: 42, height: 52 },
+    partner: { width: 36, height: 44 },
+    free: { width: 30, height: 38 },
+  };
+
+  const size = sizes[tier];
+  const width = Math.round(size.width * scale);
+  const height = Math.round(size.height * scale);
+
+  const svg = createMarkerSVG(tier, type, isSelected);
+  const svgUrl = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+
+  return L.icon({
+    iconUrl: svgUrl,
+    iconSize: [width, height],
+    iconAnchor: [width / 2, height],
+    popupAnchor: [0, -height + 10],
   });
 };
 
@@ -152,111 +192,115 @@ const createPopupContent = (sponsor: MapSponsor) => {
   const tierLabels: Record<PartnerTier, { label: string; color: string; bg: string }> = {
     premium: { label: "Premium Sponsor", color: "#92400E", bg: "#FEF3C7" },
     partner_plus: { label: "Uitgelicht", color: "#0F766E", bg: "#CCFBF1" },
-    partner: { label: "Partner", color: "#4338CA", bg: "#E0E7FF" },
+    partner: { label: "Partner", color: "#5B21B6", bg: "#EDE9FE" },
     free: { label: "", color: "", bg: "" },
   };
 
   const tierInfo = tierLabels[sponsor.tier];
+  const typeEmoji = sponsor.type === "food" ? "🍽️" : "🛍️";
 
   return `
-    <div class="sponsor-popup" style="
-      min-width: 240px;
+    <div style="
+      min-width: 260px;
       max-width: 300px;
       font-family: system-ui, -apple-system, sans-serif;
+      background: #0f2d2d;
+      color: white;
+      margin: -14px;
+      padding: 16px;
+      border-radius: 12px;
     ">
       ${sponsor.logo_url ? `
         <div style="
-          width: 100%;
+          width: calc(100% + 32px);
           height: 100px;
+          margin: -16px -16px 16px -16px;
           background-image: url('${sponsor.logo_url}');
           background-size: cover;
           background-position: center;
-          border-radius: 8px 8px 0 0;
-          margin: -14px -14px 12px -14px;
-          width: calc(100% + 28px);
+          border-radius: 12px 12px 0 0;
         "></div>
       ` : ''}
 
-      <div style="padding: 0 2px;">
-        ${tierInfo.label ? `
-          <span style="
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 600;
-            background: ${tierInfo.bg};
-            color: ${tierInfo.color};
-            margin-bottom: 8px;
-          ">${tierInfo.label}</span>
-        ` : ''}
-
-        <h3 style="
-          margin: 0 0 4px 0;
-          font-size: 16px;
-          font-weight: 700;
-          color: #1F2937;
-        ">${sponsor.name}</h3>
-
-        <p style="
-          margin: 0 0 8px 0;
-          font-size: 12px;
-          color: #6B7280;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        ">
-          <span style="font-size: 14px;">${sponsor.type === 'food' ? '🍽️' : '🛍️'}</span>
-          ${sponsor.categoryLabel}
-        </p>
-
-        ${sponsor.description ? `
-          <p style="
-            margin: 0 0 10px 0;
-            font-size: 13px;
-            color: #4B5563;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-          ">${sponsor.description}</p>
-        ` : ''}
-
-        ${sponsor.special ? `
-          <div style="
-            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-            border-radius: 6px;
-            padding: 8px 10px;
-            margin-bottom: 10px;
-          ">
-            <p style="
-              margin: 0;
-              font-size: 12px;
-              color: #92400E;
-              font-weight: 500;
-            ">🌙 ${sponsor.special}</p>
-            ${sponsor.specialPrice ? `
-              <p style="
-                margin: 4px 0 0 0;
-                font-size: 11px;
-                color: #A16207;
-              ">${sponsor.specialPrice}</p>
-            ` : ''}
-          </div>
-        ` : ''}
-
-        <p style="
-          margin: 0;
+      ${tierInfo.label ? `
+        <span style="
+          display: inline-block;
+          padding: 4px 12px;
+          border-radius: 100px;
           font-size: 11px;
-          color: #9CA3AF;
-          display: flex;
-          align-items: center;
-          gap: 4px;
+          font-weight: 600;
+          background: ${tierInfo.bg};
+          color: ${tierInfo.color};
+          margin-bottom: 10px;
+        ">${tierInfo.label}</span>
+      ` : ''}
+
+      <h3 style="
+        margin: 0 0 6px 0;
+        font-size: 17px;
+        font-weight: 700;
+        color: white;
+      ">${sponsor.name}</h3>
+
+      <p style="
+        margin: 0 0 12px 0;
+        font-size: 13px;
+        color: rgba(255,255,255,0.6);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      ">
+        <span>${typeEmoji}</span>
+        ${sponsor.categoryLabel}
+      </p>
+
+      ${sponsor.description ? `
+        <p style="
+          margin: 0 0 14px 0;
+          font-size: 13px;
+          color: rgba(255,255,255,0.8);
+          line-height: 1.5;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        ">${sponsor.description}</p>
+      ` : ''}
+
+      ${sponsor.special ? `
+        <div style="
+          background: linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,165,0,0.2) 100%);
+          border: 1px solid rgba(255,215,0,0.3);
+          border-radius: 8px;
+          padding: 10px 12px;
+          margin-bottom: 14px;
         ">
-          📍 ${sponsor.address}, ${sponsor.city}
-        </p>
-      </div>
+          <p style="
+            margin: 0;
+            font-size: 12px;
+            color: #FFD700;
+            font-weight: 500;
+          ">🌙 ${sponsor.special}</p>
+          ${sponsor.specialPrice ? `
+            <p style="
+              margin: 4px 0 0 0;
+              font-size: 11px;
+              color: rgba(255,215,0,0.7);
+            ">${sponsor.specialPrice}</p>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      <p style="
+        margin: 0;
+        font-size: 12px;
+        color: rgba(255,255,255,0.5);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      ">
+        📍 ${sponsor.address}, ${sponsor.city}
+      </p>
     </div>
   `;
 };
@@ -267,12 +311,12 @@ export default function SponsorMapComponent({
   zoom = 14,
   onSponsorClick,
   showRoutes = true,
+  selectedSponsorId,
 }: SponsorMapComponentProps) {
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const markersRef = useRef<L.Marker[]>([]);
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
   const routeLayersRef = useRef<L.Polyline[]>([]);
-  const [activePopup, setActivePopup] = useState<string | null>(null);
 
   // Initialize map
   useEffect(() => {
@@ -285,45 +329,37 @@ export default function SponsorMapComponent({
       attributionControl: false,
     });
 
-    // Gestileerde cartoon-achtige tiles (Stamen Watercolor style via Stadia)
-    // Using CartoDB Voyager for a clean, illustrated look
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    // Dark theme tiles (CartoDB Dark Matter) - like the mosque map
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
       maxZoom: 19,
     }).addTo(mapRef.current);
 
     // Add zoom control to bottom right
     L.control.zoom({ position: "bottomright" }).addTo(mapRef.current);
 
-    // Add custom CSS for animations
+    // Add custom CSS for popups
     const style = document.createElement("style");
     style.textContent = `
-      @keyframes sparkle {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.5; transform: scale(1.2); }
-      }
-
-      .sponsor-marker-wrapper:hover {
-        transform: scale(1.15) translateY(-4px) !important;
-        filter: drop-shadow(0 12px 20px rgba(0,0,0,0.4)) !important;
-      }
-
       .leaflet-popup-content-wrapper {
-        border-radius: 12px !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important;
-        padding: 0 !important;
-      }
-
-      .leaflet-popup-content {
-        margin: 14px !important;
-      }
-
-      .leaflet-popup-tip {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-      }
-
-      .custom-sponsor-marker {
         background: transparent !important;
-        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border-radius: 12px !important;
+        overflow: hidden;
+      }
+      .leaflet-popup-content {
+        margin: 0 !important;
+        width: auto !important;
+      }
+      .leaflet-popup-tip-container {
+        display: none !important;
+      }
+      .leaflet-popup-close-button {
+        color: white !important;
+        font-size: 20px !important;
+        top: 8px !important;
+        right: 8px !important;
+        z-index: 10 !important;
       }
     `;
     document.head.appendChild(style);
@@ -337,7 +373,7 @@ export default function SponsorMapComponent({
     };
   }, []);
 
-  // Add routes with glow effect
+  // Add routes with beautiful glow effect
   useEffect(() => {
     if (!mapRef.current || !showRoutes) return;
 
@@ -347,45 +383,55 @@ export default function SponsorMapComponent({
     });
     routeLayersRef.current = [];
 
-    // Add both routes
+    // Add both routes with animated glow
     [routes.wondelgemstraat, routes.bevrijdingslaanPhoenix].forEach((route) => {
       // Outer glow
-      const glowLayer = L.polyline(route, {
+      const outerGlow = L.polyline(route, {
         color: "#FFD700",
-        weight: 16,
-        opacity: 0.25,
+        weight: 20,
+        opacity: 0.15,
         lineCap: "round",
         lineJoin: "round",
       });
 
       // Middle glow
-      const midGlowLayer = L.polyline(route, {
+      const middleGlow = L.polyline(route, {
         color: "#FFD700",
-        weight: 10,
-        opacity: 0.4,
+        weight: 12,
+        opacity: 0.3,
+        lineCap: "round",
+        lineJoin: "round",
+      });
+
+      // Inner glow
+      const innerGlow = L.polyline(route, {
+        color: "#FFD700",
+        weight: 6,
+        opacity: 0.6,
         lineCap: "round",
         lineJoin: "round",
       });
 
       // Core line
-      const coreLayer = L.polyline(route, {
-        color: "#FFD700",
-        weight: 5,
-        opacity: 0.9,
+      const core = L.polyline(route, {
+        color: "#FFFACD",
+        weight: 3,
+        opacity: 1,
         lineCap: "round",
         lineJoin: "round",
       });
 
       if (mapRef.current) {
-        glowLayer.addTo(mapRef.current);
-        midGlowLayer.addTo(mapRef.current);
-        coreLayer.addTo(mapRef.current);
-        routeLayersRef.current.push(glowLayer, midGlowLayer, coreLayer);
+        outerGlow.addTo(mapRef.current);
+        middleGlow.addTo(mapRef.current);
+        innerGlow.addTo(mapRef.current);
+        core.addTo(mapRef.current);
+        routeLayersRef.current.push(outerGlow, middleGlow, innerGlow, core);
       }
     });
   }, [showRoutes]);
 
-  // Add sponsor markers
+  // Add/update sponsor markers
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -393,9 +439,9 @@ export default function SponsorMapComponent({
     markersRef.current.forEach(marker => {
       mapRef.current?.removeLayer(marker);
     });
-    markersRef.current = [];
+    markersRef.current.clear();
 
-    // Sort sponsors by tier (free first so premium renders on top)
+    // Sort sponsors by tier
     const tierOrder: Record<PartnerTier, number> = {
       free: 0,
       partner: 1,
@@ -407,33 +453,29 @@ export default function SponsorMapComponent({
       (a, b) => tierOrder[a.tier] - tierOrder[b.tier]
     );
 
-    // Add markers for each sponsor
+    // Add markers
     sortedSponsors.forEach((sponsor) => {
       if (!sponsor.latitude || !sponsor.longitude) return;
 
-      const icon = createMarkerIcon(sponsor.tier, sponsor.type);
+      const isSelected = sponsor.id === selectedSponsorId;
+      const icon = createMarkerIcon(sponsor.tier, sponsor.type, isSelected);
+
       const marker = L.marker([sponsor.latitude, sponsor.longitude], {
         icon,
-        zIndexOffset: tierOrder[sponsor.tier] * 100,
+        zIndexOffset: tierOrder[sponsor.tier] * 100 + (isSelected ? 1000 : 0),
       });
 
       // Create popup
       const popup = L.popup({
         closeButton: true,
-        className: "sponsor-popup-container",
+        className: "sponsor-popup",
         maxWidth: 320,
         offset: [0, -10],
       }).setContent(createPopupContent(sponsor));
 
       marker.bindPopup(popup);
 
-      // Events
-      marker.on("mouseover", () => {
-        marker.openPopup();
-      });
-
       marker.on("click", () => {
-        setActivePopup(sponsor.id);
         if (onSponsorClick) {
           onSponsorClick(sponsor);
         }
@@ -441,49 +483,58 @@ export default function SponsorMapComponent({
 
       if (mapRef.current) {
         marker.addTo(mapRef.current);
-        markersRef.current.push(marker);
+        markersRef.current.set(sponsor.id, marker);
       }
     });
-  }, [sponsors, onSponsorClick]);
+  }, [sponsors, selectedSponsorId, onSponsorClick]);
 
-  // Update center/zoom when props change
+  // Pan to selected sponsor
   useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current.flyTo(center, zoom, { duration: 0.5 });
+    if (!mapRef.current || !selectedSponsorId) return;
+
+    const marker = markersRef.current.get(selectedSponsorId);
+    if (marker) {
+      const latlng = marker.getLatLng();
+      mapRef.current.flyTo([latlng.lat + 0.002, latlng.lng], 16, {
+        duration: 0.5,
+      });
+      marker.openPopup();
     }
-  }, [center, zoom]);
+  }, [selectedSponsorId]);
 
   return (
-    <div className="relative w-full h-full rounded-2xl overflow-hidden">
+    <div className="relative w-full h-full">
       <div
         ref={containerRef}
         className="w-full h-full"
-        style={{ background: "#f8f4f0" }}
+        style={{ background: "#0f2d2d" }}
       />
 
       {/* Legend */}
-      <div className="absolute bottom-20 left-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg z-[1000]">
-        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Legenda</h4>
-        <div className="space-y-2">
+      <div className="absolute bottom-24 left-4 bg-[#0f2d2d]/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl border border-white/10 z-[1000]">
+        <h4 className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">Legenda</h4>
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <span className="text-xl">👑</span>
-            <span className="text-sm text-gray-700">Premium Sponsor</span>
+            <div className="w-6 h-6 rounded-full bg-gradient-to-b from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-500/30">
+              <span className="text-white text-xs">👑</span>
+            </div>
+            <span className="text-sm text-white/80">Premium Sponsor</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xl">⭐</span>
-            <span className="text-sm text-gray-700">Partner Plus</span>
+            <div className="w-5 h-5 rounded-full bg-gradient-to-b from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/30">
+              <span className="text-white text-[10px]">⭐</span>
+            </div>
+            <span className="text-sm text-white/80">Partner Plus</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xl">🍽️</span>
-            <span className="text-sm text-gray-700">Food Partner</span>
+            <div className="w-4 h-4 rounded-full bg-gradient-to-b from-violet-400 to-violet-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+              <span className="text-white text-[8px]">●</span>
+            </div>
+            <span className="text-sm text-white/80">Partner</span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xl">🛍️</span>
-            <span className="text-sm text-gray-700">Shop Partner</span>
-          </div>
-          <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-            <div className="w-5 h-1 bg-yellow-400 rounded-full"></div>
-            <span className="text-sm text-gray-700">Verlichtingsroute</span>
+          <div className="flex items-center gap-3 pt-2 border-t border-white/10">
+            <div className="w-6 h-1 rounded-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 shadow-lg shadow-yellow-400/50"></div>
+            <span className="text-sm text-white/80">Verlichtingsroute</span>
           </div>
         </div>
       </div>

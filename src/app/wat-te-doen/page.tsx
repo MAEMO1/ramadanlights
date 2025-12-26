@@ -2645,24 +2645,73 @@ export default function WatTeDoenPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-12 bg-[#0f2d2d]">
         <div className="section-container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-3xl"
-          >
-            <p className="text-teal-400 font-medium mb-4 tracking-wide uppercase text-sm">
-              Ramadan 2026
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="max-w-3xl"
+            >
+              <p className="text-teal-400 font-medium mb-4 tracking-wide uppercase text-sm">
+                Ramadan 2026
+              </p>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-white mb-6 tracking-tight">
-              Wat te doen
-            </h1>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-white mb-6 tracking-tight">
+                Wat te doen
+              </h1>
 
-            <p className="text-xl text-white/70 mb-6 leading-relaxed max-w-2xl">
-              Ontdek halal eten & drinken en activiteiten in Gent tijdens Ramadan.
-            </p>
-          </motion.div>
+              <p className="text-xl text-white/70 leading-relaxed max-w-2xl">
+                Ontdek halal eten & drinken en activiteiten in Gent tijdens Ramadan.
+              </p>
+            </motion.div>
+
+            {/* View Mode Toggle - Like Mosques Page */}
+            {(selectedCategory === "food" || selectedCategory === "shopping") && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="inline-flex p-1 bg-white/10 rounded-lg backdrop-blur-sm self-start sm:self-auto"
+              >
+                <button
+                  onClick={() => setPartnerViewMode("map")}
+                  className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                    partnerViewMode === "map"
+                      ? "text-white"
+                      : "text-white/50 hover:text-white/70"
+                  }`}
+                >
+                  {partnerViewMode === "map" && (
+                    <motion.div
+                      layoutId="viewModeTab"
+                      className="absolute inset-0 bg-teal rounded-md"
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                    />
+                  )}
+                  <Map className="w-4 h-4 relative z-10" />
+                  <span className="relative z-10">Kaart</span>
+                </button>
+                <button
+                  onClick={() => setPartnerViewMode("list")}
+                  className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                    partnerViewMode === "list"
+                      ? "text-white"
+                      : "text-white/50 hover:text-white/70"
+                  }`}
+                >
+                  {partnerViewMode === "list" && (
+                    <motion.div
+                      layoutId="viewModeTab"
+                      className="absolute inset-0 bg-teal rounded-md"
+                      transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                    />
+                  )}
+                  <List className="w-4 h-4 relative z-10" />
+                  <span className="relative z-10">Lijst</span>
+                </button>
+              </motion.div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -2727,6 +2776,29 @@ export default function WatTeDoenPage() {
         </div>
       </section>
 
+      {/* Full Page Map View for Food/Shop Partners */}
+      {partnerViewMode === "map" && (selectedCategory === "food" || selectedCategory === "shopping") ? (
+        <section className="bg-[#0f2d2d]" style={{ height: "calc(100vh - 280px)", minHeight: "500px" }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key="sponsor-map"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="h-full"
+            >
+              <SponsorMap
+                foodPartners={selectedCategory === "food" ? filteredFoodPartners : []}
+                shopPartners={selectedCategory === "shopping" ? filteredShopPartners : []}
+                showOnlyPaid={false}
+                className="h-full"
+              />
+            </motion.div>
+          </AnimatePresence>
+        </section>
+      ) : (
+      <>
       {/* Filters Section - Takeaway.com Style */}
       <section className="bg-white border-b border-gray-100 sticky top-16 z-30">
         <div className="section-container py-4">
@@ -2757,34 +2829,6 @@ export default function WatTeDoenPage() {
                     </span>
                   )}
                 </button>
-
-                <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
-
-                {/* View Mode Toggle */}
-                <div className="flex items-center bg-gray-100 rounded-full p-1 flex-shrink-0">
-                  <button
-                    onClick={() => setPartnerViewMode("list")}
-                    className={`p-2 rounded-full transition-all ${
-                      partnerViewMode === "list"
-                        ? "bg-white shadow-sm text-teal"
-                        : "text-text-muted hover:text-text-secondary"
-                    }`}
-                    title="Lijstweergave"
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setPartnerViewMode("map")}
-                    className={`p-2 rounded-full transition-all ${
-                      partnerViewMode === "map"
-                        ? "bg-white shadow-sm text-teal"
-                        : "text-text-muted hover:text-text-secondary"
-                    }`}
-                    title="Kaartweergave"
-                  >
-                    <Map className="w-4 h-4" />
-                  </button>
-                </div>
 
                 <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
 
@@ -3163,34 +3207,6 @@ export default function WatTeDoenPage() {
                     </span>
                   )}
                 </button>
-
-                <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
-
-                {/* View Mode Toggle */}
-                <div className="flex items-center bg-gray-100 rounded-full p-1 flex-shrink-0">
-                  <button
-                    onClick={() => setPartnerViewMode("list")}
-                    className={`p-2 rounded-full transition-all ${
-                      partnerViewMode === "list"
-                        ? "bg-white shadow-sm text-pink-500"
-                        : "text-text-muted hover:text-text-secondary"
-                    }`}
-                    title="Lijstweergave"
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setPartnerViewMode("map")}
-                    className={`p-2 rounded-full transition-all ${
-                      partnerViewMode === "map"
-                        ? "bg-white shadow-sm text-pink-500"
-                        : "text-text-muted hover:text-text-secondary"
-                    }`}
-                    title="Kaartweergave"
-                  >
-                    <Map className="w-4 h-4" />
-                  </button>
-                </div>
 
                 <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
 
@@ -4210,6 +4226,8 @@ export default function WatTeDoenPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </>
+      )}
 
       <Footer />
     </main>
