@@ -6,15 +6,22 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    console.log("Iftar list API called");
+    console.log("NEXT_PUBLIC_SUPABASE_URL:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "SET" : "NOT SET");
+    console.log("SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY ? "SET" : "NOT SET");
+
     const supabase = getSupabaseAdmin();
 
     // Return empty list if Supabase is not configured
     if (!supabase) {
+      console.log("Supabase client is null - returning empty array");
       return NextResponse.json({
         success: true,
         data: [],
       });
     }
+
+    console.log("Supabase client created successfully");
 
     const { data: iftarEvents, error } = await supabase
       .from("iftar_events")
@@ -47,6 +54,9 @@ export async function GET() {
       .eq("status", "approved")
       .order("mosque_name", { ascending: true });
 
+    console.log("Query result - error:", error);
+    console.log("Query result - count:", iftarEvents?.length ?? 0);
+
     if (error) {
       console.error("Database error:", error);
       return NextResponse.json(
@@ -54,6 +64,8 @@ export async function GET() {
         { status: 500 }
       );
     }
+
+    console.log("Returning", iftarEvents?.length ?? 0, "iftars");
 
     return NextResponse.json({
       success: true,
