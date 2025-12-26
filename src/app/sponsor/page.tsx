@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { ArrowRight, Check, Building2, Star, Award } from "lucide-react";
+import { ArrowRight, Users, Eye, Heart, Building2, HelpCircle, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,50 +12,50 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 
-const packages = [
+const benefits = [
   {
-    name: "Brons",
-    price: "€250",
+    title: "Bereik de gemeenschap",
+    description: "Vergroot uw zichtbaarheid bij duizenden bezoekers tijdens de Ramadan periode in Gent",
+    icon: Users,
+  },
+  {
+    title: "Positieve associatie",
+    description: "Verbind uw merk aan een verbindend en positief initiatief in de stad",
+    icon: Heart,
+  },
+  {
+    title: "Logo op de website",
+    description: "Uw bedrijfslogo wordt prominent getoond op onze website en promotiematerialen",
+    icon: Eye,
+  },
+  {
+    title: "Lokale impact",
+    description: "Steun een lokaal project dat gemeenschappen samenbrengt en de stad verfraait",
     icon: Building2,
-    color: "from-amber-600 to-amber-700",
-    features: [
-      "Vermelding op de website",
-      "Bedanking op sociale media",
-      "Certificaat van deelname",
-    ],
+  },
+];
+
+const faq = [
+  {
+    question: "Wat krijg ik als sponsor?",
+    answer: "Als sponsor wordt uw logo getoond op onze website, krijgt u vermeldingen op sociale media, en ontvangt u een uitnodiging voor het openingsevent. De exacte voordelen bespreken we graag persoonlijk.",
   },
   {
-    name: "Zilver",
-    price: "€500",
-    icon: Star,
-    color: "from-gray-400 to-gray-500",
-    popular: false,
-    features: [
-      "Alles van Brons",
-      "Logo op de website",
-      "Vermelding in persberichten",
-      "Uitnodiging openingsevent",
-    ],
+    question: "Hoeveel kost het om sponsor te worden?",
+    answer: "We bieden verschillende mogelijkheden aan, afhankelijk van uw wensen en budget. Neem contact met ons op voor een vrijblijvend gesprek over de mogelijkheden.",
   },
   {
-    name: "Goud",
-    price: "€1000",
-    icon: Award,
-    color: "from-yellow-500 to-amber-500",
-    popular: true,
-    features: [
-      "Alles van Zilver",
-      "Prominente logo plaatsing",
-      "Vermelding op promotiemateriaal",
-      "VIP uitnodiging alle events",
-      "Social media shoutout",
-    ],
+    question: "Wanneer vindt Ramadan Lights plaats?",
+    answer: "Ramadan Lights Gent vindt plaats tijdens de Ramadan periode in 2026 (februari-maart). De verlichting blijft de hele maand zichtbaar.",
+  },
+  {
+    question: "Kan ik ook op een andere manier bijdragen?",
+    answer: "Zeker! Naast financiële sponsoring zijn er ook mogelijkheden voor sponsoring in natura of samenwerkingen. Neem contact op om de mogelijkheden te bespreken.",
   },
 ];
 
 export default function SponsorPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<string>("");
 
   const {
     register,
@@ -71,7 +71,7 @@ export default function SponsorPage() {
       const response = await fetch("/api/sponsor-submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, package: selectedPackage }),
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
@@ -88,103 +88,128 @@ export default function SponsorPage() {
   };
 
   return (
-    <main className="min-h-screen bg-soft">
+    <main className="min-h-screen">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-dark to-dark/95">
-        <div className="section-container text-center">
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="badge mb-6 inline-block"
-          >
-            Partnerschappen
-          </motion.span>
-
-          <motion.h1
+      <section className="pt-32 pb-20 bg-gradient-to-b from-[#0f2d2d] to-[#1a3f3f]">
+        <div className="section-container">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-6"
+            transition={{ duration: 0.5 }}
+            className="max-w-3xl mx-auto text-center"
           >
-            Word Sponsor
-          </motion.h1>
+            <p className="text-gold font-medium mb-4 tracking-wide uppercase text-sm">
+              Ramadan Lights Gent 2026
+            </p>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-white/70 max-w-2xl mx-auto"
-          >
-            Steun Ramadan Lights Gent en versterk uw zichtbaarheid binnen de
-            gemeenschap. Samen maken we Gent mooier tijdens de heilige maand.
-          </motion.p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-white mb-6 tracking-tight">
+              Word Sponsor
+            </h1>
+
+            <p className="text-xl text-white/70 mb-10 leading-relaxed">
+              Steun Ramadan Lights Gent en maak deel uit van dit verbindende initiatief.
+              Samen maken we Gent mooier tijdens de heilige maand.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="#aanmelden"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-gold text-gray-900 hover:bg-gold/90 transition-all"
+              >
+                Word sponsor
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </a>
+              <a
+                href="#voordelen"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium border-2 border-white/30 text-white hover:bg-white/10 transition-all"
+              >
+                Bekijk voordelen
+              </a>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Packages Section */}
-      <section className="py-20 bg-white">
+      {/* Benefits Section */}
+      <section id="voordelen" className="bg-white section-padding">
         <div className="section-container">
-          <div className="text-center mb-16">
-            <h2 className="heading-section mb-4">Sponsorpakketten</h2>
-            <p className="text-body max-w-lg mx-auto">
-              Kies het pakket dat bij uw organisatie past
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary mb-4">
+              Waarom sponsor worden?
+            </h2>
+            <p className="text-lg text-text-muted max-w-2xl mx-auto">
+              Versterk uw zichtbaarheid en maak impact in de gemeenschap
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {packages.map((pkg, index) => (
-              <motion.div
-                key={pkg.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
-                className={`relative rounded-2xl bg-white border-2 p-8 ${
-                  selectedPackage === pkg.name
-                    ? "border-teal shadow-xl"
-                    : "border-gray-100 hover:border-teal/30"
-                } transition-all cursor-pointer`}
-                onClick={() => setSelectedPackage(pkg.name)}
-              >
-                {pkg.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-teal text-white text-xs font-medium px-3 py-1 rounded-full">
-                      Populair
-                    </span>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {benefits.map((benefit, index) => {
+              const Icon = benefit.icon;
+              return (
+                <motion.div
+                  key={benefit.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="card text-center"
+                >
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-teal/10 flex items-center justify-center">
+                    <Icon className="w-6 h-6 text-teal" />
                   </div>
-                )}
+                  <h3 className="font-display font-semibold text-text-primary mb-2">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-sm text-text-muted">{benefit.description}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-                <div
-                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${pkg.color} flex items-center justify-center mb-6`}
-                >
-                  <pkg.icon className="w-7 h-7 text-white" />
+      {/* How it works */}
+      <section className="bg-[#f8fafa] section-padding">
+        <div className="section-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary mb-4">
+              Hoe werkt het?
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {[
+              { step: 1, title: "Vul het formulier in", description: "Laat uw gegevens achter via het aanmeldformulier hieronder" },
+              { step: 2, title: "Persoonlijk contact", description: "We nemen contact op om de mogelijkheden te bespreken" },
+              { step: 3, title: "Word zichtbaar", description: "Uw logo verschijnt op de website en promotiematerialen" },
+            ].map((item, index) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-teal text-white flex items-center justify-center font-bold text-lg">
+                  {item.step}
                 </div>
-
-                <h3 className="text-2xl font-display font-bold text-dark mb-2">
-                  {pkg.name}
+                <h3 className="font-display font-semibold text-text-primary mb-2">
+                  {item.title}
                 </h3>
-                <p className="text-3xl font-bold text-teal mb-6">{pkg.price}</p>
-
-                <ul className="space-y-3 mb-8">
-                  {pkg.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-teal flex-shrink-0 mt-0.5" />
-                      <span className="text-text-muted">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  onClick={() => setSelectedPackage(pkg.name)}
-                  className={`w-full py-3 rounded-full font-medium transition-all ${
-                    selectedPackage === pkg.name
-                      ? "bg-teal text-white"
-                      : "bg-gray-100 text-dark hover:bg-teal/10"
-                  }`}
-                >
-                  {selectedPackage === pkg.name ? "Geselecteerd" : "Selecteer"}
-                </button>
+                <p className="text-sm text-text-muted">{item.description}</p>
               </motion.div>
             ))}
           </div>
@@ -192,31 +217,30 @@ export default function SponsorPage() {
       </section>
 
       {/* Form Section */}
-      <section id="aanmelden" className="py-20 bg-soft">
+      <section id="aanmelden" className="bg-white section-padding">
         <div className="section-container">
-          <div className="text-center mb-12">
-            <h2 className="heading-section mb-4">Aanmeldformulier</h2>
-            <p className="text-body max-w-lg mx-auto">
-              Vul onderstaand formulier in en wij nemen contact met u op
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary mb-4">
+              Aanmelden als sponsor
+            </h2>
+            <p className="text-lg text-text-muted max-w-2xl mx-auto">
+              Vul onderstaand formulier in en wij nemen zo snel mogelijk contact met u op
             </p>
-          </div>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
             className="max-w-xl mx-auto"
           >
             <form onSubmit={handleSubmit(onSubmit)} className="card space-y-5">
-              {selectedPackage && (
-                <div className="bg-teal/10 border border-teal/20 rounded-xl p-4 mb-2">
-                  <p className="text-sm text-teal font-medium">
-                    Geselecteerd pakket:{" "}
-                    <span className="font-bold">{selectedPackage}</span>
-                  </p>
-                </div>
-              )}
-
               <Input
                 id="companyName"
                 label="Bedrijfsnaam *"
@@ -262,7 +286,7 @@ export default function SponsorPage() {
               <Textarea
                 id="message"
                 label="Bericht (optioneel)"
-                placeholder="Vragen of opmerkingen?"
+                placeholder="Heeft u vragen of opmerkingen? Laat het ons weten."
                 error={errors.message?.message}
                 {...register("message")}
               />
@@ -282,6 +306,71 @@ export default function SponsorPage() {
                 U ontvangt een bevestiging per e-mail.
               </p>
             </form>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="bg-[#f8fafa] section-padding">
+        <div className="section-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-text-primary mb-4">
+              Veelgestelde vragen
+            </h2>
+          </motion.div>
+
+          <div className="max-w-2xl mx-auto space-y-4">
+            {faq.map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05 }}
+                className="card"
+              >
+                <div className="flex items-start gap-3">
+                  <HelpCircle className="w-5 h-5 text-teal flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-medium text-text-primary mb-2">
+                      {item.question}
+                    </h3>
+                    <p className="text-sm text-text-muted">{item.answer}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="bg-[#0f2d2d] section-padding">
+        <div className="section-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-2xl mx-auto text-center"
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-semibold text-white mb-4">
+              Vragen?
+            </h2>
+            <p className="text-lg text-white/70 mb-8">
+              Neem gerust contact met ons op voor meer informatie over sponsormogelijkheden.
+            </p>
+            <a
+              href="mailto:info@ramadanlights.be?subject=Sponsoring%20informatie"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-full font-medium bg-gold text-gray-900 hover:bg-gold/90 transition-all"
+            >
+              <Mail className="w-5 h-5 mr-2" />
+              info@ramadanlights.be
+            </a>
           </motion.div>
         </div>
       </section>
