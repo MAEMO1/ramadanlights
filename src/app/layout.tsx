@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sora, Inter } from "next/font/google";
 import "./globals.css";
+import { GameMapWrapper } from "@/components/GameMapWrapper";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -45,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="nl" className={`${sora.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-white antialiased font-body">
-        {children}
+        <GameMapWrapper>{children}</GameMapWrapper>
       </body>
     </html>
   );
