@@ -2415,11 +2415,22 @@ export default function WatTeDoenPage() {
 
   // Scroll refs for arrow navigation
   const foodFilterScrollRef = useRef<HTMLDivElement>(null);
+  const shopFilterScrollRef = useRef<HTMLDivElement>(null);
 
   const scrollFilters = (direction: "left" | "right") => {
     if (foodFilterScrollRef.current) {
       const scrollAmount = 200;
       foodFilterScrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const scrollShopFilters = (direction: "left" | "right") => {
+    if (shopFilterScrollRef.current) {
+      const scrollAmount = 200;
+      shopFilterScrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
       });
@@ -2856,10 +2867,10 @@ export default function WatTeDoenPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="md:hidden fixed inset-0 z-50 bg-white flex flex-col"
+                      className="md:hidden fixed inset-0 z-50 bg-white flex flex-col pt-16"
                     >
                       {/* Header */}
-                      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+                      <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-text-primary">Filters</h3>
                         <button
                           onClick={() => setShowFilters(false)}
@@ -2871,7 +2882,7 @@ export default function WatTeDoenPage() {
                       </div>
 
                       {/* Scrollable content */}
-                      <div className="overflow-y-auto h-[calc(100vh-140px)] px-4 py-6 space-y-6">
+                      <div className="overflow-y-auto flex-1 px-4 py-6 space-y-6">
                         {/* Cuisine Type Grid */}
                         <div>
                           <p className="text-sm font-medium text-text-secondary mb-3">
@@ -3101,8 +3112,9 @@ export default function WatTeDoenPage() {
           ) : selectedCategory === "shopping" ? (
             // Shop Partner Filters
             <div className="space-y-4">
-              {/* Main filter bar */}
-              <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {/* Main filter bar with arrows */}
+              <div className="flex items-center gap-3">
+                {/* Fixed Filter Button */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
@@ -3123,50 +3135,75 @@ export default function WatTeDoenPage() {
 
                 <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
 
-                {/* Shop category filters */}
-                {(Object.keys(shopCategoryLabels) as ShopCategory[]).map((category) => {
-                  const Icon = shopCategoryIcons[category];
-                  return (
+                {/* Scrollable container with arrows */}
+                <div className="relative flex-1 flex items-center min-w-0">
+                  {/* Left arrow */}
+                  <button
+                    onClick={() => scrollShopFilters("left")}
+                    className="absolute left-0 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:shadow-lg transition-all -ml-2"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {/* Scrollable filter chips */}
+                  <div
+                    ref={shopFilterScrollRef}
+                    className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide mx-8 scroll-smooth"
+                  >
+                    {/* Shop category filters */}
+                    {(Object.keys(shopCategoryLabels) as ShopCategory[]).map((category) => {
+                      const Icon = shopCategoryIcons[category];
+                      return (
+                        <FilterChip
+                          key={category}
+                          label={shopCategoryLabels[category]}
+                          icon={<Icon className="w-4 h-4" />}
+                          active={shopFilters.category === category}
+                          onClick={() =>
+                            setShopFilters({
+                              ...shopFilters,
+                              category: shopFilters.category === category ? null : category,
+                            })
+                          }
+                        />
+                      );
+                    })}
+
+                    <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+
+                    {/* Ramadan special filter */}
                     <FilterChip
-                      key={category}
-                      label={shopCategoryLabels[category]}
-                      icon={<Icon className="w-4 h-4" />}
-                      active={shopFilters.category === category}
+                      label="Heeft Ramadan actie"
+                      icon={<Sparkles className="w-4 h-4" />}
+                      active={shopFilters.hasRamadanSpecial}
                       onClick={() =>
                         setShopFilters({
                           ...shopFilters,
-                          category: shopFilters.category === category ? null : category,
+                          hasRamadanSpecial: !shopFilters.hasRamadanSpecial,
                         })
                       }
                     />
-                  );
-                })}
 
-                <div className="h-6 w-px bg-gray-200 flex-shrink-0" />
+                    {/* Clear filters */}
+                    {hasActiveShopFilters && (
+                      <button
+                        onClick={clearShopFilters}
+                        className="inline-flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium text-pink-600 hover:bg-pink-50 transition-all whitespace-nowrap flex-shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                        Wissen
+                      </button>
+                    )}
+                  </div>
 
-                {/* Ramadan special filter */}
-                <FilterChip
-                  label="Heeft Ramadan actie"
-                  icon={<Sparkles className="w-4 h-4" />}
-                  active={shopFilters.hasRamadanSpecial}
-                  onClick={() =>
-                    setShopFilters({
-                      ...shopFilters,
-                      hasRamadanSpecial: !shopFilters.hasRamadanSpecial,
-                    })
-                  }
-                />
-
-                {/* Clear filters */}
-                {hasActiveShopFilters && (
+                  {/* Right arrow */}
                   <button
-                    onClick={clearShopFilters}
-                    className="inline-flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium text-pink-600 hover:bg-pink-50 transition-all whitespace-nowrap flex-shrink-0"
+                    onClick={() => scrollShopFilters("right")}
+                    className="absolute right-0 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:shadow-lg transition-all -mr-2"
                   >
-                    <X className="w-4 h-4" />
-                    Wissen
+                    <ChevronRight className="w-5 h-5" />
                   </button>
-                )}
+                </div>
               </div>
             </div>
           ) : (
@@ -3301,10 +3338,10 @@ export default function WatTeDoenPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="md:hidden fixed inset-0 z-50 bg-white flex flex-col"
+                      className="md:hidden fixed inset-0 z-50 bg-white flex flex-col pt-16"
                     >
                       {/* Header */}
-                      <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
+                      <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-text-primary">Filters</h3>
                         <button
                           onClick={() => setShowFilters(false)}
@@ -3316,7 +3353,7 @@ export default function WatTeDoenPage() {
                       </div>
 
                       {/* Scrollable content */}
-                      <div className="overflow-y-auto h-[calc(100vh-140px)] px-4 py-6 space-y-6">
+                      <div className="overflow-y-auto flex-1 px-4 py-6 space-y-6">
                         {/* Audience filters */}
                         <div>
                           <p className="text-sm font-medium text-text-secondary mb-3">
