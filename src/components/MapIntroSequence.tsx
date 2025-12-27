@@ -108,11 +108,13 @@ export function MapIntroSequence({
   useEffect(() => {
     if (phase !== "BEAMS_LAND") return;
 
-    // Target positions closer to the illuminated streets (center of map)
-    // Wondelgemstraat runs NE from center, Bevrijdingslaan runs SW
+    // Target positions matching the actual illuminated streets
+    // Map center is [51.055, 3.715] at zoom 14
+    // Wondelgemstraat midpoint: ~[51.0625, 3.710] - north and west of center
+    // Bevrijdingslaan midpoint: ~[51.0606, 3.7015] - north and more west of center
     const targets = [
-      { x: dimensions.width * 0.52, y: dimensions.height * 0.42 }, // Near Wondelgemstraat (slightly right of center)
-      { x: dimensions.width * 0.48, y: dimensions.height * 0.48 }, // Near Bevrijdingslaan (slightly left of center)
+      { x: dimensions.width * 0.47, y: dimensions.height * 0.37 }, // Wondelgemstraat (upper-left area)
+      { x: dimensions.width * 0.42, y: dimensions.height * 0.40 }, // Bevrijdingslaan (more to the left)
     ];
 
     // Fade out central glow
@@ -250,10 +252,10 @@ export function MapIntroSequence({
           : Math.max(0, 1 - (flashProgress - 0.2) * 1.5);
 
         if (flashAlpha > 0.01) {
-          // Flash at target locations (matching particle landing spots)
+          // Flash at target locations (matching particle landing spots on actual streets)
           const flashPoints = [
-            { x: dimensions.width * 0.52, y: dimensions.height * 0.42 },
-            { x: dimensions.width * 0.48, y: dimensions.height * 0.48 },
+            { x: dimensions.width * 0.47, y: dimensions.height * 0.37 }, // Wondelgemstraat
+            { x: dimensions.width * 0.42, y: dimensions.height * 0.40 }, // Bevrijdingslaan
           ];
 
           flashPoints.forEach((point) => {
