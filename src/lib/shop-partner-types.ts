@@ -7,6 +7,10 @@ import {
   Baby,
   Smartphone,
   Store,
+  Gem,
+  Book,
+  Zap,
+  Dumbbell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -19,6 +23,10 @@ export type ShopCategory =
   | "beauty"
   | "kids"
   | "tech"
+  | "jewelry"
+  | "books"
+  | "electronics"
+  | "sports"
   | "other";
 
 // Reuse PartnerTier from food-partner-types
@@ -91,6 +99,10 @@ export const shopCategoryLabels: Record<ShopCategory, string> = {
   beauty: "Beauty & wellness",
   kids: "Kids & families",
   tech: "Tech & lifestyle",
+  jewelry: "Juwelen & sieraden",
+  books: "Boeken & media",
+  electronics: "Elektronica",
+  sports: "Sport & fitness",
   other: "Overig",
 };
 
@@ -103,6 +115,10 @@ export const shopCategoryIcons: Record<ShopCategory, LucideIcon> = {
   beauty: Sparkles,
   kids: Baby,
   tech: Smartphone,
+  jewelry: Gem,
+  books: Book,
+  electronics: Zap,
+  sports: Dumbbell,
   other: Store,
 };
 
@@ -115,6 +131,10 @@ export const shopCategoryEmojis: Record<ShopCategory, string> = {
   beauty: "✨",
   kids: "👶",
   tech: "📱",
+  jewelry: "💎",
+  books: "📚",
+  electronics: "⚡",
+  sports: "🏋️",
   other: "🏪",
 };
 

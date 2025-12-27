@@ -6,6 +6,7 @@ export type FoodPartnerCategory =
   | "supermarket"
   | "catering"
   | "cafe"
+  | "takeaway"
   | "other";
 
 // Cuisine type options (like Takeaway.com/UberEats)
@@ -157,6 +158,7 @@ export const categoryLabels: Record<FoodPartnerCategory, string> = {
   supermarket: "Supermarkt",
   catering: "Catering",
   cafe: "Café",
+  takeaway: "Afhaal",
   other: "Overig",
 };
 
