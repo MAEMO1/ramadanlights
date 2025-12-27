@@ -149,7 +149,7 @@ const createGameMarker = (
 
   const html = `
     <style>${pulseKeyframes}</style>
-    <div class="game-marker-icon" style="
+    <div class="game-marker-icon tier-${tier}" style="
       width: ${size}px;
       height: ${size}px;
       position: relative;
@@ -296,6 +296,12 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
   const routeLayersRef = useRef<L.Polyline[]>([]);
   const connectorLinesRef = useRef<L.Polyline[]>([]);
   const [mapReady, setMapReady] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(14);
+
+  // Animation phases:
+  // 0=curtains, 1=lights floating, 2=lights traveling, 3=streets glowing,
+  // 4=mosques appearing, 5=small sponsors, 6=medium sponsors, 7=large sponsors, 8=complete
+  const [animationPhase, setAnimationPhase] = useState(0);
 
   // Initialize map when overlay opens
   useEffect(() => {
@@ -315,7 +321,22 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
         maxZoom: 19,
       }).addTo(mapRef.current);
 
+      // Create custom pane for routes that renders ABOVE markers (default markerPane z-index is 600)
+      mapRef.current.createPane("routesPane");
+      const routesPane = mapRef.current.getPane("routesPane");
+      if (routesPane) {
+        routesPane.style.zIndex = "650"; // Above markers (600) but below popups (700)
+        routesPane.style.pointerEvents = "none"; // Don't block clicks on markers below
+      }
+
       L.control.zoom({ position: "bottomright" }).addTo(mapRef.current);
+
+      // Track zoom level changes
+      mapRef.current.on("zoomend", () => {
+        if (mapRef.current) {
+          setZoomLevel(mapRef.current.getZoom());
+        }
+      });
 
       setMapReady(true);
     }, 800);
@@ -329,22 +350,101 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       mapRef.current.remove();
       mapRef.current = null;
       setMapReady(false);
+      setAnimationPhase(0); // Reset animation
     }
   }, [isOpen]);
 
-  // Add routes
+  // Animation sequence controller - Extended with floating lights and sequential icon appearance
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Phase 0: Curtains opening (0-0.8s)
+    // Phase 1: Lights appear and float around (0.8-3.5s) - 2.7s floating
+    const phase1Timer = setTimeout(() => setAnimationPhase(1), 800);
+    // Phase 2: Lights travel to streets (3.5-5.5s)
+    const phase2Timer = setTimeout(() => setAnimationPhase(2), 3500);
+    // Phase 3: Streets illuminate (5.5-7s)
+    const phase3Timer = setTimeout(() => setAnimationPhase(3), 5500);
+    // Phase 4: Mosques appear like mushrooms (7-8.5s)
+    const phase4Timer = setTimeout(() => setAnimationPhase(4), 7000);
+    // Phase 5: Small sponsors appear (8.5-9.5s) - partner tier
+    const phase5Timer = setTimeout(() => setAnimationPhase(5), 8500);
+    // Phase 6: Medium sponsors appear (9.5-10.5s) - partner_plus tier
+    const phase6Timer = setTimeout(() => setAnimationPhase(6), 9500);
+    // Phase 7: Large sponsors appear with overshoot (10.5-12s) - premium tier
+    const phase7Timer = setTimeout(() => setAnimationPhase(7), 10500);
+    // Phase 8: Animation complete
+    const phase8Timer = setTimeout(() => setAnimationPhase(8), 12000);
+
+    return () => {
+      clearTimeout(phase1Timer);
+      clearTimeout(phase2Timer);
+      clearTimeout(phase3Timer);
+      clearTimeout(phase4Timer);
+      clearTimeout(phase5Timer);
+      clearTimeout(phase6Timer);
+      clearTimeout(phase7Timer);
+      clearTimeout(phase8Timer);
+    };
+  }, [isOpen]);
+
+  // Add routes - glow brighter when zooming out and based on animation phase
   useEffect(() => {
     if (!mapRef.current || !mapReady) return;
 
     routeLayersRef.current.forEach(layer => mapRef.current?.removeLayer(layer));
     routeLayersRef.current = [];
 
+    // Don't show routes until animation phase 3 (streets illumination)
+    if (animationPhase < 3) return;
+
+    // Calculate glow intensity based on zoom (brighter when zoomed out)
+    // Zoom 14 = normal, zoom 10 = max glow
+    const glowMultiplier = Math.max(1, 1 + (14 - zoomLevel) * 0.35); // Stronger glow when zoomed out
+    const weightMultiplier = Math.max(1, 1 + (14 - zoomLevel) * 0.2); // Thicker lines when zoomed out
+
+    // Animation intensity - starts bright and settles
+    const animIntensity = animationPhase === 3 ? 1.8 : 1;
+
     [routes.wondelgemstraat, routes.bevrijdingslaanPhoenix].forEach((route) => {
+      // All route layers use the custom routesPane to render ABOVE markers
       const layers = [
-        L.polyline(route, { color: "#FFD700", weight: 16, opacity: 0.15, lineCap: "round", lineJoin: "round" }),
-        L.polyline(route, { color: "#FFD700", weight: 10, opacity: 0.3, lineCap: "round", lineJoin: "round" }),
-        L.polyline(route, { color: "#FFD700", weight: 5, opacity: 0.6, lineCap: "round", lineJoin: "round" }),
-        L.polyline(route, { color: "#FFFACD", weight: 2, opacity: 1, lineCap: "round", lineJoin: "round" }),
+        // Outer glow - gets much bigger and brighter when zoomed out
+        L.polyline(route, {
+          color: "#FFD700",
+          weight: 16 * weightMultiplier * glowMultiplier * animIntensity,
+          opacity: Math.min(0.5, 0.15 * glowMultiplier * animIntensity),
+          lineCap: "round",
+          lineJoin: "round",
+          pane: "routesPane"
+        }),
+        // Middle glow
+        L.polyline(route, {
+          color: "#FFD700",
+          weight: 10 * weightMultiplier * animIntensity,
+          opacity: Math.min(0.7, 0.3 * glowMultiplier * animIntensity),
+          lineCap: "round",
+          lineJoin: "round",
+          pane: "routesPane"
+        }),
+        // Inner glow
+        L.polyline(route, {
+          color: "#FFD700",
+          weight: 5 * weightMultiplier,
+          opacity: Math.min(0.95, 0.6 * glowMultiplier * animIntensity),
+          lineCap: "round",
+          lineJoin: "round",
+          pane: "routesPane"
+        }),
+        // Core line (always bright)
+        L.polyline(route, {
+          color: "#FFFACD",
+          weight: 2 * weightMultiplier,
+          opacity: 1,
+          lineCap: "round",
+          lineJoin: "round",
+          pane: "routesPane"
+        }),
       ];
 
       layers.forEach(layer => {
@@ -354,14 +454,20 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
         }
       });
     });
-  }, [mapReady]);
+  }, [mapReady, zoomLevel, animationPhase]);
 
-  // Add markers
+  // Add markers - sequential appearance by tier (mosques → small → medium → large)
   useEffect(() => {
     if (!mapRef.current || !mapReady) return;
 
+    // Clear existing markers and connector lines
     markersRef.current.forEach(marker => mapRef.current?.removeLayer(marker));
     markersRef.current = [];
+    connectorLinesRef.current.forEach(line => mapRef.current?.removeLayer(line));
+    connectorLinesRef.current = [];
+
+    // Don't add markers until animation phase 4 (mosques start appearing)
+    if (animationPhase < 4) return;
 
     // Combine all markers
     const allMarkers: Array<{
@@ -431,11 +537,21 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
     const tierOrder: Record<PartnerTier | "mosque", number> = { free: 0, partner: 1, partner_plus: 2, mosque: 3, premium: 4 };
     allMarkers.sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier]);
 
+    // Filter markers based on animation phase (sequential appearance)
+    // Phase 4: mosques, Phase 5: partner, Phase 6: partner_plus, Phase 7+: premium
+    const visibleMarkers = allMarkers.filter(item => {
+      if (item.tier === "mosque") return animationPhase >= 4;
+      if (item.tier === "partner" || item.tier === "free") return animationPhase >= 5;
+      if (item.tier === "partner_plus") return animationPhase >= 6;
+      if (item.tier === "premium") return animationPhase >= 7;
+      return false;
+    });
+
     // Add markers with offset for those near illuminated streets
-    allMarkers.forEach((item, index) => {
+    visibleMarkers.forEach((item, index) => {
       const icon = createGameMarker(item.category, item.tier);
-      const [offsetLat, offsetLng] = offsetMarkerPosition(item.lat, item.lng, index);
-      const marker = L.marker([offsetLat, offsetLng], {
+      const { position, original, wasOffset } = offsetMarkerPosition(item.lat, item.lng, index);
+      const marker = L.marker(position, {
         icon,
         zIndexOffset: tierSizes[item.tier].zIndex,
       });
@@ -456,25 +572,101 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       marker.bindPopup(popup);
 
       if (mapRef.current) {
+        // Draw connector line if marker was offset
+        if (wasOffset) {
+          const connectorLine = L.polyline([original, position], {
+            color: tierColors[item.tier].border,
+            weight: 2,
+            opacity: 0.6,
+            dashArray: "4, 6",
+            lineCap: "round",
+          });
+          connectorLine.addTo(mapRef.current);
+          connectorLinesRef.current.push(connectorLine);
+
+          // Add small dot at original location to show real address
+          const dotIcon = L.divIcon({
+            className: "connector-dot",
+            html: `<div style="
+              width: 10px;
+              height: 10px;
+              background: ${tierColors[item.tier].border};
+              border: 2px solid ${tierColors[item.tier].icon};
+              border-radius: 50%;
+              box-shadow: 0 0 6px ${tierColors[item.tier].glow};
+            "></div>`,
+            iconSize: [10, 10],
+            iconAnchor: [5, 5],
+          });
+          const dotMarker = L.marker(original, { icon: dotIcon, zIndexOffset: 10 });
+          dotMarker.addTo(mapRef.current);
+          markersRef.current.push(dotMarker);
+        }
+
         marker.addTo(mapRef.current);
         markersRef.current.push(marker);
       }
     });
-  }, [mapReady, foodPartners, shopPartners, mosques]);
+  }, [mapReady, foodPartners, shopPartners, mosques, animationPhase]);
 
-  // Add custom styles
+  // Add custom styles - scale markers based on zoom level (MUCH MORE AGGRESSIVE)
   useEffect(() => {
     if (!isOpen) return;
+
+    // Calculate marker scale based on zoom (EXTREMELY small when zoomed out to keep streets visible)
+    // Zoom 14 = 1.0, zoom 12 = 0.35, zoom 10 = 0.12, zoom 8 = 0.05
+    const baseScale = Math.max(0.05, Math.min(1, Math.pow((zoomLevel - 7) / 7, 2)));
+
+    // Premium markers should be 20% bigger after animation completes
+    const premiumBonus = animationPhase >= 8 ? 1.2 : 1;
 
     const style = document.createElement("style");
     style.id = "game-map-styles";
     style.textContent = `
+      @keyframes mushroomPop {
+        0% { transform: scale(0) translateY(20px); opacity: 0; }
+        50% { transform: scale(1.3) translateY(-5px); opacity: 1; }
+        70% { transform: scale(0.9) translateY(2px); opacity: 1; }
+        100% { transform: scale(1) translateY(0); opacity: 1; }
+      }
+      @keyframes mushroomPopMedium {
+        0% { transform: scale(0) translateY(25px); opacity: 0; }
+        50% { transform: scale(1.4) translateY(-8px); opacity: 1; }
+        70% { transform: scale(0.85) translateY(3px); opacity: 1; }
+        100% { transform: scale(1) translateY(0); opacity: 1; }
+      }
+      @keyframes mushroomPopLarge {
+        0% { transform: scale(0) translateY(30px); opacity: 0; }
+        40% { transform: scale(1.6) translateY(-12px); opacity: 1; }
+        60% { transform: scale(1.1) translateY(5px); opacity: 1; }
+        80% { transform: scale(1.25) translateY(-2px); opacity: 1; }
+        100% { transform: scale(${premiumBonus}) translateY(0); opacity: 1; }
+      }
       .game-marker-container {
         background: transparent !important;
         border: none !important;
       }
-      .game-marker-icon:hover > div:first-child {
-        transform: scale(1.15) !important;
+      .game-marker-icon {
+        transform: scale(${baseScale}) !important;
+        transform-origin: center center !important;
+        transition: transform 0.3s ease !important;
+        animation: mushroomPop 0.6s ease-out forwards;
+      }
+      .game-marker-icon.tier-partner,
+      .game-marker-icon.tier-free {
+        animation: mushroomPop 0.5s ease-out forwards;
+      }
+      .game-marker-icon.tier-partner_plus {
+        animation: mushroomPopMedium 0.6s ease-out forwards;
+      }
+      .game-marker-icon.tier-premium {
+        animation: mushroomPopLarge 0.8s ease-out forwards;
+      }
+      .game-marker-icon.tier-mosque {
+        animation: mushroomPop 0.7s ease-out forwards;
+      }
+      .game-marker-icon:hover {
+        transform: scale(${baseScale * 1.3}) !important;
       }
       .leaflet-popup-content-wrapper {
         background: transparent !important;
@@ -498,14 +690,26 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       .leaflet-popup-close-button:hover {
         opacity: 1;
       }
+      .connector-dot {
+        background: transparent !important;
+        border: none !important;
+        transform: scale(${baseScale}) !important;
+        transition: transform 0.3s ease !important;
+        animation: mushroomPop 0.4s ease-out forwards;
+      }
     `;
+
+    // Remove existing style first
+    const existingStyle = document.getElementById("game-map-styles");
+    if (existingStyle) existingStyle.remove();
+
     document.head.appendChild(style);
 
     return () => {
-      const existingStyle = document.getElementById("game-map-styles");
-      if (existingStyle) existingStyle.remove();
+      const styleToRemove = document.getElementById("game-map-styles");
+      if (styleToRemove) styleToRemove.remove();
     };
-  }, [isOpen]);
+  }, [isOpen, zoomLevel, animationPhase]);
 
   return (
     <AnimatePresence>
@@ -561,22 +765,214 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
           >
             <div ref={containerRef} className="w-full h-full" />
 
-            {/* Close Button */}
+            {/* Light Beam Animation Overlay - Extended with floating phase */}
+            {animationPhase >= 1 && animationPhase < 5 && (
+              <div className="absolute inset-0 pointer-events-none z-[9998] overflow-hidden">
+                {/* Phase 1: Central light source appears and pulses */}
+                {animationPhase === 1 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{
+                      opacity: [0, 1, 1, 1],
+                      scale: [0, 1.2, 0.9, 1.1],
+                    }}
+                    transition={{ duration: 2.5, times: [0, 0.2, 0.6, 1], repeat: Infinity, repeatType: "reverse" }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  >
+                    <div className="w-20 h-20 rounded-full bg-gold/90"
+                      style={{ boxShadow: '0 0 80px 40px rgba(255, 215, 0, 0.7), 0 0 120px 60px rgba(255, 215, 0, 0.4)' }}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Phase 1: Floating light particles orbiting around center */}
+                {animationPhase === 1 && (
+                  <>
+                    {/* Floating light 1 - circular orbit */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: [0, 1, 1, 1],
+                        x: ["50vw", "65vw", "50vw", "35vw", "50vw"],
+                        y: ["40vh", "50vh", "60vh", "50vh", "40vh"],
+                      }}
+                      transition={{
+                        duration: 2.7,
+                        times: [0, 0.25, 0.5, 0.75, 1],
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      className="absolute -translate-x-1/2 -translate-y-1/2"
+                    >
+                      <div className="w-6 h-6 rounded-full bg-gold"
+                        style={{ boxShadow: '0 0 30px 12px rgba(255, 215, 0, 0.8), 0 0 60px 25px rgba(255, 215, 0, 0.4)' }}
+                      />
+                    </motion.div>
+
+                    {/* Floating light 2 - opposite orbit */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: [0, 1, 1, 1],
+                        x: ["50vw", "35vw", "50vw", "65vw", "50vw"],
+                        y: ["60vh", "50vh", "40vh", "50vh", "60vh"],
+                      }}
+                      transition={{
+                        duration: 2.7,
+                        times: [0, 0.25, 0.5, 0.75, 1],
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      className="absolute -translate-x-1/2 -translate-y-1/2"
+                    >
+                      <div className="w-6 h-6 rounded-full bg-gold"
+                        style={{ boxShadow: '0 0 30px 12px rgba(255, 215, 0, 0.8), 0 0 60px 25px rgba(255, 215, 0, 0.4)' }}
+                      />
+                    </motion.div>
+
+                    {/* Sparkle particles floating around - predefined positions */}
+                    {[
+                      { startX: 48, startY: 45, endX: 42, endY: 38 },
+                      { startX: 52, startY: 48, endX: 58, endY: 42 },
+                      { startX: 46, startY: 52, endX: 38, endY: 58 },
+                      { startX: 54, startY: 55, endX: 62, endY: 52 },
+                      { startX: 50, startY: 42, endX: 55, endY: 35 },
+                      { startX: 47, startY: 58, endX: 40, endY: 62 },
+                    ].map((pos, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{
+                          opacity: [0, 1, 0],
+                          scale: [0, 1, 0],
+                          x: [`${pos.startX}vw`, `${pos.endX}vw`],
+                          y: [`${pos.startY}vh`, `${pos.endY}vh`],
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          delay: i * 0.4,
+                          repeat: Infinity,
+                          ease: "easeOut"
+                        }}
+                        className="absolute text-gold text-2xl"
+                      >
+                        ✦
+                      </motion.div>
+                    ))}
+                  </>
+                )}
+
+                {/* Phase 2: Lights travel from center to streets */}
+                {animationPhase === 2 && (
+                  <>
+                    {/* Central light fading out */}
+                    <motion.div
+                      initial={{ opacity: 1, scale: 1.1 }}
+                      animate={{ opacity: [1, 0.5, 0], scale: [1.1, 1.5, 0] }}
+                      transition={{ duration: 1.5 }}
+                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                    >
+                      <div className="w-20 h-20 rounded-full bg-gold/90"
+                        style={{ boxShadow: '0 0 80px 40px rgba(255, 215, 0, 0.7), 0 0 120px 60px rgba(255, 215, 0, 0.4)' }}
+                      />
+                    </motion.div>
+
+                    {/* Light beam 1 - traveling to Wondelgemstraat (top-right direction) */}
+                    <motion.div
+                      initial={{ opacity: 1, x: "50vw", y: "50vh" }}
+                      animate={{
+                        opacity: [1, 1, 1, 0.8, 0],
+                        x: ["50vw", "55vw", "65vw", "75vw"],
+                        y: ["50vh", "40vh", "25vh", "15vh"],
+                      }}
+                      transition={{ duration: 2, times: [0, 0.3, 0.7, 0.95, 1] }}
+                      className="absolute -translate-x-1/2 -translate-y-1/2"
+                    >
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-full bg-gold"
+                          style={{ boxShadow: '0 0 50px 20px rgba(255, 215, 0, 0.9), 0 0 100px 40px rgba(255, 215, 0, 0.5)' }}
+                        />
+                        <motion.div
+                          animate={{ opacity: [0.9, 0.4, 0.9] }}
+                          transition={{ duration: 0.2, repeat: Infinity }}
+                          className="absolute -left-12 top-1/2 -translate-y-1/2 w-24 h-6 rounded-full"
+                          style={{ background: 'linear-gradient(to left, rgba(255, 215, 0, 0.8), transparent)' }}
+                        />
+                      </div>
+                    </motion.div>
+
+                    {/* Light beam 2 - traveling to Bevrijdingslaan (bottom-left direction) */}
+                    <motion.div
+                      initial={{ opacity: 1, x: "50vw", y: "50vh" }}
+                      animate={{
+                        opacity: [1, 1, 1, 0.8, 0],
+                        x: ["50vw", "42vw", "32vw", "22vw"],
+                        y: ["50vh", "55vh", "58vh", "62vh"],
+                      }}
+                      transition={{ duration: 2, times: [0, 0.3, 0.7, 0.95, 1] }}
+                      className="absolute -translate-x-1/2 -translate-y-1/2"
+                    >
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-full bg-gold"
+                          style={{ boxShadow: '0 0 50px 20px rgba(255, 215, 0, 0.9), 0 0 100px 40px rgba(255, 215, 0, 0.5)' }}
+                        />
+                        <motion.div
+                          animate={{ opacity: [0.9, 0.4, 0.9] }}
+                          transition={{ duration: 0.2, repeat: Infinity }}
+                          className="absolute -right-12 top-1/2 -translate-y-1/2 w-24 h-6 rounded-full"
+                          style={{ background: 'linear-gradient(to right, rgba(255, 215, 0, 0.8), transparent)' }}
+                        />
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+
+                {/* Phase 3: Street illumination flash effects */}
+                {animationPhase >= 3 && (
+                  <>
+                    {/* Big flash for Wondelgemstraat */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: [0, 1, 0.5, 0.2, 0] }}
+                      transition={{ duration: 1.5, times: [0, 0.1, 0.3, 0.6, 1] }}
+                      className="absolute top-[10%] right-[15%] w-[40vw] h-[30vh]"
+                      style={{
+                        background: 'radial-gradient(ellipse at center, rgba(255, 215, 0, 0.6) 0%, rgba(255, 215, 0, 0.2) 40%, transparent 70%)',
+                        filter: 'blur(30px)',
+                      }}
+                    />
+                    {/* Big flash for Bevrijdingslaan */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: [0, 1, 0.5, 0.2, 0] }}
+                      transition={{ duration: 1.5, times: [0, 0.1, 0.3, 0.6, 1] }}
+                      className="absolute bottom-[25%] left-[10%] w-[40vw] h-[35vh]"
+                      style={{
+                        background: 'radial-gradient(ellipse at center, rgba(255, 215, 0, 0.6) 0%, rgba(255, 215, 0, 0.2) 40%, transparent 70%)',
+                        filter: 'blur(30px)',
+                      }}
+                    />
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Close Button - appears when mosques start appearing */}
             <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1, duration: 0.3 }}
+              animate={{ opacity: animationPhase >= 4 ? 1 : 0, scale: animationPhase >= 4 ? 1 : 0.8 }}
+              transition={{ duration: 0.3 }}
               onClick={onClose}
               className="absolute top-6 right-6 z-[9999] w-12 h-12 bg-[#0f2d2d] border-2 border-white/20 rounded-full flex items-center justify-center text-white hover:bg-[#1a4a4a] hover:border-white/40 transition-all shadow-2xl"
             >
               <X className="w-5 h-5" />
             </motion.button>
 
-            {/* Title */}
+            {/* Title - appears when streets illuminate */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2, duration: 0.5 }}
+              animate={{ opacity: animationPhase >= 3 ? 1 : 0, y: animationPhase >= 3 ? 0 : -20 }}
+              transition={{ duration: 0.5 }}
               className="absolute top-6 left-6 z-[9999]"
             >
               <div className="bg-[#0f2d2d]/90 backdrop-blur-sm border border-white/10 rounded-xl px-5 py-3 shadow-2xl">
@@ -585,11 +981,11 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
               </div>
             </motion.div>
 
-            {/* Legend */}
+            {/* Legend - appears when streets illuminate */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4, duration: 0.5 }}
+              animate={{ opacity: animationPhase >= 3 ? 1 : 0, y: animationPhase >= 3 ? 0 : 20 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
               className="absolute bottom-6 left-6 z-[9999]"
             >
               <div className="bg-[#0f2d2d]/90 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 shadow-2xl">
