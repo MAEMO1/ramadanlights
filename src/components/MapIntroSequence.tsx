@@ -32,6 +32,7 @@ export function MapIntroSequence({
   const particlesRef = useRef<Particle[]>([]);
   const centralGlowRef = useRef({ alpha: 0, scale: 0, pulse: 0 });
   const timeRef = useRef(0);
+  const particlesInitializedRef = useRef(false); // Track if particles have been initialized
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   // Initialize dimensions
@@ -64,45 +65,59 @@ export function MapIntroSequence({
     }
   }, [dimensions]);
 
-  // Initialize particles when entering BEAMS_SWIRL
+  // Initialize particles ONCE when entering BEAMS_SWIRL (not on dimension changes)
   useEffect(() => {
-    if (phase === "PRELOAD" || phase === "BEAMS_SWIRL") {
-      const count = isMobile ? 6 : 10;
-      const particles: Particle[] = [];
+    // Only initialize once, and only when we have valid dimensions
+    if (particlesInitializedRef.current || dimensions.width === 0) return;
+    if (phase !== "PRELOAD" && phase !== "BEAMS_SWIRL") return;
 
-      for (let i = 0; i < count; i++) {
-        const angle = (i / count) * Math.PI * 2;
-        particles.push({
-          x: dimensions.width / 2,
-          y: dimensions.height / 2,
-          angle,
-          radius: 80 + Math.random() * 60,
-          size: 15 + Math.random() * 15,
-          alpha: 0,
-          speed: 0.5 + Math.random() * 0.5,
-        });
-      }
+    particlesInitializedRef.current = true;
 
-      particlesRef.current = particles;
+    const count = isMobile ? 6 : 10;
+    const particles: Particle[] = [];
 
-      // Animate central glow in
-      gsap.to(centralGlowRef.current, {
-        alpha: 1,
-        scale: 1,
-        duration: 0.8,
-        ease: "power2.out",
-      });
-
-      // Animate particles in
-      particles.forEach((p, i) => {
-        gsap.to(p, {
-          alpha: 1,
-          delay: i * 0.1,
-          duration: 0.5,
-        });
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2;
+      particles.push({
+        x: dimensions.width / 2,
+        y: dimensions.height / 2,
+        angle,
+        radius: 80 + Math.random() * 60,
+        size: 15 + Math.random() * 15,
+        alpha: 0,
+        speed: 0.5 + Math.random() * 0.5,
       });
     }
+
+    particlesRef.current = particles;
+
+    // Animate central glow in smoothly
+    gsap.to(centralGlowRef.current, {
+      alpha: 1,
+      scale: 1,
+      duration: 1.0,
+      ease: "power2.out",
+    });
+
+    // Animate particles in with stagger
+    particles.forEach((p, i) => {
+      gsap.to(p, {
+        alpha: 1,
+        delay: 0.3 + i * 0.08, // Start after glow begins, faster stagger
+        duration: 0.6,
+        ease: "power2.out",
+      });
+    });
   }, [phase, dimensions, isMobile]);
+
+  // Reset initialization flag when phase goes back to IDLE
+  useEffect(() => {
+    if (phase === "IDLE") {
+      particlesInitializedRef.current = false;
+      particlesRef.current = [];
+      centralGlowRef.current = { alpha: 0, scale: 0, pulse: 0 };
+    }
+  }, [phase]);
 
   // Handle BEAMS_LAND phase - particles travel to targets
   useEffect(() => {

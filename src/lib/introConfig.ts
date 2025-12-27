@@ -23,9 +23,9 @@ export const INTRO_PHASES: Record<IntroPhase, PhaseConfig> = {
   PRELOAD: { duration: 0.5, label: "Loading" },
   BEAMS_SWIRL: { duration: 2.5, label: "Light beams swirling" },
   BEAMS_LAND: { duration: 1.5, label: "Beams landing" },
-  STREETS_GLOW: { duration: 1.0, label: "Streets illuminating" },
-  MOSQUES_RISE: { duration: 1.2, label: "Mosques appearing" },
-  SPONSORS_WAVE: { duration: 2.0, label: "Sponsors appearing" },
+  STREETS_GLOW: { duration: 1.8, label: "Streets illuminating" }, // Extended for proper glow effect
+  MOSQUES_RISE: { duration: 2.5, label: "Mosques appearing" }, // Extended for staggered animations
+  SPONSORS_WAVE: { duration: 3.0, label: "Sponsors appearing" }, // Extended for tiered animations
   COMPLETE: { duration: 0, label: "Complete" },
 };
 
@@ -35,9 +35,9 @@ export const PHASE_TIMELINE = {
   BEAMS_SWIRL_START: 0.5,
   BEAMS_LAND_START: 3.0,
   STREETS_GLOW_START: 4.5,
-  MOSQUES_RISE_START: 5.5,
-  SPONSORS_WAVE_START: 6.7,
-  COMPLETE_START: 8.7,
+  MOSQUES_RISE_START: 6.3, // After streets have glowed (4.5 + 1.8)
+  SPONSORS_WAVE_START: 8.8, // After mosques have appeared (6.3 + 2.5)
+  COMPLETE_START: 11.8, // After sponsors (8.8 + 3.0)
 };
 
 // Easing functions for GSAP
@@ -88,28 +88,28 @@ export const STREET_FLASH_CONFIG = {
 // Marker animation configuration
 export const MARKER_CONFIG = {
   mosque: {
-    delay: 0, // First to appear in phase
-    stagger: 0.08, // Time between each mosque
-    scale: { from: 0, overshoot: 1.3, to: 1 },
-    yOffset: 30, // Pixels to rise from
+    delay: 0.2, // Small delay after phase starts
+    stagger: 0.15, // More time between each mosque for dramatic effect
+    scale: { from: 0, overshoot: 1.4, to: 1 },
+    yOffset: 35, // Pixels to rise from
   },
   partner: {
-    delay: 0, // Start of sponsors phase
-    stagger: 0.05,
-    scale: { from: 0, overshoot: 1.2, to: 1 },
-    yOffset: 20,
+    delay: 0, // Start of sponsors phase - simple appearance
+    stagger: 0.03, // Quick, simple stagger
+    scale: { from: 0, overshoot: 1.1, to: 1 }, // Minimal overshoot
+    yOffset: 15,
   },
   partner_plus: {
-    delay: 0.6, // 0.6s after sponsors phase starts
-    stagger: 0.06,
+    delay: 1.0, // 1s after sponsors phase starts
+    stagger: 0.08, // More noticeable stagger
     scale: { from: 0, overshoot: 1.3, to: 1 },
     yOffset: 25,
   },
   premium: {
-    delay: 1.2, // 1.2s after sponsors phase starts
-    stagger: 0.1,
+    delay: 2.0, // 2s after sponsors phase starts (last to appear)
+    stagger: 0.15, // Dramatic stagger for premium sponsors
     scale: { from: 0, overshoot: 1.5, to: 1.15 }, // Premium stays 15% bigger
-    yOffset: 35,
+    yOffset: 40,
   },
 };
 

@@ -13,6 +13,7 @@
     "@mollie/api-client": "^4.3.3",
     "@react-google-maps/api": "^2.20.8",
     "@supabase/supabase-js": "^2.89.0",
+    "@tabler/icons-react": "^3.36.0",
     "@types/leaflet": "^1.9.21",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",

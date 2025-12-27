@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, SkipForward } from "lucide-react";
+import { X, SkipForward, Filter, ChevronUp } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { FoodPartner } from "@/lib/food-partner-types";
@@ -435,6 +435,11 @@ const tierColors: Record<PartnerTier | "mosque", {
   },
 };
 
+// Food categories for filtering
+const foodCategories = ['restaurant', 'bakery', 'butcher', 'supermarket', 'cafe', 'takeaway', 'catering', 'other'];
+// Shop categories for filtering
+const shopCategories = ['decor', 'clothing', 'gifts', 'jewelry', 'books', 'electronics', 'beauty', 'sports'];
+
 // Create professional game-style marker with enhanced container and glow effects
 const createGameMarker = (
   category: string,
@@ -447,6 +452,11 @@ const createGameMarker = (
   const size = config.size;
   const iconSize = Math.round(size * 0.6); // Larger icon ratio for new detailed icons
   const borderWidth = tier === "premium" || tier === "mosque" ? 4 : 3;
+
+  // Determine category group for filtering
+  const categoryGroup = tier === "mosque" ? "mosque" :
+    foodCategories.includes(category) ? "food" :
+    shopCategories.includes(category) ? "shop" : "other";
 
   // Calculate stagger delay based on index
   const staggerDelay = markerIndex * 0.08; // 80ms between each marker
@@ -492,7 +502,7 @@ const createGameMarker = (
 
   const html = `
     <style>${pulseKeyframes}</style>
-    <div class="game-marker-icon tier-${tier}" data-category="${category}" data-index="${markerIndex}" style="
+    <div class="game-marker-icon tier-${tier} category-${categoryGroup}" data-category="${category}" data-index="${markerIndex}" style="
       width: ${size}px;
       height: ${size}px;
       position: relative;
@@ -783,6 +793,50 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
   // Track sponsor wave sub-phases (within SPONSORS_WAVE phase)
   const [sponsorSubPhase, setSponsorSubPhase] = useState(0); // 0=partner, 1=partner_plus, 2=premium
 
+  // Filter state for FAB
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({
+    mosques: true,
+    food: true,
+    shops: true,
+  });
+
+  // Toggle filter and update marker visibility
+  const toggleFilter = useCallback((filterType: 'mosques' | 'food' | 'shops') => {
+    setActiveFilters(prev => {
+      const newFilters = { ...prev, [filterType]: !prev[filterType] };
+
+      // Update marker visibility based on filters
+      requestAnimationFrame(() => {
+        // Mosques
+        document.querySelectorAll('.game-marker-icon.tier-mosque').forEach(el => {
+          (el as HTMLElement).style.display = newFilters.mosques ? '' : 'none';
+        });
+        document.querySelectorAll('.connector-dot.tier-mosque').forEach(el => {
+          (el as HTMLElement).style.display = newFilters.mosques ? '' : 'none';
+        });
+
+        // Food partners (all tiers with food categories)
+        document.querySelectorAll('.game-marker-icon.category-food').forEach(el => {
+          (el as HTMLElement).style.display = newFilters.food ? '' : 'none';
+        });
+        document.querySelectorAll('.connector-dot.category-food').forEach(el => {
+          (el as HTMLElement).style.display = newFilters.food ? '' : 'none';
+        });
+
+        // Shop partners
+        document.querySelectorAll('.game-marker-icon.category-shop').forEach(el => {
+          (el as HTMLElement).style.display = newFilters.shops ? '' : 'none';
+        });
+        document.querySelectorAll('.connector-dot.category-shop').forEach(el => {
+          (el as HTMLElement).style.display = newFilters.shops ? '' : 'none';
+        });
+      });
+
+      return newFilters;
+    });
+  }, []);
+
   // Initialize map when overlay opens
   useEffect(() => {
     if (!isOpen || !containerRef.current || mapRef.current) return;
@@ -843,14 +897,15 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
   }, [isOpen, mapReady, introPhase, startIntro]);
 
   // Handle sponsor sub-phases within SPONSORS_WAVE
+  // SPONSORS_WAVE is 3.0s total, matching MARKER_CONFIG delays (0, 1.0, 2.0)
   useEffect(() => {
     if (introPhase !== "SPONSORS_WAVE") return;
 
-    // phaseProgress goes from 0 to 1 over 2 seconds
-    // 0-0.3: partner tier, 0.3-0.6: partner_plus, 0.6-1.0: premium
-    if (phaseProgress < 0.3) {
+    // phaseProgress goes from 0 to 1 over 3 seconds
+    // 0-0.33: partner tier (0-1s), 0.33-0.67: partner_plus (1-2s), 0.67-1.0: premium (2-3s)
+    if (phaseProgress < 0.33) {
       setSponsorSubPhase(0);
-    } else if (phaseProgress < 0.6) {
+    } else if (phaseProgress < 0.67) {
       setSponsorSubPhase(1);
     } else {
       setSponsorSubPhase(2);
@@ -1040,6 +1095,11 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
         zIndexOffset: tierSizes[item.tier].zIndex,
       });
 
+      // Determine category group for filtering
+      const categoryGroup = item.tier === "mosque" ? "mosque" :
+        foodCategories.includes(item.category) ? "food" :
+        shopCategories.includes(item.category) ? "shop" : "other";
+
       const popup = L.popup({
         closeButton: true,
         className: "game-popup",
@@ -1064,14 +1124,14 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
             opacity: 0,
             dashArray: "4, 6",
             lineCap: "round",
-            className: `connector-line tier-${item.tier}`,
+            className: `connector-line tier-${item.tier} category-${categoryGroup}`,
           });
           connectorLine.addTo(mapRef.current);
           connectorLinesRef.current.push(connectorLine);
 
           // Add small dot at original location to show real address
           const dotIcon = L.divIcon({
-            className: `connector-dot tier-${item.tier}`,
+            className: `connector-dot tier-${item.tier} category-${categoryGroup}`,
             html: `<div style="
               width: 10px;
               height: 10px;
@@ -1203,25 +1263,39 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
     const staticStyle = document.createElement("style");
     staticStyle.id = "game-map-static-styles";
     staticStyle.textContent = `
-      /* Mushroom pop animations */
-      @keyframes mushroomPop {
+      /* Mosque: Dramatic elastic mushroom pop from ground */
+      @keyframes mosqueRise {
+        0% { transform: scale(0) translateY(35px); opacity: 0; }
+        30% { transform: scale(0.3) translateY(25px); opacity: 0.5; }
+        50% { transform: scale(1.4) translateY(-15px); opacity: 1; }
+        65% { transform: scale(0.85) translateY(5px); opacity: 1; }
+        80% { transform: scale(1.15) translateY(-3px); opacity: 1; }
+        90% { transform: scale(0.95) translateY(1px); opacity: 1; }
+        100% { transform: scale(1) translateY(0); opacity: 1; }
+      }
+
+      /* Simple fade-scale for basic partners */
+      @keyframes simplePop {
+        0% { transform: scale(0.5); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+
+      /* Medium bounce for partner_plus */
+      @keyframes mediumPop {
         0% { transform: scale(0) translateY(20px); opacity: 0; }
-        50% { transform: scale(1.3) translateY(-5px); opacity: 1; }
-        70% { transform: scale(0.9) translateY(2px); opacity: 1; }
+        60% { transform: scale(1.25) translateY(-6px); opacity: 1; }
+        80% { transform: scale(0.9) translateY(2px); opacity: 1; }
         100% { transform: scale(1) translateY(0); opacity: 1; }
       }
-      @keyframes mushroomPopMedium {
-        0% { transform: scale(0) translateY(25px); opacity: 0; }
-        50% { transform: scale(1.4) translateY(-8px); opacity: 1; }
-        70% { transform: scale(0.85) translateY(3px); opacity: 1; }
-        100% { transform: scale(1) translateY(0); opacity: 1; }
-      }
-      @keyframes mushroomPopLarge {
-        0% { transform: scale(0) translateY(30px); opacity: 0; }
-        40% { transform: scale(1.6) translateY(-12px); opacity: 1; }
-        60% { transform: scale(1.1) translateY(5px); opacity: 1; }
-        80% { transform: scale(1.25) translateY(-2px); opacity: 1; }
-        100% { transform: scale(1.2) translateY(0); opacity: 1; }
+
+      /* Premium: Dramatic entrance with glow pulse */
+      @keyframes premiumPop {
+        0% { transform: scale(0) translateY(40px); opacity: 0; filter: brightness(1); }
+        35% { transform: scale(1.5) translateY(-15px); opacity: 1; filter: brightness(1.5); }
+        50% { transform: scale(1.0) translateY(8px); opacity: 1; filter: brightness(1.2); }
+        65% { transform: scale(1.35) translateY(-5px); opacity: 1; filter: brightness(1.3); }
+        80% { transform: scale(1.1) translateY(2px); opacity: 1; filter: brightness(1.1); }
+        100% { transform: scale(1.2) translateY(0); opacity: 1; filter: brightness(1); }
       }
 
       /* Glow pulse animation for hover */
@@ -1252,25 +1326,36 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       /* Using individual properties so inline animation-delay isn't overridden */
       .game-marker-icon.marker-activated {
         visibility: visible !important;
-        animation-timing-function: ease-out;
         animation-fill-mode: forwards;
       }
+
+      /* Mosques: Dramatic elastic rise from ground, one by one */
       .game-marker-icon.tier-mosque.marker-activated {
-        animation-name: mushroomPop;
-        animation-duration: 0.7s;
+        animation-name: mosqueRise;
+        animation-duration: 0.9s;
+        animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
       }
+
+      /* Partners/Free: Simple quick appearance */
       .game-marker-icon.tier-partner.marker-activated,
       .game-marker-icon.tier-free.marker-activated {
-        animation-name: mushroomPop;
-        animation-duration: 0.5s;
+        animation-name: simplePop;
+        animation-duration: 0.3s;
+        animation-timing-function: ease-out;
       }
+
+      /* Partner Plus: Medium bounce animation */
       .game-marker-icon.tier-partner_plus.marker-activated {
-        animation-name: mushroomPopMedium;
+        animation-name: mediumPop;
         animation-duration: 0.6s;
+        animation-timing-function: cubic-bezier(0.34, 1.2, 0.64, 1);
       }
+
+      /* Premium: Dramatic entrance with multiple bounces */
       .game-marker-icon.tier-premium.marker-activated {
-        animation-name: mushroomPopLarge;
-        animation-duration: 0.8s;
+        animation-name: premiumPop;
+        animation-duration: 1.0s;
+        animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
       /* Hover effects */
@@ -1579,6 +1664,92 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
                 </div>
               </div>
             </motion.div>
+
+            {/* Filter FAB - appears after intro completes */}
+            <AnimatePresence>
+              {introPhase === "COMPLETE" && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                  transition={{ duration: 0.3, delay: 0.3 }}
+                  className="absolute bottom-6 right-6 z-[9999] flex flex-col items-end gap-2"
+                >
+                  {/* Filter panel - expands upward */}
+                  <AnimatePresence>
+                    {filterOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="bg-[#0f2d2d]/95 backdrop-blur-sm border border-white/10 rounded-xl p-3 shadow-2xl min-w-[180px]"
+                      >
+                        <p className="text-white/60 text-xs font-medium mb-2 uppercase tracking-wide">Filter</p>
+                        <div className="space-y-1">
+                          {/* Mosques filter */}
+                          <button
+                            onClick={() => toggleFilter('mosques')}
+                            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
+                              activeFilters.mosques
+                                ? 'bg-emerald-500/20 border border-emerald-500/40'
+                                : 'bg-white/5 border border-white/10 opacity-50'
+                            }`}
+                          >
+                            <div className={`w-4 h-4 rounded-full ${activeFilters.mosques ? 'bg-emerald-500' : 'bg-white/20'}`} />
+                            <span className="text-white text-sm font-medium">Moskeeën</span>
+                          </button>
+
+                          {/* Food filter */}
+                          <button
+                            onClick={() => toggleFilter('food')}
+                            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
+                              activeFilters.food
+                                ? 'bg-amber-500/20 border border-amber-500/40'
+                                : 'bg-white/5 border border-white/10 opacity-50'
+                            }`}
+                          >
+                            <div className={`w-4 h-4 rounded-full ${activeFilters.food ? 'bg-amber-500' : 'bg-white/20'}`} />
+                            <span className="text-white text-sm font-medium">Eten & Drinken</span>
+                          </button>
+
+                          {/* Shops filter */}
+                          <button
+                            onClick={() => toggleFilter('shops')}
+                            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
+                              activeFilters.shops
+                                ? 'bg-purple-500/20 border border-purple-500/40'
+                                : 'bg-white/5 border border-white/10 opacity-50'
+                            }`}
+                          >
+                            <div className={`w-4 h-4 rounded-full ${activeFilters.shops ? 'bg-purple-500' : 'bg-white/20'}`} />
+                            <span className="text-white text-sm font-medium">Winkels</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* FAB button */}
+                  <motion.button
+                    onClick={() => setFilterOpen(!filterOpen)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all ${
+                      filterOpen
+                        ? 'bg-gold text-[#0f2d2d]'
+                        : 'bg-[#0f2d2d] border-2 border-white/20 text-white hover:border-gold/50'
+                    }`}
+                  >
+                    {filterOpen ? (
+                      <ChevronUp className="w-6 h-6" />
+                    ) : (
+                      <Filter className="w-5 h-5" />
+                    )}
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Loading indicator */}
             {!mapReady && (
