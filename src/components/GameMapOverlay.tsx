@@ -96,7 +96,7 @@ const tierSizes: Record<PartnerTier | "mosque", { size: number; zIndex: number; 
   partner_plus: { size: 48, zIndex: 500, pulse: false },
   partner: { size: 38, zIndex: 100, pulse: false },
   free: { size: 30, zIndex: 50, pulse: false },
-  mosque: { size: 52, zIndex: 800, pulse: true },
+  mosque: { size: 26, zIndex: 800, pulse: true },
 };
 
 // Color configurations - Night blue + warm gold palette with enhanced glows
@@ -289,20 +289,20 @@ const createGameMarker = (
       ${tier === "mosque" ? `
         <div class="marker-badge mosque-badge" style="
           position: absolute;
-          top: -6px;
-          right: -6px;
-          width: 20px;
-          height: 20px;
+          top: -4px;
+          right: -4px;
+          width: 14px;
+          height: 14px;
           background: linear-gradient(145deg, #34D399 0%, #10B981 50%, #059669 100%);
-          border: 2px solid #064e3b;
+          border: 1.5px solid #064e3b;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 8px rgba(16, 185, 129, 0.7), inset 0 1px 2px rgba(255,255,255,0.3);
+          box-shadow: 0 2px 6px rgba(16, 185, 129, 0.7), inset 0 1px 2px rgba(255,255,255,0.3);
           z-index: 10;
         ">
-          <svg viewBox="0 0 24 24" fill="#fff" style="width: 12px; height: 12px;">
+          <svg viewBox="0 0 24 24" fill="#fff" style="width: 8px; height: 8px;">
             <path d="M17 8c0-3-2-5-5-5S7 5 7 8c0 1.5.5 2.8 1.4 3.8L12 16l3.6-4.2C16.5 10.8 17 9.5 17 8z"/>
           </svg>
         </div>
@@ -935,32 +935,78 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
     }
   }, [isOpen]);
 
-  // Update connector line visibility based on phase
+  // Track which connector line tiers have been shown (to prevent flickering)
+  const shownConnectorTiersRef = useRef<Set<string>>(new Set());
+
+  // Reset connector tier tracking when map closes
+  useEffect(() => {
+    if (!isOpen) {
+      shownConnectorTiersRef.current.clear();
+    }
+  }, [isOpen]);
+
+  // Update connector line visibility based on phase - with DELAY after icons appear
   useEffect(() => {
     if (!mapRef.current) return;
 
-    const showMosques = introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE";
-    const showPartner = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 0) || introPhase === "COMPLETE";
-    const showPartnerPlus = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 1) || introPhase === "COMPLETE";
-    const showPremium = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 2) || introPhase === "COMPLETE";
+    // Icons should appear, THEN connector lines follow with a delay
+    // Mosque icons animate for 0.9s, so delay connector lines by 1s
+    // Partner icons animate for 0.3s, delay by 0.5s
+    // Partner Plus icons animate for 0.6s, delay by 0.8s
+    // Premium icons animate for 1.0s, delay by 1.2s
 
-    connectorLinesRef.current.forEach(line => {
-      const el = line.getElement();
-      if (!el) return;
+    const showMosqueIcons = introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE";
+    const showPartnerIcons = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 0) || introPhase === "COMPLETE";
+    const showPartnerPlusIcons = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 1) || introPhase === "COMPLETE";
+    const showPremiumIcons = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 2) || introPhase === "COMPLETE";
 
-      const isMosque = el.classList.contains("tier-mosque");
-      const isPartner = el.classList.contains("tier-partner");
-      const isPartnerPlus = el.classList.contains("tier-partner_plus");
-      const isPremium = el.classList.contains("tier-premium");
+    // Helper to show connector lines for a tier with delay
+    const showConnectorLinesForTier = (tierClass: string, delay: number) => {
+      // Don't re-trigger if already shown
+      if (shownConnectorTiersRef.current.has(tierClass)) return;
+      shownConnectorTiersRef.current.add(tierClass);
 
-      let shouldShow = false;
-      if (isMosque) shouldShow = showMosques;
-      else if (isPartner) shouldShow = showPartner;
-      else if (isPartnerPlus) shouldShow = showPartnerPlus;
-      else if (isPremium) shouldShow = showPremium;
+      setTimeout(() => {
+        connectorLinesRef.current.forEach(line => {
+          const el = line.getElement();
+          if (!el) return;
+          if (el.classList.contains(tierClass)) {
+            line.setStyle({ opacity: 0.6 });
+          }
+        });
+      }, delay);
+    };
 
-      line.setStyle({ opacity: shouldShow ? 0.6 : 0 });
-    });
+    // Hide all connector lines initially if we're before their phase
+    if (introPhase === "IDLE" || introPhase === "PRELOAD" || introPhase === "BEAMS_SWIRL" || introPhase === "BEAMS_LAND" || introPhase === "STREETS_GLOW") {
+      shownConnectorTiersRef.current.clear();
+      connectorLinesRef.current.forEach(line => {
+        line.setStyle({ opacity: 0 });
+      });
+      return;
+    }
+
+    // If COMPLETE, show all immediately (skip was pressed or animation finished)
+    if (introPhase === "COMPLETE") {
+      connectorLinesRef.current.forEach(line => {
+        line.setStyle({ opacity: 0.6 });
+      });
+      return;
+    }
+
+    // Show connector lines AFTER icons have animated
+    if (showMosqueIcons) {
+      showConnectorLinesForTier("tier-mosque", 1000); // 1s after mosque icons start animating
+    }
+    if (showPartnerIcons) {
+      showConnectorLinesForTier("tier-partner", 500); // 0.5s after partner icons appear
+    }
+    if (showPartnerPlusIcons) {
+      showConnectorLinesForTier("tier-partner_plus", 800); // 0.8s after partner_plus icons appear
+    }
+    if (showPremiumIcons) {
+      showConnectorLinesForTier("tier-premium", 1200); // 1.2s after premium icons appear
+    }
   }, [introPhase, sponsorSubPhase]);
 
   // Track which tiers have been activated (to prevent re-animating)

@@ -9,8 +9,8 @@ export type ActivityType =
   | "shopping"
   | "other";
 
-// Language options
-export type ActivityLanguage = "nl" | "ar" | "tr" | "en" | "fr" | "other";
+// Language options (ordered by most common)
+export type ActivityLanguage = "nl" | "fr" | "en" | "tr" | "ar" | "other";
 
 // Recurrence pattern types
 export type RecurrencePattern = "daily" | "weekly" | "weekdays" | "weekends";
@@ -95,13 +95,13 @@ export const activityTypeLabels: Record<ActivityType, string> = {
   other: "Overig",
 };
 
-// Labels for languages (Dutch)
+// Labels for languages (Dutch) - ordered by most common
 export const languageLabels: Record<ActivityLanguage, string> = {
   nl: "Nederlands",
-  ar: "Arabisch",
-  tr: "Turks",
-  en: "Engels",
   fr: "Frans",
+  en: "Engels",
+  tr: "Turks",
+  ar: "Arabisch",
   other: "Andere",
 };
 

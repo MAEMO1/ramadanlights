@@ -127,10 +127,19 @@ export function MapIntroSequence({
     // Map center is [51.055, 3.715] at zoom 14
     // Wondelgemstraat midpoint: ~[51.0625, 3.710] - north and west of center
     // Bevrijdingslaan midpoint: ~[51.0606, 3.7015] - north and more west of center
-    const targets = [
-      { x: dimensions.width * 0.47, y: dimensions.height * 0.37 }, // Wondelgemstraat (upper-left area)
-      { x: dimensions.width * 0.42, y: dimensions.height * 0.40 }, // Bevrijdingslaan (more to the left)
-    ];
+    //
+    // On mobile (portrait), the aspect ratio is different:
+    // - Viewport is taller relative to width
+    // - Streets appear more centered horizontally but higher vertically
+    const targets = isMobile
+      ? [
+          { x: dimensions.width * 0.42, y: dimensions.height * 0.42 }, // Wondelgemstraat - more centered on mobile
+          { x: dimensions.width * 0.35, y: dimensions.height * 0.45 }, // Bevrijdingslaan - left of center
+        ]
+      : [
+          { x: dimensions.width * 0.47, y: dimensions.height * 0.37 }, // Wondelgemstraat (upper-left area)
+          { x: dimensions.width * 0.42, y: dimensions.height * 0.40 }, // Bevrijdingslaan (more to the left)
+        ];
 
     // Fade out central glow
     gsap.to(centralGlowRef.current, {
@@ -154,7 +163,7 @@ export function MapIntroSequence({
         },
       });
     });
-  }, [phase, dimensions]);
+  }, [phase, dimensions, isMobile]);
 
   // Main animation loop
   useEffect(() => {
@@ -268,10 +277,16 @@ export function MapIntroSequence({
 
         if (flashAlpha > 0.01) {
           // Flash at target locations (matching particle landing spots on actual streets)
-          const flashPoints = [
-            { x: dimensions.width * 0.47, y: dimensions.height * 0.37 }, // Wondelgemstraat
-            { x: dimensions.width * 0.42, y: dimensions.height * 0.40 }, // Bevrijdingslaan
-          ];
+          // Use same mobile/desktop distinction as BEAMS_LAND targets
+          const flashPoints = isMobile
+            ? [
+                { x: dimensions.width * 0.42, y: dimensions.height * 0.42 }, // Wondelgemstraat
+                { x: dimensions.width * 0.35, y: dimensions.height * 0.45 }, // Bevrijdingslaan
+              ]
+            : [
+                { x: dimensions.width * 0.47, y: dimensions.height * 0.37 }, // Wondelgemstraat
+                { x: dimensions.width * 0.42, y: dimensions.height * 0.40 }, // Bevrijdingslaan
+              ];
 
           flashPoints.forEach((point) => {
             const gradient = ctx.createRadialGradient(
@@ -300,7 +315,7 @@ export function MapIntroSequence({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, phase, phaseProgress, dimensions]);
+  }, [isPlaying, phase, phaseProgress, dimensions, isMobile]);
 
   // Cleanup GSAP on unmount
   useEffect(() => {

@@ -128,7 +128,7 @@ export const activityFormSchema = z.object({
 
   // Language
   language: z
-    .enum(["nl", "ar", "tr", "en", "fr", "other"])
+    .enum(["nl", "fr", "en", "tr", "ar", "other"])
     .optional()
     .nullable(),
 });
