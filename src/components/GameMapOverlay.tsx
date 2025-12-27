@@ -81,49 +81,321 @@ function offsetMarkerPosition(lat: number, lng: number, index: number): { positi
   return { position: [offsetLat, offsetLng], original, wasOffset: true };
 }
 
-// Professional 2D SVG icons for each category
+// Game-style 2D SVG icons - Night blue + warm gold palette with thick outlines
+// Each icon has: thick strokes, highlight top-left, shadow bottom-right, readable at 24px
 const categoryIcons: Record<string, string> = {
-  // Food categories - Professional restaurant/food icons
-  restaurant: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>`,
-  bakery: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.5 2 5 4 5 8c0 2.5 1.5 4 3 5v9h8v-9c1.5-1 3-2.5 3-5 0-4-3.5-6-7-6zm-1 16h2v-2h-2v2zm0-4h2v-2h-2v2z"/><path d="M12 4c2.5 0 4.5 1.5 4.5 4 0 1.5-1 2.5-2 3.5-.5.5-1 1-1 1.5h-3c0-.5-.5-1-1-1.5-1-1-2-2-2-3.5 0-2.5 2-4 4.5-4z" opacity="0.3"/></svg>`,
-  butcher: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.06 3.64c-1.17-1.17-3.07-1.17-4.24 0l-2.12 2.12 4.24 4.24 2.12-2.12c1.17-1.17 1.17-3.07 0-4.24zM7.59 7.59L2 22l14.41-5.59L7.59 7.59zm5.65 5.65l-2.83 2.83 4.24 4.24 2.83-2.83-4.24-4.24z"/></svg>`,
-  supermarket: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>`,
-  catering: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg>`,
-  cafe: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z"/></svg>`,
+  // Food categories - Game-style restaurant/food icons
+  restaurant: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="rest-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFE4A0"/>
+        <stop offset="100%" stop-color="#FFD700"/>
+      </linearGradient>
+    </defs>
+    <path d="M22 10v20c0 3.5 2.5 6.5 6 7.5V54h8V37.5c3.5-1 6-4 6-7.5V10h-4v18c0 2-1 3-2 3h-8c-1 0-2-1-2-3V10h-4z" fill="url(#rest-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <circle cx="47" cy="15" r="8" fill="url(#rest-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <path d="M47 23v31" stroke="#1a1a2e" stroke-width="6" stroke-linecap="round"/>
+    <path d="M47 23v31" stroke="url(#rest-grad)" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="22" cy="10" r="2" fill="#FFF5D4"/>
+  </svg>`,
 
-  // Shop categories - Professional retail icons
-  decor: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L8 6v2H6v2h2v10h8V10h2V8h-2V6l-4-4zm0 2.83L14 7v1h-4V7l2-2.17zM10 12h4v6h-4v-6z"/><path d="M11 14h2v3h-2z" opacity="0.5"/></svg>`,
-  clothing: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.6 18.2L13 11.75v-.91c1.65-.49 2.8-2.17 2.43-4.05-.26-1.31-1.3-2.4-2.61-2.7C10.54 3.57 8.5 5.3 8.5 7.5h2c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5c0 .84-.69 1.52-1.53 1.5-.54-.01-.97.45-.97.99v1.76L2.4 18.2c-.77.58-.36 1.8.6 1.8h18c.96 0 1.37-1.22.6-1.8zM6 18l6-4.5 6 4.5H6z"/></svg>`,
-  spiritual: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1.06 13.54L7.4 12l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41-5.64 5.66z"/></svg>`,
-  gifts: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>`,
-  beauty: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 4-8 8-8 12 0 4.42 3.58 8 8 8s8-3.58 8-8c0-4-2.67-8-8-12zm0 18c-3.31 0-6-2.69-6-6 0-2.97 1.8-5.94 4.5-9.33.4-.5 1.2-.5 1.6 0C14.2 8.06 16 11.03 16 14c0 3.31-2.69 6-6 6z"/></svg>`,
-  kids: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z"/></svg>`,
-  tech: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>`,
-  other: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>`,
+  bakery: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="bake-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFE4A0"/>
+        <stop offset="100%" stop-color="#D4A574"/>
+      </linearGradient>
+    </defs>
+    <ellipse cx="32" cy="40" rx="20" ry="12" fill="url(#bake-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <path d="M16 35c0-8 7-15 16-15s16 7 16 15" fill="url(#bake-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <path d="M22 32c0-4 4-8 10-8s10 4 10 8" fill="#8B6914" opacity="0.3"/>
+    <ellipse cx="32" cy="16" rx="4" ry="3" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <path d="M28 16c2-4 6-4 8 0" stroke="#1a1a2e" stroke-width="2" fill="none"/>
+    <circle cx="18" cy="30" r="1.5" fill="#FFF5D4"/>
+  </svg>`,
 
-  // Mosque icon - Clear dome and minaret silhouette
-  mosque: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 .8.2 1.5.5 2.1V10H6v10h12V10h-2V8.6c.3-.6.5-1.3.5-2.1C16.5 4 14.5 2 12 2zm0 2c1.9 0 3.5 1.6 3.5 3.5 0 1.1-.5 2-1.2 2.7-.4.4-.8.6-.8.8v1h-3v-1c0-.2-.4-.4-.8-.8-.7-.7-1.2-1.6-1.2-2.7C8.5 5.6 10.1 4 12 4z"/><path d="M10 12h4v6h-4z" opacity="0.3"/><rect x="3" y="6" width="2" height="14" rx="1"/><path d="M4 3l1.5 3H2.5L4 3z"/></svg>`,
+  butcher: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="meat-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FF8A8A"/>
+        <stop offset="100%" stop-color="#C44"/>
+      </linearGradient>
+    </defs>
+    <ellipse cx="36" cy="34" rx="18" ry="14" fill="url(#meat-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <ellipse cx="36" cy="34" rx="10" ry="7" fill="#FFB4B4" opacity="0.5"/>
+    <path d="M12 12L22 28" stroke="#1a1a2e" stroke-width="6" stroke-linecap="round"/>
+    <path d="M12 12L22 28" stroke="#8B7355" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="12" cy="12" r="4" fill="#1a1a2e"/>
+    <circle cx="20" cy="30" r="1.5" fill="#FFF5D4"/>
+  </svg>`,
+
+  supermarket: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="cart-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#5EEAD4"/>
+        <stop offset="100%" stop-color="#14B8A6"/>
+      </linearGradient>
+    </defs>
+    <path d="M10 12h6l8 28h24l6-20H20" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10 12h6l8 28h24l6-20H20" fill="none" stroke="url(#cart-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="24" cy="50" r="5" fill="url(#cart-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <circle cx="44" cy="50" r="5" fill="url(#cart-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <rect x="26" y="24" width="14" height="10" rx="2" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="16" cy="14" r="1.5" fill="#A7F3D0"/>
+  </svg>`,
+
+  catering: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="cater-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFE4A0"/>
+        <stop offset="100%" stop-color="#FFD700"/>
+      </linearGradient>
+    </defs>
+    <ellipse cx="32" cy="44" rx="22" ry="8" fill="#1a1a2e"/>
+    <ellipse cx="32" cy="42" rx="22" ry="8" fill="url(#cater-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <path d="M12 42c0-12 9-24 20-24s20 12 20 24" fill="url(#cater-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <ellipse cx="32" cy="14" rx="3" ry="4" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <path d="M32 10v-4" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="16" cy="32" r="1.5" fill="#FFF5D4"/>
+  </svg>`,
+
+  cafe: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="cafe-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#A78BFA"/>
+        <stop offset="100%" stop-color="#8B5CF6"/>
+      </linearGradient>
+      <linearGradient id="coffee-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#8B6914"/>
+        <stop offset="100%" stop-color="#5C4A1A"/>
+      </linearGradient>
+    </defs>
+    <rect x="12" y="22" width="30" height="28" rx="4" fill="url(#cafe-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <path d="M42 28h8c4 0 6 4 6 8s-2 8-6 8h-8" stroke="#1a1a2e" stroke-width="3" fill="url(#cafe-grad)"/>
+    <ellipse cx="27" cy="26" rx="12" ry="3" fill="url(#coffee-grad)" stroke="#1a1a2e" stroke-width="2"/>
+    <path d="M20 14c2-4 4-4 6 0M28 12c2-4 4-4 6 0" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
+    <rect x="8" y="50" width="38" height="4" rx="2" fill="#1a1a2e"/>
+    <circle cx="16" cy="26" r="1.5" fill="#C4B5FD"/>
+  </svg>`,
+
+  // Shop categories - Game-style retail icons
+  decor: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="decor-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFE4A0"/>
+        <stop offset="100%" stop-color="#FFD700"/>
+      </linearGradient>
+    </defs>
+    <path d="M32 6l-16 20v28h32V26L32 6z" fill="url(#decor-grad)" stroke="#1a1a2e" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="26" y="38" width="12" height="16" fill="#1a1a2e"/>
+    <circle cx="32" cy="20" r="6" fill="#1a1a2e"/>
+    <path d="M28 20l4 4 4-4M32 28v-4" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+    <rect x="20" y="28" width="6" height="8" rx="1" fill="#A78BFA" stroke="#1a1a2e" stroke-width="2"/>
+    <rect x="38" y="28" width="6" height="8" rx="1" fill="#5EEAD4" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="20" cy="16" r="1.5" fill="#FFF5D4"/>
+  </svg>`,
+
+  clothing: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="cloth-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#A78BFA"/>
+        <stop offset="100%" stop-color="#8B5CF6"/>
+      </linearGradient>
+    </defs>
+    <path d="M24 8l-14 12 6 6 4-4v32h24V22l4 4 6-6L40 8c-2 4-6 6-8 6s-6-2-8-6z" fill="url(#cloth-grad)" stroke="#1a1a2e" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M28 8c2 3 5 4 4 4s2-1 4-4" stroke="#1a1a2e" stroke-width="2"/>
+    <ellipse cx="32" cy="8" rx="8" ry="3" fill="#E9D5FF" stroke="#1a1a2e" stroke-width="2"/>
+    <rect x="28" y="30" width="8" height="18" rx="1" fill="#FFD700" opacity="0.5"/>
+    <circle cx="14" cy="16" r="1.5" fill="#C4B5FD"/>
+  </svg>`,
+
+  spiritual: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="spirit-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#5EEAD4"/>
+        <stop offset="100%" stop-color="#14B8A6"/>
+      </linearGradient>
+    </defs>
+    <path d="M32 6L10 18v22c0 10 10 16 22 16s22-6 22-16V18L32 6z" fill="url(#spirit-grad)" stroke="#1a1a2e" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M24 32l6 6 12-12" stroke="#FFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="32" cy="18" r="3" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="16" cy="22" r="1.5" fill="#A7F3D0"/>
+  </svg>`,
+
+  gifts: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="gift-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FF8A8A"/>
+        <stop offset="100%" stop-color="#EF4444"/>
+      </linearGradient>
+    </defs>
+    <rect x="10" y="26" width="44" height="30" rx="4" fill="url(#gift-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <rect x="10" y="18" width="44" height="12" rx="3" fill="#FFD700" stroke="#1a1a2e" stroke-width="3"/>
+    <rect x="28" y="18" width="8" height="38" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <path d="M22 18c0-8 5-12 10-8M42 18c0-8-5-12-10-8" stroke="#FFD700" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="32" cy="10" rx="4" ry="3" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="14" cy="22" r="1.5" fill="#FEF3C7"/>
+  </svg>`,
+
+  beauty: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="beauty-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#F9A8D4"/>
+        <stop offset="100%" stop-color="#EC4899"/>
+      </linearGradient>
+    </defs>
+    <ellipse cx="32" cy="40" rx="16" ry="18" fill="url(#beauty-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <ellipse cx="32" cy="36" rx="10" ry="10" fill="#FDF2F8" opacity="0.4"/>
+    <rect x="26" y="8" width="12" height="16" rx="6" fill="url(#beauty-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <circle cx="32" cy="14" r="3" fill="#FFD700"/>
+    <path d="M28 24h8" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="20" cy="32" r="1.5" fill="#FBCFE8"/>
+  </svg>`,
+
+  kids: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="kids-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FCD34D"/>
+        <stop offset="100%" stop-color="#F59E0B"/>
+      </linearGradient>
+    </defs>
+    <circle cx="32" cy="18" r="12" fill="url(#kids-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <circle cx="28" cy="16" r="2" fill="#1a1a2e"/>
+    <circle cx="36" cy="16" r="2" fill="#1a1a2e"/>
+    <path d="M28 22c2 2 6 2 8 0" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round"/>
+    <rect x="22" y="30" width="20" height="24" rx="4" fill="#A78BFA" stroke="#1a1a2e" stroke-width="3"/>
+    <rect x="14" y="34" width="8" height="12" rx="2" fill="#5EEAD4" stroke="#1a1a2e" stroke-width="2"/>
+    <rect x="42" y="34" width="8" height="12" rx="2" fill="#5EEAD4" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="24" cy="12" r="1.5" fill="#FEF3C7"/>
+  </svg>`,
+
+  tech: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="tech-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#60A5FA"/>
+        <stop offset="100%" stop-color="#3B82F6"/>
+      </linearGradient>
+    </defs>
+    <rect x="16" y="8" width="32" height="48" rx="4" fill="#1a1a2e" stroke="#1a1a2e" stroke-width="3"/>
+    <rect x="20" y="14" width="24" height="34" rx="2" fill="url(#tech-grad)"/>
+    <circle cx="32" cy="54" r="3" fill="#374151"/>
+    <rect x="24" y="18" width="16" height="8" rx="1" fill="#1a1a2e" opacity="0.3"/>
+    <circle cx="36" cy="30" r="4" fill="#FFD700"/>
+    <circle cx="22" cy="16" r="1.5" fill="#93C5FD"/>
+  </svg>`,
+
+  other: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="other-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#9CA3AF"/>
+        <stop offset="100%" stop-color="#6B7280"/>
+      </linearGradient>
+    </defs>
+    <rect x="8" y="24" width="48" height="28" rx="4" fill="url(#other-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <rect x="8" y="16" width="48" height="12" rx="3" fill="#374151" stroke="#1a1a2e" stroke-width="3"/>
+    <rect x="16" y="32" width="12" height="12" rx="2" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <rect x="36" y="32" width="12" height="12" rx="2" fill="#5EEAD4" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="14" cy="20" r="1.5" fill="#D1D5DB"/>
+  </svg>`,
+
+  // Mosque icon - Iconic dome and minaret with gold crescent
+  mosque: `<svg viewBox="0 0 64 64" fill="none">
+    <defs>
+      <linearGradient id="mosque-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#34D399"/>
+        <stop offset="100%" stop-color="#10B981"/>
+      </linearGradient>
+      <linearGradient id="mosque-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#065F46"/>
+        <stop offset="100%" stop-color="#064E3B"/>
+      </linearGradient>
+    </defs>
+    <rect x="12" y="36" width="40" height="20" fill="url(#mosque-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <path d="M12 36c0-14 10-22 20-22s20 8 20 22" fill="url(#mosque-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <rect x="6" y="20" width="6" height="36" fill="url(#mosque-dark)" stroke="#1a1a2e" stroke-width="2"/>
+    <rect x="52" y="20" width="6" height="36" fill="url(#mosque-dark)" stroke="#1a1a2e" stroke-width="2"/>
+    <path d="M9 20l-3-8 6 0z" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <path d="M55 20l-3-8 6 0z" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="32" cy="18" r="5" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
+    <path d="M34 18a3 3 0 1 1-4-3" fill="none" stroke="#1a1a2e" stroke-width="1.5"/>
+    <rect x="26" y="40" width="12" height="16" rx="6 6 0 0" fill="url(#mosque-dark)" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="16" cy="30" r="1.5" fill="#A7F3D0"/>
+  </svg>`,
 };
 
-// Size configurations based on tier
+// Size configurations based on tier - slightly larger for new detailed icons
 const tierSizes: Record<PartnerTier | "mosque", { size: number; zIndex: number; pulse: boolean }> = {
-  premium: { size: 56, zIndex: 1000, pulse: true },
-  partner_plus: { size: 44, zIndex: 500, pulse: false },
-  partner: { size: 34, zIndex: 100, pulse: false },
-  free: { size: 26, zIndex: 50, pulse: false },
-  mosque: { size: 48, zIndex: 800, pulse: true },
+  premium: { size: 60, zIndex: 1000, pulse: true },
+  partner_plus: { size: 48, zIndex: 500, pulse: false },
+  partner: { size: 38, zIndex: 100, pulse: false },
+  free: { size: 30, zIndex: 50, pulse: false },
+  mosque: { size: 52, zIndex: 800, pulse: true },
 };
 
-// Color configurations
-const tierColors: Record<PartnerTier | "mosque", { bg: string; border: string; glow: string; icon: string }> = {
-  premium: { bg: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)", border: "#FFD700", glow: "rgba(255, 215, 0, 0.5)", icon: "#FFD700" },
-  partner_plus: { bg: "linear-gradient(135deg, #0f2d2d 0%, #1a4a4a 100%)", border: "#14B8A6", glow: "rgba(20, 184, 166, 0.4)", icon: "#5EEAD4" },
-  partner: { bg: "linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)", border: "#8B5CF6", glow: "rgba(139, 92, 246, 0.3)", icon: "#A78BFA" },
-  free: { bg: "linear-gradient(135deg, #1f2937 0%, #374151 100%)", border: "#6B7280", glow: "rgba(107, 114, 128, 0.2)", icon: "#9CA3AF" },
-  mosque: { bg: "linear-gradient(135deg, #064e3b 0%, #065f46 100%)", border: "#10B981", glow: "rgba(16, 185, 129, 0.5)", icon: "#34D399" },
+// Color configurations - Night blue + warm gold palette with enhanced glows
+const tierColors: Record<PartnerTier | "mosque", {
+  bg: string;
+  bgHover: string;
+  border: string;
+  borderHover: string;
+  glow: string;
+  glowHover: string;
+  icon: string;
+  shadow: string;
+}> = {
+  premium: {
+    bg: "linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%)",
+    bgHover: "linear-gradient(145deg, #252540 0%, #1a1a2e 100%)",
+    border: "#FFD700",
+    borderHover: "#FFE55C",
+    glow: "rgba(255, 215, 0, 0.6)",
+    glowHover: "rgba(255, 215, 0, 0.9)",
+    icon: "#FFD700",
+    shadow: "0 6px 20px rgba(0,0,0,0.5), 0 0 30px rgba(255, 215, 0, 0.3)"
+  },
+  partner_plus: {
+    bg: "linear-gradient(145deg, #0f2d2d 0%, #0a1f1f 100%)",
+    bgHover: "linear-gradient(145deg, #1a4a4a 0%, #0f2d2d 100%)",
+    border: "#14B8A6",
+    borderHover: "#2DD4BF",
+    glow: "rgba(20, 184, 166, 0.5)",
+    glowHover: "rgba(20, 184, 166, 0.8)",
+    icon: "#5EEAD4",
+    shadow: "0 5px 16px rgba(0,0,0,0.4), 0 0 20px rgba(20, 184, 166, 0.25)"
+  },
+  partner: {
+    bg: "linear-gradient(145deg, #1e1b4b 0%, #151234 100%)",
+    bgHover: "linear-gradient(145deg, #312e81 0%, #1e1b4b 100%)",
+    border: "#8B5CF6",
+    borderHover: "#A78BFA",
+    glow: "rgba(139, 92, 246, 0.4)",
+    glowHover: "rgba(139, 92, 246, 0.7)",
+    icon: "#A78BFA",
+    shadow: "0 4px 14px rgba(0,0,0,0.35), 0 0 15px rgba(139, 92, 246, 0.2)"
+  },
+  free: {
+    bg: "linear-gradient(145deg, #1f2937 0%, #111827 100%)",
+    bgHover: "linear-gradient(145deg, #374151 0%, #1f2937 100%)",
+    border: "#6B7280",
+    borderHover: "#9CA3AF",
+    glow: "rgba(107, 114, 128, 0.3)",
+    glowHover: "rgba(107, 114, 128, 0.5)",
+    icon: "#9CA3AF",
+    shadow: "0 3px 10px rgba(0,0,0,0.3)"
+  },
+  mosque: {
+    bg: "linear-gradient(145deg, #064e3b 0%, #022c22 100%)",
+    bgHover: "linear-gradient(145deg, #065f46 0%, #064e3b 100%)",
+    border: "#10B981",
+    borderHover: "#34D399",
+    glow: "rgba(16, 185, 129, 0.6)",
+    glowHover: "rgba(16, 185, 129, 0.9)",
+    icon: "#34D399",
+    shadow: "0 5px 18px rgba(0,0,0,0.45), 0 0 25px rgba(16, 185, 129, 0.3)"
+  },
 };
 
-// Create professional game-style marker
+// Create professional game-style marker with enhanced container and glow effects
 const createGameMarker = (
   category: string,
   tier: PartnerTier | "mosque"
@@ -132,80 +404,144 @@ const createGameMarker = (
   const colors = tierColors[tier];
   const iconSvg = categoryIcons[category] || categoryIcons.other;
   const size = config.size;
-  const iconSize = Math.round(size * 0.5);
+  const iconSize = Math.round(size * 0.6); // Larger icon ratio for new detailed icons
+  const borderWidth = tier === "premium" || tier === "mosque" ? 4 : 3;
 
+  // Enhanced pulse animation with glow
   const pulseKeyframes = config.pulse ? `
-    @keyframes marker-pulse-${tier} {
+    @keyframes marker-pulse-${tier}-${category.replace(/[^a-z]/gi, '')} {
       0%, 100% {
-        box-shadow: 0 0 0 0 ${colors.glow}, 0 4px 12px ${colors.glow};
-        transform: scale(1);
+        box-shadow: ${colors.shadow}, 0 0 0 0 ${colors.glow};
       }
       50% {
-        box-shadow: 0 0 0 6px transparent, 0 6px 20px ${colors.glow};
-        transform: scale(1.05);
+        box-shadow: ${colors.shadow}, 0 0 0 8px transparent;
       }
     }
   ` : "";
 
+  // Outer glow ring for premium/mosque tiers
+  const glowRing = (tier === "premium" || tier === "mosque") ? `
+    <div class="marker-glow-ring" style="
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: radial-gradient(circle, ${colors.glow} 0%, transparent 70%);
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: -1;
+    "></div>
+  ` : "";
+
+  // Inner highlight for 3D effect
+  const innerHighlight = `
+    <div style="
+      position: absolute;
+      top: 2px;
+      left: 15%;
+      width: 40%;
+      height: 30%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 100%);
+      border-radius: 50% 50% 40% 40%;
+      pointer-events: none;
+    "></div>
+  `;
+
   const html = `
     <style>${pulseKeyframes}</style>
-    <div class="game-marker-icon tier-${tier}" style="
+    <div class="game-marker-icon tier-${tier}" data-category="${category}" style="
       width: ${size}px;
       height: ${size}px;
       position: relative;
       cursor: pointer;
     ">
-      <div style="
+      ${glowRing}
+      <div class="marker-inner" style="
         width: 100%;
         height: 100%;
         background: ${colors.bg};
-        border: 3px solid ${colors.border};
+        border: ${borderWidth}px solid ${colors.border};
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        ${config.pulse ? `animation: marker-pulse-${tier} 2s ease-in-out infinite;` : `box-shadow: 0 4px 12px ${colors.glow};`}
-        transition: transform 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        ${config.pulse ? `animation: marker-pulse-${tier}-${category.replace(/[^a-z]/gi, '')} 2.5s ease-in-out infinite;` : `box-shadow: ${colors.shadow};`}
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       ">
-        <div style="width: ${iconSize}px; height: ${iconSize}px; color: ${colors.icon};">
+        ${innerHighlight}
+        <div class="marker-icon-wrapper" style="
+          width: ${iconSize}px;
+          height: ${iconSize}px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          z-index: 1;
+        ">
           ${iconSvg}
         </div>
       </div>
       ${tier === "premium" ? `
-        <div style="
+        <div class="marker-badge premium-badge" style="
           position: absolute;
-          top: -6px;
-          right: -6px;
-          width: 20px;
-          height: 20px;
-          background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+          top: -8px;
+          right: -8px;
+          width: 24px;
+          height: 24px;
+          background: linear-gradient(145deg, #FFE55C 0%, #FFD700 50%, #FFA500 100%);
+          border: 2px solid #1a1a2e;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 8px rgba(255, 215, 0, 0.6);
+          box-shadow: 0 3px 10px rgba(255, 215, 0, 0.7), inset 0 1px 2px rgba(255,255,255,0.4);
+          z-index: 10;
         ">
-          <svg viewBox="0 0 24 24" fill="#1a1a2e" style="width: 12px; height: 12px;">
+          <svg viewBox="0 0 24 24" fill="#1a1a2e" style="width: 14px; height: 14px;">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
           </svg>
         </div>
       ` : ""}
       ${tier === "mosque" ? `
-        <div style="
+        <div class="marker-badge mosque-badge" style="
           position: absolute;
-          top: -4px;
-          right: -4px;
-          width: 16px;
-          height: 16px;
-          background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+          top: -6px;
+          right: -6px;
+          width: 20px;
+          height: 20px;
+          background: linear-gradient(145deg, #34D399 0%, #10B981 50%, #059669 100%);
+          border: 2px solid #064e3b;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 6px rgba(16, 185, 129, 0.6);
+          box-shadow: 0 2px 8px rgba(16, 185, 129, 0.7), inset 0 1px 2px rgba(255,255,255,0.3);
+          z-index: 10;
         ">
-          <svg viewBox="0 0 24 24" fill="white" style="width: 10px; height: 10px;">
-            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+          <svg viewBox="0 0 24 24" fill="#fff" style="width: 12px; height: 12px;">
+            <path d="M17 8c0-3-2-5-5-5S7 5 7 8c0 1.5.5 2.8 1.4 3.8L12 16l3.6-4.2C16.5 10.8 17 9.5 17 8z"/>
+          </svg>
+        </div>
+      ` : ""}
+      ${tier === "partner_plus" ? `
+        <div class="marker-badge plus-badge" style="
+          position: absolute;
+          top: -5px;
+          right: -5px;
+          width: 18px;
+          height: 18px;
+          background: linear-gradient(145deg, #5EEAD4 0%, #14B8A6 100%);
+          border: 2px solid #0f2d2d;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 6px rgba(20, 184, 166, 0.6);
+          z-index: 10;
+        ">
+          <svg viewBox="0 0 24 24" fill="#0f2d2d" style="width: 10px; height: 10px;">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
           </svg>
         </div>
       ` : ""}
@@ -221,7 +557,7 @@ const createGameMarker = (
   });
 };
 
-// Popup content
+// Popup content - Enhanced with game-style design
 const createPopupContent = (
   name: string,
   category: string,
@@ -240,49 +576,82 @@ const createPopupContent = (
   };
   const tierLabel = tierLabels[tier];
 
+  // Use a smaller, simplified icon for the popup
+  const getSimpleIcon = (cat: string) => {
+    const iconMap: Record<string, string> = {
+      restaurant: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>`,
+      bakery: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.5 2 5 4 5 8c0 2.5 1.5 4 3 5v9h8v-9c1.5-1 3-2.5 3-5 0-4-3.5-6-7-6z"/></svg>`,
+      butcher: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.06 3.64c-1.17-1.17-3.07-1.17-4.24 0l-2.12 2.12 4.24 4.24 2.12-2.12c1.17-1.17 1.17-3.07 0-4.24zM7.59 7.59L2 22l14.41-5.59L7.59 7.59z"/></svg>`,
+      supermarket: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>`,
+      mosque: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 .8.2 1.5.5 2.1V10H6v10h12V10h-2V8.6c.3-.6.5-1.3.5-2.1C16.5 4 14.5 2 12 2z"/><rect x="3" y="6" width="2" height="14" rx="1"/></svg>`,
+    };
+    return iconMap[cat] || `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>`;
+  };
+
   return `
     <div style="
-      background: linear-gradient(135deg, #0f2d2d 0%, #1a3a3a 100%);
+      background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
       color: white;
-      padding: 16px;
+      padding: 18px;
       border-radius: 16px;
-      min-width: 220px;
-      max-width: 280px;
+      min-width: 240px;
+      max-width: 300px;
       font-family: system-ui, -apple-system, sans-serif;
       margin: -14px;
-      border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      border: 2px solid ${colors.border};
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px ${colors.glow};
     ">
       ${tierLabel ? `
         <span style="
           display: inline-block;
-          padding: 4px 12px;
-          background: ${tier === "premium" ? "linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)" : tier === "mosque" ? "linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)" : "linear-gradient(135deg, #CCFBF1 0%, #99F6E4 100%)"};
-          color: ${tier === "premium" ? "#92400E" : tier === "mosque" ? "#065F46" : "#0F766E"};
+          padding: 5px 14px;
+          background: ${tier === "premium" ? "linear-gradient(145deg, #FFE55C 0%, #FFD700 50%, #FFA500 100%)" : tier === "mosque" ? "linear-gradient(145deg, #34D399 0%, #10B981 100%)" : tier === "partner_plus" ? "linear-gradient(145deg, #5EEAD4 0%, #14B8A6 100%)" : "linear-gradient(145deg, #A78BFA 0%, #8B5CF6 100%)"};
+          color: ${tier === "premium" ? "#1a1a2e" : tier === "mosque" ? "#022c22" : tier === "partner_plus" ? "#0f2d2d" : "#1e1b4b"};
           border-radius: 100px;
           font-size: 11px;
           font-weight: 700;
-          margin-bottom: 12px;
+          margin-bottom: 14px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
-        ">${tierLabel}</span>
+          box-shadow: 0 2px 8px ${colors.glow};
+        ">${tier === "premium" ? "⭐ " : tier === "mosque" ? "🕌 " : ""}${tierLabel}</span>
       ` : ""}
 
-      <h3 style="margin: 0 0 8px 0; font-size: 17px; font-weight: 700;">${name}</h3>
+      <h3 style="margin: 0 0 10px 0; font-size: 18px; font-weight: 700; line-height: 1.3;">${name}</h3>
 
-      <p style="margin: 0 0 12px 0; font-size: 13px; color: rgba(255,255,255,0.6); display: flex; align-items: center; gap: 6px;">
-        <span style="width: 16px; height: 16px; color: ${colors.icon}; display: inline-flex;">${categoryIcons[category] || categoryIcons.other}</span>
+      <p style="margin: 0 0 14px 0; font-size: 13px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 8px;">
+        <span style="
+          width: 24px;
+          height: 24px;
+          color: ${colors.icon};
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(255,255,255,0.1);
+          border-radius: 6px;
+          padding: 3px;
+        ">${getSimpleIcon(category)}</span>
         ${categoryLabel}
       </p>
 
       ${description ? `
-        <p style="margin: 0 0 12px 0; font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5;">
-          ${description.slice(0, 100)}${description.length > 100 ? "..." : ""}
+        <p style="margin: 0 0 14px 0; font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; border-left: 2px solid ${colors.border}; padding-left: 10px;">
+          ${description.slice(0, 120)}${description.length > 120 ? "..." : ""}
         </p>
       ` : ""}
 
-      <p style="margin: 0; font-size: 12px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 6px;">
-        <svg viewBox="0 0 24 24" fill="currentColor" style="width: 14px; height: 14px;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      <p style="
+        margin: 0;
+        font-size: 12px;
+        color: rgba(255,255,255,0.6);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+      ">
+        <svg viewBox="0 0 24 24" fill="${colors.icon}" style="width: 16px; height: 16px; flex-shrink: 0;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
         ${address}
       </p>
     </div>
@@ -623,6 +992,7 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
     const style = document.createElement("style");
     style.id = "game-map-styles";
     style.textContent = `
+      /* Mushroom pop animations */
       @keyframes mushroomPop {
         0% { transform: scale(0) translateY(20px); opacity: 0; }
         50% { transform: scale(1.3) translateY(-5px); opacity: 1; }
@@ -642,16 +1012,31 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
         80% { transform: scale(1.25) translateY(-2px); opacity: 1; }
         100% { transform: scale(${premiumBonus}) translateY(0); opacity: 1; }
       }
+
+      /* Glow pulse animation for hover */
+      @keyframes glowPulse {
+        0%, 100% { opacity: 0.6; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.1); }
+      }
+
+      /* Badge bounce animation */
+      @keyframes badgeBounce {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+      }
+
       .game-marker-container {
         background: transparent !important;
         border: none !important;
       }
+
       .game-marker-icon {
         transform: scale(${baseScale}) !important;
         transform-origin: center center !important;
-        transition: transform 0.3s ease !important;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease !important;
         animation: mushroomPop 0.6s ease-out forwards;
       }
+
       .game-marker-icon.tier-partner,
       .game-marker-icon.tier-free {
         animation: mushroomPop 0.5s ease-out forwards;
@@ -665,9 +1050,68 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       .game-marker-icon.tier-mosque {
         animation: mushroomPop 0.7s ease-out forwards;
       }
+
+      /* Enhanced hover states with glow effects */
       .game-marker-icon:hover {
-        transform: scale(${baseScale * 1.3}) !important;
+        transform: scale(${baseScale * 1.35}) !important;
+        z-index: 9999 !important;
       }
+
+      .game-marker-icon:hover .marker-inner {
+        border-width: 4px !important;
+      }
+
+      /* Tier-specific hover glows */
+      .game-marker-icon.tier-premium:hover .marker-inner {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 40px rgba(255, 215, 0, 0.7), 0 0 60px rgba(255, 215, 0, 0.4) !important;
+        border-color: #FFE55C !important;
+      }
+      .game-marker-icon.tier-premium:hover .marker-glow-ring {
+        animation: glowPulse 1s ease-in-out infinite;
+        opacity: 1 !important;
+      }
+      .game-marker-icon.tier-premium:hover .marker-badge {
+        animation: badgeBounce 0.5s ease-in-out;
+      }
+
+      .game-marker-icon.tier-mosque:hover .marker-inner {
+        box-shadow: 0 8px 28px rgba(0,0,0,0.5), 0 0 35px rgba(16, 185, 129, 0.7), 0 0 55px rgba(16, 185, 129, 0.4) !important;
+        border-color: #34D399 !important;
+      }
+      .game-marker-icon.tier-mosque:hover .marker-glow-ring {
+        animation: glowPulse 1s ease-in-out infinite;
+        opacity: 1 !important;
+      }
+      .game-marker-icon.tier-mosque:hover .marker-badge {
+        animation: badgeBounce 0.5s ease-in-out;
+      }
+
+      .game-marker-icon.tier-partner_plus:hover .marker-inner {
+        box-shadow: 0 6px 24px rgba(0,0,0,0.45), 0 0 30px rgba(20, 184, 166, 0.6), 0 0 45px rgba(20, 184, 166, 0.3) !important;
+        border-color: #2DD4BF !important;
+      }
+      .game-marker-icon.tier-partner_plus:hover .marker-badge {
+        animation: badgeBounce 0.5s ease-in-out;
+      }
+
+      .game-marker-icon.tier-partner:hover .marker-inner {
+        box-shadow: 0 5px 20px rgba(0,0,0,0.4), 0 0 25px rgba(139, 92, 246, 0.5), 0 0 35px rgba(139, 92, 246, 0.25) !important;
+        border-color: #A78BFA !important;
+      }
+
+      .game-marker-icon.tier-free:hover .marker-inner {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.35), 0 0 15px rgba(107, 114, 128, 0.4) !important;
+        border-color: #9CA3AF !important;
+      }
+
+      /* Active/selected state (when popup is open) */
+      .leaflet-marker-icon:has(.game-popup-active) .game-marker-icon,
+      .leaflet-popup-open .game-marker-icon {
+        transform: scale(${baseScale * 1.4}) !important;
+        filter: brightness(1.1);
+      }
+
+      /* Popup styles */
       .leaflet-popup-content-wrapper {
         background: transparent !important;
         box-shadow: none !important;
@@ -682,20 +1126,37 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       }
       .leaflet-popup-close-button {
         color: white !important;
-        font-size: 20px !important;
-        top: 10px !important;
-        right: 10px !important;
+        font-size: 22px !important;
+        top: 12px !important;
+        right: 12px !important;
         opacity: 0.7;
+        width: 28px !important;
+        height: 28px !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.3) !important;
+        border-radius: 50% !important;
+        transition: all 0.2s ease;
       }
       .leaflet-popup-close-button:hover {
         opacity: 1;
+        background: rgba(0,0,0,0.5) !important;
+        transform: scale(1.1);
       }
+
+      /* Connector dots */
       .connector-dot {
         background: transparent !important;
         border: none !important;
         transform: scale(${baseScale}) !important;
         transition: transform 0.3s ease !important;
         animation: mushroomPop 0.4s ease-out forwards;
+      }
+
+      /* Icon inner glow on hover */
+      .game-marker-icon:hover .marker-icon-wrapper svg {
+        filter: drop-shadow(0 0 4px currentColor);
       }
     `;
 
