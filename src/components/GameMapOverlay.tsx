@@ -808,28 +808,37 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
 
       // Update marker visibility based on filters
       requestAnimationFrame(() => {
-        // Mosques
+        // Mosques - markers, dots, and connector lines
         document.querySelectorAll('.game-marker-icon.tier-mosque').forEach(el => {
           (el as HTMLElement).style.display = newFilters.mosques ? '' : 'none';
         });
         document.querySelectorAll('.connector-dot.tier-mosque').forEach(el => {
           (el as HTMLElement).style.display = newFilters.mosques ? '' : 'none';
         });
+        document.querySelectorAll('.connector-line.category-mosque').forEach(el => {
+          (el as SVGElement).style.display = newFilters.mosques ? '' : 'none';
+        });
 
-        // Food partners (all tiers with food categories)
+        // Food partners - markers, dots, and connector lines
         document.querySelectorAll('.game-marker-icon.category-food').forEach(el => {
           (el as HTMLElement).style.display = newFilters.food ? '' : 'none';
         });
         document.querySelectorAll('.connector-dot.category-food').forEach(el => {
           (el as HTMLElement).style.display = newFilters.food ? '' : 'none';
         });
+        document.querySelectorAll('.connector-line.category-food').forEach(el => {
+          (el as SVGElement).style.display = newFilters.food ? '' : 'none';
+        });
 
-        // Shop partners
+        // Shop partners - markers, dots, and connector lines
         document.querySelectorAll('.game-marker-icon.category-shop').forEach(el => {
           (el as HTMLElement).style.display = newFilters.shops ? '' : 'none';
         });
         document.querySelectorAll('.connector-dot.category-shop').forEach(el => {
           (el as HTMLElement).style.display = newFilters.shops ? '' : 'none';
+        });
+        document.querySelectorAll('.connector-line.category-shop').forEach(el => {
+          (el as SVGElement).style.display = newFilters.shops ? '' : 'none';
         });
       });
 
