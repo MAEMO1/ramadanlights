@@ -120,7 +120,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER PLUS TIER (€500) - Uitgelicht badge, delivery links
   {
@@ -163,7 +162,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER TIER (€300) - Basic paid features
   {
@@ -206,7 +204,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // ANOTHER PARTNER TIER (€300) - Indiaas/Pakistaans
   {
@@ -249,7 +246,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // MORE PARTNER TIER (€300) - Café
   {
@@ -292,7 +288,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // MORE PARTNER TIER (€300) - Grillroom
   {
@@ -335,7 +330,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // MORE PARTNER TIER (€300) - Shawarma
   {
@@ -378,7 +372,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // FREE TIER - Basic listing only
   {
@@ -421,7 +414,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // ANOTHER FREE TIER
   {
@@ -464,7 +456,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER PLUS TIER - Pizza & Burgers
   {
@@ -507,7 +498,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER TIER - Italian/Mediterranean
   {
@@ -550,7 +540,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER TIER - Asian
   {
@@ -593,7 +582,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER TIER - Catering
   {
@@ -636,7 +624,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // FREE TIER - Another Bakery
   {
@@ -679,7 +666,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // FREE TIER - Fish Restaurant
   {
@@ -722,7 +708,6 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
 ];
 
@@ -760,7 +745,6 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER PLUS - Kleding
   {
@@ -794,7 +778,6 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER - Spiritueel
   {
@@ -828,7 +811,6 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER - Geschenken
   {
@@ -862,7 +844,6 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // PARTNER - Beauty
   {
@@ -896,7 +877,6 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // FREE - Kids
   {
@@ -930,7 +910,6 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
   // FREE - Tech
   {
@@ -964,7 +943,6 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
-    language: null,
   },
 ];
 
