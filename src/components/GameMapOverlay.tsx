@@ -85,6 +85,7 @@ function offsetMarkerPosition(lat: number, lng: number, index: number): { positi
 // Each icon has: thick strokes, highlight top-left, shadow bottom-right, readable at 24px
 const categoryIcons: Record<string, string> = {
   // Food categories - Game-style restaurant/food icons
+  // Restaurant: Classic plate with fork and knife - universally recognizable
   restaurant: `<svg viewBox="0 0 64 64" fill="none">
     <defs>
       <linearGradient id="rest-grad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -92,41 +93,64 @@ const categoryIcons: Record<string, string> = {
         <stop offset="100%" stop-color="#FFD700"/>
       </linearGradient>
     </defs>
-    <path d="M22 10v20c0 3.5 2.5 6.5 6 7.5V54h8V37.5c3.5-1 6-4 6-7.5V10h-4v18c0 2-1 3-2 3h-8c-1 0-2-1-2-3V10h-4z" fill="url(#rest-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <circle cx="47" cy="15" r="8" fill="url(#rest-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <path d="M47 23v31" stroke="#1a1a2e" stroke-width="6" stroke-linecap="round"/>
-    <path d="M47 23v31" stroke="url(#rest-grad)" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="22" cy="10" r="2" fill="#FFF5D4"/>
+    <!-- Plate -->
+    <circle cx="32" cy="34" r="20" fill="url(#rest-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <circle cx="32" cy="34" r="14" fill="#1a1a2e" opacity="0.15"/>
+    <circle cx="32" cy="34" r="8" fill="url(#rest-grad)" stroke="#1a1a2e" stroke-width="2"/>
+    <!-- Fork -->
+    <path d="M14 12v10c0 3 2 5 5 5v19" stroke="#1a1a2e" stroke-width="5" stroke-linecap="round"/>
+    <path d="M14 12v10c0 3 2 5 5 5v19" stroke="url(#rest-grad)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M11 12v8M14 12v8M17 12v8" stroke="url(#rest-grad)" stroke-width="2" stroke-linecap="round"/>
+    <!-- Knife -->
+    <path d="M50 12c3 0 5 4 5 10s-2 8-5 8v16" stroke="#1a1a2e" stroke-width="5" stroke-linecap="round"/>
+    <path d="M50 12c3 0 5 4 5 10s-2 8-5 8v16" stroke="url(#rest-grad)" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="16" cy="14" r="1.5" fill="#FFF5D4"/>
   </svg>`,
 
+  // Bakery: Clear bread loaf shape
   bakery: `<svg viewBox="0 0 64 64" fill="none">
     <defs>
       <linearGradient id="bake-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FFE4A0"/>
-        <stop offset="100%" stop-color="#D4A574"/>
+        <stop offset="0%" stop-color="#F4D9A0"/>
+        <stop offset="100%" stop-color="#C4956A"/>
+      </linearGradient>
+      <linearGradient id="bake-top" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#DEB887"/>
+        <stop offset="100%" stop-color="#8B6914"/>
       </linearGradient>
     </defs>
-    <ellipse cx="32" cy="40" rx="20" ry="12" fill="url(#bake-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <path d="M16 35c0-8 7-15 16-15s16 7 16 15" fill="url(#bake-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <path d="M22 32c0-4 4-8 10-8s10 4 10 8" fill="#8B6914" opacity="0.3"/>
-    <ellipse cx="32" cy="16" rx="4" ry="3" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <path d="M28 16c2-4 6-4 8 0" stroke="#1a1a2e" stroke-width="2" fill="none"/>
-    <circle cx="18" cy="30" r="1.5" fill="#FFF5D4"/>
+    <!-- Bread loaf body -->
+    <ellipse cx="32" cy="42" rx="24" ry="14" fill="url(#bake-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <!-- Bread top/crust -->
+    <path d="M10 38c0-14 10-26 22-26s22 12 22 26" fill="url(#bake-top)" stroke="#1a1a2e" stroke-width="3"/>
+    <!-- Score marks on bread -->
+    <path d="M18 28c4-6 10-8 14-8M32 20c4 0 10 2 14 8" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <path d="M26 24l12 0" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+    <!-- Steam -->
+    <path d="M24 8c0-3 2-3 2 0M32 6c0-3 2-3 2 0M40 8c0-3 2-3 2 0" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="14" cy="32" r="1.5" fill="#FFF5D4"/>
   </svg>`,
 
+  // Butcher: T-bone steak - clearly meat
   butcher: `<svg viewBox="0 0 64 64" fill="none">
     <defs>
       <linearGradient id="meat-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FF8A8A"/>
-        <stop offset="100%" stop-color="#C44"/>
+        <stop offset="0%" stop-color="#FF9999"/>
+        <stop offset="100%" stop-color="#CC4444"/>
+      </linearGradient>
+      <linearGradient id="fat-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFF5E6"/>
+        <stop offset="100%" stop-color="#FFE4CC"/>
       </linearGradient>
     </defs>
-    <ellipse cx="36" cy="34" rx="18" ry="14" fill="url(#meat-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <ellipse cx="36" cy="34" rx="10" ry="7" fill="#FFB4B4" opacity="0.5"/>
-    <path d="M12 12L22 28" stroke="#1a1a2e" stroke-width="6" stroke-linecap="round"/>
-    <path d="M12 12L22 28" stroke="#8B7355" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="12" cy="12" r="4" fill="#1a1a2e"/>
-    <circle cx="20" cy="30" r="1.5" fill="#FFF5D4"/>
+    <!-- Main steak shape -->
+    <path d="M12 20c-4 8-2 20 8 28s24 8 32 0s4-24-4-32s-20-8-28 0c-2 2-6 2-8 4z" fill="url(#meat-grad)" stroke="#1a1a2e" stroke-width="3"/>
+    <!-- Fat marbling -->
+    <path d="M20 28c4-2 12 0 16 4s6 12 2 16" fill="url(#fat-grad)" stroke="#1a1a2e" stroke-width="2"/>
+    <!-- T-bone -->
+    <path d="M28 24v20M22 34h16" stroke="#FFF5E6" stroke-width="4" stroke-linecap="round"/>
+    <path d="M28 24v20M22 34h16" stroke="#E8DCC8" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="14" cy="22" r="1.5" fill="#FFB4B4"/>
   </svg>`,
 
   supermarket: `<svg viewBox="0 0 64 64" fill="none">
@@ -179,20 +203,33 @@ const categoryIcons: Record<string, string> = {
   </svg>`,
 
   // Shop categories - Game-style retail icons
+  // Decor: Ramadan lantern (fanoos) - iconic Islamic decoration
   decor: `<svg viewBox="0 0 64 64" fill="none">
     <defs>
       <linearGradient id="decor-grad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#FFE4A0"/>
         <stop offset="100%" stop-color="#FFD700"/>
       </linearGradient>
+      <linearGradient id="lantern-body" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#B8860B"/>
+        <stop offset="100%" stop-color="#8B6914"/>
+      </linearGradient>
     </defs>
-    <path d="M32 6l-16 20v28h32V26L32 6z" fill="url(#decor-grad)" stroke="#1a1a2e" stroke-width="3" stroke-linejoin="round"/>
-    <rect x="26" y="38" width="12" height="16" fill="#1a1a2e"/>
-    <circle cx="32" cy="20" r="6" fill="#1a1a2e"/>
-    <path d="M28 20l4 4 4-4M32 28v-4" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
-    <rect x="20" y="28" width="6" height="8" rx="1" fill="#A78BFA" stroke="#1a1a2e" stroke-width="2"/>
-    <rect x="38" y="28" width="6" height="8" rx="1" fill="#5EEAD4" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="20" cy="16" r="1.5" fill="#FFF5D4"/>
+    <!-- Lantern top cap -->
+    <path d="M26 12h12l2 4H24l2-4z" fill="url(#decor-grad)" stroke="#1a1a2e" stroke-width="2"/>
+    <!-- Hanging loop -->
+    <circle cx="32" cy="8" r="3" fill="none" stroke="url(#decor-grad)" stroke-width="3"/>
+    <!-- Lantern body frame -->
+    <path d="M24 16h16v6l4 8v12l-4 8v4H24v-4l-4-8V30l4-8v-6z" fill="url(#lantern-body)" stroke="#1a1a2e" stroke-width="3"/>
+    <!-- Glass panels with glow -->
+    <rect x="26" y="20" width="12" height="30" rx="2" fill="#FFF8DC" opacity="0.7"/>
+    <rect x="28" y="24" width="8" height="22" rx="1" fill="#FFD700" opacity="0.5"/>
+    <!-- Inner flame/glow -->
+    <ellipse cx="32" cy="38" rx="4" ry="6" fill="#FFD700"/>
+    <ellipse cx="32" cy="36" rx="2" ry="3" fill="#FFF5D4"/>
+    <!-- Decorative details -->
+    <path d="M24 22h16M24 48h16" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="22" cy="18" r="1.5" fill="#FFF5D4"/>
   </svg>`,
 
   clothing: `<svg viewBox="0 0 64 64" fill="none">
@@ -614,7 +651,7 @@ const createPopupContent = (
           text-transform: uppercase;
           letter-spacing: 0.5px;
           box-shadow: 0 2px 8px ${colors.glow};
-        ">${tier === "premium" ? "⭐ " : tier === "mosque" ? "🕌 " : ""}${tierLabel}</span>
+        ">${tierLabel}</span>
       ` : ""}
 
       <h3 style="margin: 0 0 10px 0; font-size: 18px; font-weight: 700; line-height: 1.3;">${name}</h3>
