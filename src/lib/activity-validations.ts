@@ -125,6 +125,12 @@ export const activityFormSchema = z.object({
 
   // Images
   cover_image_url: z.string().url("Ongeldige URL").optional().or(z.literal("")),
+
+  // Language
+  language: z
+    .enum(["nl", "ar", "tr", "en", "fr", "other"])
+    .optional()
+    .nullable(),
 });
 
 export type ActivityFormData = z.infer<typeof activityFormSchema>;

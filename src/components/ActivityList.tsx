@@ -134,6 +134,7 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
       type: "all",
       date: "all",
       for_youth: false,
+      language: "all",
     });
     setSearchQuery("");
   };
@@ -190,7 +191,8 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
             <span className="w-5 h-5 bg-white text-teal text-xs font-bold rounded-full flex items-center justify-center">
               {(filters.type !== "all" ? 1 : 0) +
                 (filters.date !== "all" ? 1 : 0) +
-                (filters.for_youth ? 1 : 0)}
+                (filters.for_youth ? 1 : 0) +
+                (filters.language !== "all" ? 1 : 0)}
             </span>
           )}
         </button>
@@ -278,6 +280,41 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
           className="bg-gray-50 rounded-2xl p-5 mb-6"
         >
           <div className="space-y-4">
+            {/* Language filter - shown when lecture is selected */}
+            {filters.type === "lecture" && (
+              <div>
+                <p className="text-sm font-medium text-text-secondary mb-3 flex items-center gap-2">
+                  <Languages className="w-4 h-4" />
+                  Taal
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setFilters({ ...filters, language: "all" })}
+                    className={`px-4 py-2 rounded-full text-sm transition-all ${
+                      filters.language === "all"
+                        ? "bg-blue-500 text-white font-medium"
+                        : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
+                    }`}
+                  >
+                    Alle talen
+                  </button>
+                  {(Object.keys(languageLabels) as ActivityLanguage[]).map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => setFilters({ ...filters, language: lang })}
+                      className={`px-4 py-2 rounded-full text-sm transition-all ${
+                        filters.language === lang
+                          ? "bg-blue-500 text-white font-medium"
+                          : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
+                      }`}
+                    >
+                      {languageLabels[lang]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Youth filter */}
             <div>
               <p className="text-sm font-medium text-text-secondary mb-3">

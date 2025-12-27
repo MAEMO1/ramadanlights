@@ -120,6 +120,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER PLUS TIER (€500) - Uitgelicht badge, delivery links
   {
@@ -162,6 +163,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER TIER (€300) - Basic paid features
   {
@@ -204,6 +206,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // ANOTHER PARTNER TIER (€300) - Indiaas/Pakistaans
   {
@@ -246,6 +249,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // MORE PARTNER TIER (€300) - Café
   {
@@ -288,6 +292,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // MORE PARTNER TIER (€300) - Grillroom
   {
@@ -330,6 +335,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // MORE PARTNER TIER (€300) - Shawarma
   {
@@ -372,6 +378,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // FREE TIER - Basic listing only
   {
@@ -414,6 +421,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // ANOTHER FREE TIER
   {
@@ -456,6 +464,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER PLUS TIER - Pizza & Burgers
   {
@@ -498,6 +507,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER TIER - Italian/Mediterranean
   {
@@ -540,6 +550,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER TIER - Asian
   {
@@ -582,6 +593,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER TIER - Catering
   {
@@ -624,6 +636,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // FREE TIER - Another Bakery
   {
@@ -666,6 +679,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // FREE TIER - Fish Restaurant
   {
@@ -708,6 +722,7 @@ const dummyFoodPartners: FoodPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 ];
 
@@ -745,6 +760,7 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER PLUS - Kleding
   {
@@ -778,6 +794,7 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER - Spiritueel
   {
@@ -811,6 +828,7 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER - Geschenken
   {
@@ -844,6 +862,7 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // PARTNER - Beauty
   {
@@ -877,6 +896,7 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // FREE - Kids
   {
@@ -910,6 +930,7 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   // FREE - Tech
   {
@@ -943,6 +964,7 @@ const dummyShopPartners: ShopPartner[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 ];
 
@@ -988,6 +1010,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "lecture-2",
@@ -1028,6 +1051,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "lecture-3",
@@ -1068,6 +1092,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "lecture-4",
@@ -1108,6 +1133,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 
   // ========== WORKSHOPS (4) ==========
@@ -1150,6 +1176,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "workshop-2",
@@ -1190,6 +1217,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "workshop-3",
@@ -1230,6 +1258,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "workshop-4",
@@ -1270,6 +1299,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 
   // ========== CHARITY (4) ==========
@@ -1312,6 +1342,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "charity-2",
@@ -1352,6 +1383,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "charity-3",
@@ -1392,6 +1424,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "charity-4",
@@ -1432,6 +1465,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 
   // ========== COMMUNITY (4) ==========
@@ -1474,6 +1508,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "community-2",
@@ -1514,6 +1549,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "community-3",
@@ -1554,6 +1590,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "community-4",
@@ -1594,6 +1631,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 
   // ========== YOUTH (4) ==========
@@ -1636,6 +1674,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "youth-2",
@@ -1676,6 +1715,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "youth-3",
@@ -1716,6 +1756,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "youth-4",
@@ -1756,6 +1797,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 
   // ========== SPORTS (4) ==========
@@ -1798,6 +1840,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "sports-2",
@@ -1838,6 +1881,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "sports-3",
@@ -1878,6 +1922,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "sports-4",
@@ -1918,6 +1963,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 
   // ========== SHOPPING - WINKELS (4) ==========
@@ -1960,6 +2006,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "shopping-2",
@@ -2000,6 +2047,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "shopping-3",
@@ -2040,6 +2088,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "shopping-4",
@@ -2080,6 +2129,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 
   // ========== OTHER (4) ==========
@@ -2122,6 +2172,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "other-2",
@@ -2162,6 +2213,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "other-3",
@@ -2202,6 +2254,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
   {
     id: "other-4",
@@ -2242,6 +2295,7 @@ const dummyActivities: Activity[] = [
     approved_at: new Date().toISOString(),
     rejected_at: null,
     rejection_reason: null,
+    language: null,
   },
 ];
 

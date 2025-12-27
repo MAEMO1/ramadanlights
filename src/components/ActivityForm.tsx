@@ -8,7 +8,8 @@ import { useInView } from "framer-motion";
 import { Loader2, Send, Globe, Facebook, Instagram, MapPin, Calendar, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { activityFormSchema, ActivityFormData } from "@/lib/activity-validations";
-import { activityTypeLabels, ActivityType, recurrenceLabels, RecurrencePattern } from "@/lib/activity-types";
+import { activityTypeLabels, ActivityType, recurrenceLabels, RecurrencePattern, languageLabels, ActivityLanguage } from "@/lib/activity-types";
+import { Languages } from "lucide-react";
 
 interface AddressSuggestion {
   display_name: string;
@@ -75,11 +76,13 @@ export function ActivityForm() {
       facebook_url: "",
       instagram_url: "",
       cover_image_url: "",
+      language: undefined,
     },
   });
 
   const isFree = watch("is_free");
   const isRecurring = watch("is_recurring");
+  const activityType = watch("activity_type");
 
   // Debounced address search
   const searchAddress = useCallback(async (query: string) => {
@@ -229,6 +232,24 @@ export function ActivityForm() {
                 ))}
               </select>
             </div>
+
+            {/* Language - only for lectures */}
+            {activityType === "lecture" && (
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-2 flex items-center gap-2">
+                  <Languages className="w-4 h-4" />
+                  Taal van de lezing
+                </label>
+                <select {...register("language")} className="input-field w-full">
+                  <option value="">Selecteer taal...</option>
+                  {(Object.keys(languageLabels) as ActivityLanguage[]).map((lang) => (
+                    <option key={lang} value={lang}>
+                      {languageLabels[lang]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Description */}
             <div>
