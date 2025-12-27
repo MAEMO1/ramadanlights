@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, SkipForward } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { FoodPartner } from "@/lib/food-partner-types";
@@ -10,6 +10,9 @@ import type { ShopPartner } from "@/lib/shop-partner-types";
 import type { PartnerTier } from "@/lib/food-partner-types";
 import { categoryLabels } from "@/lib/food-partner-types";
 import { shopCategoryLabels } from "@/lib/shop-partner-types";
+import { useIntroStateMachine } from "@/hooks/useIntroStateMachine";
+import { MapIntroSequence } from "./MapIntroSequence";
+import type { IntroPhase } from "@/lib/introConfig";
 
 interface Mosque {
   id: string;
@@ -435,7 +438,8 @@ const tierColors: Record<PartnerTier | "mosque", {
 // Create professional game-style marker with enhanced container and glow effects
 const createGameMarker = (
   category: string,
-  tier: PartnerTier | "mosque"
+  tier: PartnerTier | "mosque",
+  markerIndex: number = 0
 ) => {
   const config = tierSizes[tier];
   const colors = tierColors[tier];
@@ -443,6 +447,9 @@ const createGameMarker = (
   const size = config.size;
   const iconSize = Math.round(size * 0.6); // Larger icon ratio for new detailed icons
   const borderWidth = tier === "premium" || tier === "mosque" ? 4 : 3;
+
+  // Calculate stagger delay based on index
+  const staggerDelay = markerIndex * 0.08; // 80ms between each marker
 
   // Enhanced pulse animation with glow
   const pulseKeyframes = config.pulse ? `
@@ -485,11 +492,12 @@ const createGameMarker = (
 
   const html = `
     <style>${pulseKeyframes}</style>
-    <div class="game-marker-icon tier-${tier}" data-category="${category}" style="
+    <div class="game-marker-icon tier-${tier}" data-category="${category}" data-index="${markerIndex}" style="
       width: ${size}px;
       height: ${size}px;
       position: relative;
       cursor: pointer;
+      animation-delay: ${staggerDelay}s;
     ">
       ${glowRing}
       <div class="marker-inner" style="
@@ -695,6 +703,51 @@ const createPopupContent = (
   `;
 };
 
+// Helper to detect reduced motion preference
+function usePrefersReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
+  return prefersReducedMotion;
+}
+
+// Helper to detect mobile
+function useIsMobile(): boolean {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  return isMobile;
+}
+
+// Map IntroPhase to old animation phase numbers for backwards compatibility
+function phaseToNumber(phase: IntroPhase): number {
+  const mapping: Record<IntroPhase, number> = {
+    IDLE: 0,
+    PRELOAD: 0,
+    BEAMS_SWIRL: 1,
+    BEAMS_LAND: 2,
+    STREETS_GLOW: 3,
+    MOSQUES_RISE: 4,
+    SPONSORS_WAVE: 5, // This covers phases 5, 6, 7 (we'll handle sponsor tiers separately)
+    COMPLETE: 8,
+  };
+  return mapping[phase];
+}
+
 export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mosques = [] }: GameMapOverlayProps) {
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -704,10 +757,31 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
   const [mapReady, setMapReady] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(14);
 
-  // Animation phases:
-  // 0=curtains, 1=lights floating, 2=lights traveling, 3=streets glowing,
-  // 4=mosques appearing, 5=small sponsors, 6=medium sponsors, 7=large sponsors, 8=complete
-  const [animationPhase, setAnimationPhase] = useState(0);
+  // Detect user preferences
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const isMobile = useIsMobile();
+
+  // Use the new state machine for intro animation
+  const {
+    phase: introPhase,
+    isPlaying: introIsPlaying,
+    phaseProgress,
+    start: startIntro,
+    skip: skipIntro,
+    reset: resetIntro,
+  } = useIntroStateMachine({
+    autoStart: false,
+    prefersReducedMotion,
+    onComplete: () => {
+      // Intro complete, map is now fully interactive
+    },
+  });
+
+  // Convert new phase to old animation phase number for backwards compatibility
+  const animationPhase = phaseToNumber(introPhase);
+
+  // Track sponsor wave sub-phases (within SPONSORS_WAVE phase)
+  const [sponsorSubPhase, setSponsorSubPhase] = useState(0); // 0=partner, 1=partner_plus, 2=premium
 
   // Initialize map when overlay opens
   useEffect(() => {
@@ -756,43 +830,39 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       mapRef.current.remove();
       mapRef.current = null;
       setMapReady(false);
-      setAnimationPhase(0); // Reset animation
+      resetIntro(); // Reset intro state machine
+      setSponsorSubPhase(0);
     }
-  }, [isOpen]);
+  }, [isOpen, resetIntro]);
 
-  // Animation sequence controller - Extended with floating lights and sequential icon appearance
+  // Start intro when map is ready
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen && mapReady && introPhase === "IDLE") {
+      startIntro();
+    }
+  }, [isOpen, mapReady, introPhase, startIntro]);
 
-    // Phase 0: Curtains opening (0-0.8s)
-    // Phase 1: Lights appear and float around (0.8-3.5s) - 2.7s floating
-    const phase1Timer = setTimeout(() => setAnimationPhase(1), 800);
-    // Phase 2: Lights travel to streets (3.5-5.5s)
-    const phase2Timer = setTimeout(() => setAnimationPhase(2), 3500);
-    // Phase 3: Streets illuminate (5.5-7s)
-    const phase3Timer = setTimeout(() => setAnimationPhase(3), 5500);
-    // Phase 4: Mosques appear like mushrooms (7-8.5s)
-    const phase4Timer = setTimeout(() => setAnimationPhase(4), 7000);
-    // Phase 5: Small sponsors appear (8.5-9.5s) - partner tier
-    const phase5Timer = setTimeout(() => setAnimationPhase(5), 8500);
-    // Phase 6: Medium sponsors appear (9.5-10.5s) - partner_plus tier
-    const phase6Timer = setTimeout(() => setAnimationPhase(6), 9500);
-    // Phase 7: Large sponsors appear with overshoot (10.5-12s) - premium tier
-    const phase7Timer = setTimeout(() => setAnimationPhase(7), 10500);
-    // Phase 8: Animation complete
-    const phase8Timer = setTimeout(() => setAnimationPhase(8), 12000);
+  // Handle sponsor sub-phases within SPONSORS_WAVE
+  useEffect(() => {
+    if (introPhase !== "SPONSORS_WAVE") return;
 
-    return () => {
-      clearTimeout(phase1Timer);
-      clearTimeout(phase2Timer);
-      clearTimeout(phase3Timer);
-      clearTimeout(phase4Timer);
-      clearTimeout(phase5Timer);
-      clearTimeout(phase6Timer);
-      clearTimeout(phase7Timer);
-      clearTimeout(phase8Timer);
-    };
-  }, [isOpen]);
+    // phaseProgress goes from 0 to 1 over 2 seconds
+    // 0-0.3: partner tier, 0.3-0.6: partner_plus, 0.6-1.0: premium
+    if (phaseProgress < 0.3) {
+      setSponsorSubPhase(0);
+    } else if (phaseProgress < 0.6) {
+      setSponsorSubPhase(1);
+    } else {
+      setSponsorSubPhase(2);
+    }
+  }, [introPhase, phaseProgress]);
+
+  // When COMPLETE, set all sub-phases to max
+  useEffect(() => {
+    if (introPhase === "COMPLETE") {
+      setSponsorSubPhase(2);
+    }
+  }, [introPhase]);
 
   // Add routes - glow brighter when zooming out and based on animation phase
   useEffect(() => {
@@ -801,8 +871,8 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
     routeLayersRef.current.forEach(layer => mapRef.current?.removeLayer(layer));
     routeLayersRef.current = [];
 
-    // Don't show routes until animation phase 3 (streets illumination)
-    if (animationPhase < 3) return;
+    // Don't show routes until STREETS_GLOW phase or later
+    if (introPhase !== "STREETS_GLOW" && introPhase !== "MOSQUES_RISE" && introPhase !== "SPONSORS_WAVE" && introPhase !== "COMPLETE") return;
 
     // Calculate glow intensity based on zoom (brighter when zoomed out)
     // Zoom 14 = normal, zoom 10 = max glow
@@ -810,7 +880,7 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
     const weightMultiplier = Math.max(1, 1 + (14 - zoomLevel) * 0.2); // Thicker lines when zoomed out
 
     // Animation intensity - starts bright and settles
-    const animIntensity = animationPhase === 3 ? 1.8 : 1;
+    const animIntensity = introPhase === "STREETS_GLOW" ? 1.8 : 1;
 
     [routes.wondelgemstraat, routes.bevrijdingslaanPhoenix].forEach((route) => {
       // All route layers use the custom routesPane to render ABOVE markers
@@ -860,20 +930,14 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
         }
       });
     });
-  }, [mapReady, zoomLevel, animationPhase]);
+  }, [mapReady, zoomLevel, introPhase]);
 
-  // Add markers - sequential appearance by tier (mosques → small → medium → large)
+  // Track which markers have been added
+  const markersAddedRef = useRef(false);
+
+  // Add ALL markers once when map is ready - visibility controlled by CSS
   useEffect(() => {
-    if (!mapRef.current || !mapReady) return;
-
-    // Clear existing markers and connector lines
-    markersRef.current.forEach(marker => mapRef.current?.removeLayer(marker));
-    markersRef.current = [];
-    connectorLinesRef.current.forEach(line => mapRef.current?.removeLayer(line));
-    connectorLinesRef.current = [];
-
-    // Don't add markers until animation phase 4 (mosques start appearing)
-    if (animationPhase < 4) return;
+    if (!mapRef.current || !mapReady || markersAddedRef.current) return;
 
     // Combine all markers
     const allMarkers: Array<{
@@ -943,19 +1007,9 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
     const tierOrder: Record<PartnerTier | "mosque", number> = { free: 0, partner: 1, partner_plus: 2, mosque: 3, premium: 4 };
     allMarkers.sort((a, b) => tierOrder[a.tier] - tierOrder[b.tier]);
 
-    // Filter markers based on animation phase (sequential appearance)
-    // Phase 4: mosques, Phase 5: partner, Phase 6: partner_plus, Phase 7+: premium
-    const visibleMarkers = allMarkers.filter(item => {
-      if (item.tier === "mosque") return animationPhase >= 4;
-      if (item.tier === "partner" || item.tier === "free") return animationPhase >= 5;
-      if (item.tier === "partner_plus") return animationPhase >= 6;
-      if (item.tier === "premium") return animationPhase >= 7;
-      return false;
-    });
-
-    // Add markers with offset for those near illuminated streets
-    visibleMarkers.forEach((item, index) => {
-      const icon = createGameMarker(item.category, item.tier);
+    // Add all markers with offset for those near illuminated streets
+    allMarkers.forEach((item, index) => {
+      const icon = createGameMarker(item.category, item.tier, index);
       const { position, original, wasOffset } = offsetMarkerPosition(item.lat, item.lng, index);
       const marker = L.marker(position, {
         icon,
@@ -983,16 +1037,17 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
           const connectorLine = L.polyline([original, position], {
             color: tierColors[item.tier].border,
             weight: 2,
-            opacity: 0.6,
+            opacity: 0,
             dashArray: "4, 6",
             lineCap: "round",
+            className: `connector-line tier-${item.tier}`,
           });
           connectorLine.addTo(mapRef.current);
           connectorLinesRef.current.push(connectorLine);
 
           // Add small dot at original location to show real address
           const dotIcon = L.divIcon({
-            className: "connector-dot",
+            className: `connector-dot tier-${item.tier}`,
             html: `<div style="
               width: 10px;
               height: 10px;
@@ -1000,6 +1055,7 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
               border: 2px solid ${tierColors[item.tier].icon};
               border-radius: 50%;
               box-shadow: 0 0 6px ${tierColors[item.tier].glow};
+              opacity: 0;
             "></div>`,
             iconSize: [10, 10],
             iconAnchor: [5, 5],
@@ -1013,22 +1069,82 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
         markersRef.current.push(marker);
       }
     });
-  }, [mapReady, foodPartners, shopPartners, mosques, animationPhase]);
 
-  // Add custom styles - scale markers based on zoom level (MUCH MORE AGGRESSIVE)
+    markersAddedRef.current = true;
+  }, [mapReady, foodPartners, shopPartners, mosques]);
+
+  // Reset markersAddedRef when map is closed
+  useEffect(() => {
+    if (!isOpen) {
+      markersAddedRef.current = false;
+    }
+  }, [isOpen]);
+
+  // Update connector line visibility based on phase
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const showMosques = introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE";
+    const showPartner = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 0) || introPhase === "COMPLETE";
+    const showPartnerPlus = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 1) || introPhase === "COMPLETE";
+    const showPremium = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 2) || introPhase === "COMPLETE";
+
+    connectorLinesRef.current.forEach(line => {
+      const el = line.getElement();
+      if (!el) return;
+
+      const isMosque = el.classList.contains("tier-mosque");
+      const isPartner = el.classList.contains("tier-partner");
+      const isPartnerPlus = el.classList.contains("tier-partner_plus");
+      const isPremium = el.classList.contains("tier-premium");
+
+      let shouldShow = false;
+      if (isMosque) shouldShow = showMosques;
+      else if (isPartner) shouldShow = showPartner;
+      else if (isPartnerPlus) shouldShow = showPartnerPlus;
+      else if (isPremium) shouldShow = showPremium;
+
+      line.setStyle({ opacity: shouldShow ? 0.6 : 0 });
+    });
+  }, [introPhase, sponsorSubPhase]);
+
+  // Track which tiers have been activated (to prevent re-animating)
+  const activatedTiersRef = useRef<Set<string>>(new Set());
+
+  // Determine visibility states for CSS
+  const showMosques = introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE";
+  const showPartner = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 0) || introPhase === "COMPLETE";
+  const showPartnerPlus = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 1) || introPhase === "COMPLETE";
+  const showPremium = (introPhase === "SPONSORS_WAVE" && sponsorSubPhase >= 2) || introPhase === "COMPLETE";
+
+  // Track activation state (once activated, stays activated)
+  useEffect(() => {
+    if (showMosques) activatedTiersRef.current.add("mosque");
+    if (showPartner) {
+      activatedTiersRef.current.add("partner");
+      activatedTiersRef.current.add("free");
+    }
+    if (showPartnerPlus) activatedTiersRef.current.add("partner_plus");
+    if (showPremium) activatedTiersRef.current.add("premium");
+  }, [showMosques, showPartner, showPartnerPlus, showPremium]);
+
+  // Reset activation tracking when map closes
+  useEffect(() => {
+    if (!isOpen) {
+      activatedTiersRef.current.clear();
+    }
+  }, [isOpen]);
+
+  // Add STATIC styles once (animations, hover effects, popup styles)
   useEffect(() => {
     if (!isOpen) return;
 
-    // Calculate marker scale based on zoom (EXTREMELY small when zoomed out to keep streets visible)
-    // Zoom 14 = 1.0, zoom 12 = 0.35, zoom 10 = 0.12, zoom 8 = 0.05
-    const baseScale = Math.max(0.05, Math.min(1, Math.pow((zoomLevel - 7) / 7, 2)));
+    // Check if static styles already exist
+    if (document.getElementById("game-map-static-styles")) return;
 
-    // Premium markers should be 20% bigger after animation completes
-    const premiumBonus = animationPhase >= 8 ? 1.2 : 1;
-
-    const style = document.createElement("style");
-    style.id = "game-map-styles";
-    style.textContent = `
+    const staticStyle = document.createElement("style");
+    staticStyle.id = "game-map-static-styles";
+    staticStyle.textContent = `
       /* Mushroom pop animations */
       @keyframes mushroomPop {
         0% { transform: scale(0) translateY(20px); opacity: 0; }
@@ -1047,7 +1163,7 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
         40% { transform: scale(1.6) translateY(-12px); opacity: 1; }
         60% { transform: scale(1.1) translateY(5px); opacity: 1; }
         80% { transform: scale(1.25) translateY(-2px); opacity: 1; }
-        100% { transform: scale(${premiumBonus}) translateY(0); opacity: 1; }
+        100% { transform: scale(1.2) translateY(0); opacity: 1; }
       }
 
       /* Glow pulse animation for hover */
@@ -1067,33 +1183,39 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
         border: none !important;
       }
 
+      /* Base marker style - hidden by default */
       .game-marker-icon {
-        transform: scale(${baseScale}) !important;
         transform-origin: center center !important;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease !important;
-        animation: mushroomPop 0.6s ease-out forwards;
+        opacity: 0;
+        visibility: hidden;
       }
 
-      .game-marker-icon.tier-partner,
-      .game-marker-icon.tier-free {
-        animation: mushroomPop 0.5s ease-out forwards;
+      /* Activated markers - visible with animation */
+      /* Using individual properties so inline animation-delay isn't overridden */
+      .game-marker-icon.marker-activated {
+        visibility: visible !important;
+        animation-timing-function: ease-out;
+        animation-fill-mode: forwards;
       }
-      .game-marker-icon.tier-partner_plus {
-        animation: mushroomPopMedium 0.6s ease-out forwards;
+      .game-marker-icon.tier-mosque.marker-activated {
+        animation-name: mushroomPop;
+        animation-duration: 0.7s;
       }
-      .game-marker-icon.tier-premium {
-        animation: mushroomPopLarge 0.8s ease-out forwards;
+      .game-marker-icon.tier-partner.marker-activated,
+      .game-marker-icon.tier-free.marker-activated {
+        animation-name: mushroomPop;
+        animation-duration: 0.5s;
       }
-      .game-marker-icon.tier-mosque {
-        animation: mushroomPop 0.7s ease-out forwards;
+      .game-marker-icon.tier-partner_plus.marker-activated {
+        animation-name: mushroomPopMedium;
+        animation-duration: 0.6s;
+      }
+      .game-marker-icon.tier-premium.marker-activated {
+        animation-name: mushroomPopLarge;
+        animation-duration: 0.8s;
       }
 
-      /* Enhanced hover states with glow effects */
-      .game-marker-icon:hover {
-        transform: scale(${baseScale * 1.35}) !important;
-        z-index: 9999 !important;
-      }
-
+      /* Hover effects */
       .game-marker-icon:hover .marker-inner {
         border-width: 4px !important;
       }
@@ -1141,13 +1263,6 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
         border-color: #9CA3AF !important;
       }
 
-      /* Active/selected state (when popup is open) */
-      .leaflet-marker-icon:has(.game-popup-active) .game-marker-icon,
-      .leaflet-popup-open .game-marker-icon {
-        transform: scale(${baseScale * 1.4}) !important;
-        filter: brightness(1.1);
-      }
-
       /* Popup styles */
       .leaflet-popup-content-wrapper {
         background: transparent !important;
@@ -1186,9 +1301,12 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       .connector-dot {
         background: transparent !important;
         border: none !important;
-        transform: scale(${baseScale}) !important;
-        transition: transform 0.3s ease !important;
-        animation: mushroomPop 0.4s ease-out forwards;
+      }
+      .connector-dot > div {
+        transition: opacity 0.3s ease !important;
+      }
+      .connector-dot.dot-activated > div {
+        opacity: 1 !important;
       }
 
       /* Icon inner glow on hover */
@@ -1197,17 +1315,85 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       }
     `;
 
-    // Remove existing style first
-    const existingStyle = document.getElementById("game-map-styles");
-    if (existingStyle) existingStyle.remove();
-
-    document.head.appendChild(style);
+    document.head.appendChild(staticStyle);
 
     return () => {
-      const styleToRemove = document.getElementById("game-map-styles");
+      const styleToRemove = document.getElementById("game-map-static-styles");
       if (styleToRemove) styleToRemove.remove();
     };
-  }, [isOpen, zoomLevel, animationPhase]);
+  }, [isOpen]);
+
+  // Add DYNAMIC styles (zoom-based scaling)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Calculate marker scale based on zoom (EXTREMELY small when zoomed out to keep streets visible)
+    // Zoom 14 = 1.0, zoom 12 = 0.35, zoom 10 = 0.12, zoom 8 = 0.05
+    const baseScale = Math.max(0.05, Math.min(1, Math.pow((zoomLevel - 7) / 7, 2)));
+
+    const dynamicStyle = document.createElement("style");
+    dynamicStyle.id = "game-map-dynamic-styles";
+    dynamicStyle.textContent = `
+      .game-marker-icon {
+        transform: scale(${baseScale}) !important;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease !important;
+      }
+
+      .game-marker-icon:hover {
+        transform: scale(${baseScale * 1.35}) !important;
+        z-index: 9999 !important;
+      }
+
+      .leaflet-marker-icon:has(.game-popup-active) .game-marker-icon,
+      .leaflet-popup-open .game-marker-icon {
+        transform: scale(${baseScale * 1.4}) !important;
+        filter: brightness(1.1);
+      }
+
+      .connector-dot {
+        transform: scale(${baseScale}) !important;
+        transition: transform 0.3s ease !important;
+      }
+    `;
+
+    // Remove existing dynamic style first
+    const existingStyle = document.getElementById("game-map-dynamic-styles");
+    if (existingStyle) existingStyle.remove();
+
+    document.head.appendChild(dynamicStyle);
+
+    return () => {
+      const styleToRemove = document.getElementById("game-map-dynamic-styles");
+      if (styleToRemove) styleToRemove.remove();
+    };
+  }, [isOpen, zoomLevel]);
+
+  // Activate markers by adding class when their phase is reached
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Get all marker elements on the map
+    const activateMarkers = (tier: string) => {
+      document.querySelectorAll(`.game-marker-icon.tier-${tier}`).forEach(el => {
+        if (!el.classList.contains("marker-activated")) {
+          el.classList.add("marker-activated");
+        }
+      });
+      document.querySelectorAll(`.connector-dot.tier-${tier}`).forEach(el => {
+        if (!el.classList.contains("dot-activated")) {
+          el.classList.add("dot-activated");
+        }
+      });
+    };
+
+    if (showMosques) activateMarkers("mosque");
+    if (showPartner) {
+      activateMarkers("partner");
+      activateMarkers("free");
+    }
+    if (showPartnerPlus) activateMarkers("partner_plus");
+    if (showPremium) activateMarkers("premium");
+  }, [showMosques, showPartner, showPartnerPlus, showPremium]);
 
   return (
     <AnimatePresence>
@@ -1253,6 +1439,14 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
             </div>
           </motion.div>
 
+          {/* Canvas VFX Overlay - Outside map container for proper z-index */}
+          <MapIntroSequence
+            phase={introPhase}
+            phaseProgress={phaseProgress}
+            isPlaying={introIsPlaying}
+            isMobile={isMobile}
+          />
+
           {/* Map Container */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -1263,202 +1457,30 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
           >
             <div ref={containerRef} className="w-full h-full" />
 
-            {/* Light Beam Animation Overlay - Extended with floating phase */}
-            {animationPhase >= 1 && animationPhase < 5 && (
-              <div className="absolute inset-0 pointer-events-none z-[9998] overflow-hidden">
-                {/* Phase 1: Central light source appears and pulses */}
-                {animationPhase === 1 && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{
-                      opacity: [0, 1, 1, 1],
-                      scale: [0, 1.2, 0.9, 1.1],
-                    }}
-                    transition={{ duration: 2.5, times: [0, 0.2, 0.6, 1], repeat: Infinity, repeatType: "reverse" }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                  >
-                    <div className="w-20 h-20 rounded-full bg-gold/90"
-                      style={{ boxShadow: '0 0 80px 40px rgba(255, 215, 0, 0.7), 0 0 120px 60px rgba(255, 215, 0, 0.4)' }}
-                    />
-                  </motion.div>
-                )}
+            {/* Skip Intro Button - visible during intro phases */}
+            <AnimatePresence>
+              {introIsPlaying && introPhase !== "COMPLETE" && introPhase !== "IDLE" && (
+                <motion.button
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ duration: 0.3 }}
+                  onClick={skipIntro}
+                  className="absolute bottom-6 right-6 z-[10000] flex items-center gap-2 px-4 py-2 bg-[#0f2d2d]/90 backdrop-blur-sm border border-white/20 rounded-full text-white/80 text-sm font-medium hover:bg-[#1a4a4a] hover:border-white/40 hover:text-white transition-all shadow-2xl"
+                >
+                  <SkipForward className="w-4 h-4" />
+                  <span>Skip intro</span>
+                </motion.button>
+              )}
+            </AnimatePresence>
 
-                {/* Phase 1: Floating light particles orbiting around center */}
-                {animationPhase === 1 && (
-                  <>
-                    {/* Floating light 1 - circular orbit */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{
-                        opacity: [0, 1, 1, 1],
-                        x: ["50vw", "65vw", "50vw", "35vw", "50vw"],
-                        y: ["40vh", "50vh", "60vh", "50vh", "40vh"],
-                      }}
-                      transition={{
-                        duration: 2.7,
-                        times: [0, 0.25, 0.5, 0.75, 1],
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      className="absolute -translate-x-1/2 -translate-y-1/2"
-                    >
-                      <div className="w-6 h-6 rounded-full bg-gold"
-                        style={{ boxShadow: '0 0 30px 12px rgba(255, 215, 0, 0.8), 0 0 60px 25px rgba(255, 215, 0, 0.4)' }}
-                      />
-                    </motion.div>
-
-                    {/* Floating light 2 - opposite orbit */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{
-                        opacity: [0, 1, 1, 1],
-                        x: ["50vw", "35vw", "50vw", "65vw", "50vw"],
-                        y: ["60vh", "50vh", "40vh", "50vh", "60vh"],
-                      }}
-                      transition={{
-                        duration: 2.7,
-                        times: [0, 0.25, 0.5, 0.75, 1],
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      className="absolute -translate-x-1/2 -translate-y-1/2"
-                    >
-                      <div className="w-6 h-6 rounded-full bg-gold"
-                        style={{ boxShadow: '0 0 30px 12px rgba(255, 215, 0, 0.8), 0 0 60px 25px rgba(255, 215, 0, 0.4)' }}
-                      />
-                    </motion.div>
-
-                    {/* Sparkle particles floating around - predefined positions */}
-                    {[
-                      { startX: 48, startY: 45, endX: 42, endY: 38 },
-                      { startX: 52, startY: 48, endX: 58, endY: 42 },
-                      { startX: 46, startY: 52, endX: 38, endY: 58 },
-                      { startX: 54, startY: 55, endX: 62, endY: 52 },
-                      { startX: 50, startY: 42, endX: 55, endY: 35 },
-                      { startX: 47, startY: 58, endX: 40, endY: 62 },
-                    ].map((pos, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{
-                          opacity: [0, 1, 0],
-                          scale: [0, 1, 0],
-                          x: [`${pos.startX}vw`, `${pos.endX}vw`],
-                          y: [`${pos.startY}vh`, `${pos.endY}vh`],
-                        }}
-                        transition={{
-                          duration: 1.5,
-                          delay: i * 0.4,
-                          repeat: Infinity,
-                          ease: "easeOut"
-                        }}
-                        className="absolute text-gold text-2xl"
-                      >
-                        ✦
-                      </motion.div>
-                    ))}
-                  </>
-                )}
-
-                {/* Phase 2: Lights travel from center to streets */}
-                {animationPhase === 2 && (
-                  <>
-                    {/* Central light fading out */}
-                    <motion.div
-                      initial={{ opacity: 1, scale: 1.1 }}
-                      animate={{ opacity: [1, 0.5, 0], scale: [1.1, 1.5, 0] }}
-                      transition={{ duration: 1.5 }}
-                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-                    >
-                      <div className="w-20 h-20 rounded-full bg-gold/90"
-                        style={{ boxShadow: '0 0 80px 40px rgba(255, 215, 0, 0.7), 0 0 120px 60px rgba(255, 215, 0, 0.4)' }}
-                      />
-                    </motion.div>
-
-                    {/* Light beam 1 - traveling to Wondelgemstraat (top-right direction) */}
-                    <motion.div
-                      initial={{ opacity: 1, x: "50vw", y: "50vh" }}
-                      animate={{
-                        opacity: [1, 1, 1, 0.8, 0],
-                        x: ["50vw", "55vw", "65vw", "75vw"],
-                        y: ["50vh", "40vh", "25vh", "15vh"],
-                      }}
-                      transition={{ duration: 2, times: [0, 0.3, 0.7, 0.95, 1] }}
-                      className="absolute -translate-x-1/2 -translate-y-1/2"
-                    >
-                      <div className="relative">
-                        <div className="w-10 h-10 rounded-full bg-gold"
-                          style={{ boxShadow: '0 0 50px 20px rgba(255, 215, 0, 0.9), 0 0 100px 40px rgba(255, 215, 0, 0.5)' }}
-                        />
-                        <motion.div
-                          animate={{ opacity: [0.9, 0.4, 0.9] }}
-                          transition={{ duration: 0.2, repeat: Infinity }}
-                          className="absolute -left-12 top-1/2 -translate-y-1/2 w-24 h-6 rounded-full"
-                          style={{ background: 'linear-gradient(to left, rgba(255, 215, 0, 0.8), transparent)' }}
-                        />
-                      </div>
-                    </motion.div>
-
-                    {/* Light beam 2 - traveling to Bevrijdingslaan (bottom-left direction) */}
-                    <motion.div
-                      initial={{ opacity: 1, x: "50vw", y: "50vh" }}
-                      animate={{
-                        opacity: [1, 1, 1, 0.8, 0],
-                        x: ["50vw", "42vw", "32vw", "22vw"],
-                        y: ["50vh", "55vh", "58vh", "62vh"],
-                      }}
-                      transition={{ duration: 2, times: [0, 0.3, 0.7, 0.95, 1] }}
-                      className="absolute -translate-x-1/2 -translate-y-1/2"
-                    >
-                      <div className="relative">
-                        <div className="w-10 h-10 rounded-full bg-gold"
-                          style={{ boxShadow: '0 0 50px 20px rgba(255, 215, 0, 0.9), 0 0 100px 40px rgba(255, 215, 0, 0.5)' }}
-                        />
-                        <motion.div
-                          animate={{ opacity: [0.9, 0.4, 0.9] }}
-                          transition={{ duration: 0.2, repeat: Infinity }}
-                          className="absolute -right-12 top-1/2 -translate-y-1/2 w-24 h-6 rounded-full"
-                          style={{ background: 'linear-gradient(to right, rgba(255, 215, 0, 0.8), transparent)' }}
-                        />
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-
-                {/* Phase 3: Street illumination flash effects */}
-                {animationPhase >= 3 && (
-                  <>
-                    {/* Big flash for Wondelgemstraat */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 1, 0.5, 0.2, 0] }}
-                      transition={{ duration: 1.5, times: [0, 0.1, 0.3, 0.6, 1] }}
-                      className="absolute top-[10%] right-[15%] w-[40vw] h-[30vh]"
-                      style={{
-                        background: 'radial-gradient(ellipse at center, rgba(255, 215, 0, 0.6) 0%, rgba(255, 215, 0, 0.2) 40%, transparent 70%)',
-                        filter: 'blur(30px)',
-                      }}
-                    />
-                    {/* Big flash for Bevrijdingslaan */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: [0, 1, 0.5, 0.2, 0] }}
-                      transition={{ duration: 1.5, times: [0, 0.1, 0.3, 0.6, 1] }}
-                      className="absolute bottom-[25%] left-[10%] w-[40vw] h-[35vh]"
-                      style={{
-                        background: 'radial-gradient(ellipse at center, rgba(255, 215, 0, 0.6) 0%, rgba(255, 215, 0, 0.2) 40%, transparent 70%)',
-                        filter: 'blur(30px)',
-                      }}
-                    />
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* Close Button - appears when mosques start appearing */}
+            {/* Close Button - appears after STREETS_GLOW */}
             <motion.button
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: animationPhase >= 4 ? 1 : 0, scale: animationPhase >= 4 ? 1 : 0.8 }}
+              animate={{
+                opacity: introPhase === "STREETS_GLOW" || introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE" ? 1 : 0,
+                scale: introPhase === "STREETS_GLOW" || introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE" ? 1 : 0.8
+              }}
               transition={{ duration: 0.3 }}
               onClick={onClose}
               className="absolute top-6 right-6 z-[9999] w-12 h-12 bg-[#0f2d2d] border-2 border-white/20 rounded-full flex items-center justify-center text-white hover:bg-[#1a4a4a] hover:border-white/40 transition-all shadow-2xl"
@@ -1466,23 +1488,29 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
               <X className="w-5 h-5" />
             </motion.button>
 
-            {/* Title - appears when streets illuminate */}
+            {/* Title - appears after STREETS_GLOW */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: animationPhase >= 3 ? 1 : 0, y: animationPhase >= 3 ? 0 : -20 }}
+              animate={{
+                opacity: introPhase === "STREETS_GLOW" || introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE" ? 1 : 0,
+                y: introPhase === "STREETS_GLOW" || introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE" ? 0 : -20
+              }}
               transition={{ duration: 0.5 }}
               className="absolute top-6 left-6 z-[9999]"
             >
               <div className="bg-[#0f2d2d]/90 backdrop-blur-sm border border-white/10 rounded-xl px-5 py-3 shadow-2xl">
                 <h2 className="text-white font-display font-bold text-lg">Ramadan Lights Kaart</h2>
-                <p className="text-white/60 text-sm">Moskeeën, restaurants & winkels in Gent</p>
+                <p className="text-white/60 text-sm">Moskeeen, restaurants & winkels in Gent</p>
               </div>
             </motion.div>
 
-            {/* Legend - appears when streets illuminate */}
+            {/* Legend - appears after STREETS_GLOW */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: animationPhase >= 3 ? 1 : 0, y: animationPhase >= 3 ? 0 : 20 }}
+              animate={{
+                opacity: introPhase === "STREETS_GLOW" || introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE" ? 1 : 0,
+                y: introPhase === "STREETS_GLOW" || introPhase === "MOSQUES_RISE" || introPhase === "SPONSORS_WAVE" || introPhase === "COMPLETE" ? 0 : 20
+              }}
               transition={{ duration: 0.5, delay: 0.2 }}
               className="absolute bottom-6 left-6 z-[9999]"
             >
