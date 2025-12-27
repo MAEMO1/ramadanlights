@@ -25,7 +25,7 @@ const mdiPaths: Record<string, string> = {
   takeaway: `M12 13a5 5 0 0 1-5-5h2a3 3 0 0 0 3 3a3 3 0 0 0 3-3h2a5 5 0 0 1-5 5m0-10a3 3 0 0 1 3 3H9a3 3 0 0 1 3-3m7 3h-2a5 5 0 0 0-5-5a5 5 0 0 0-5 5H5c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2`, // shopping bag
 
   // Shop Categories
-  decor: `M12.3 2H12A10 10 0 0 0 2 12a10 10 0 0 0 10 10c3 0 4.7-1 6.5-2.5C13 21 8 17 8 12s5-9 10.5-7.5A8.56 8.56 0 0 0 12.3 2m4.5 4.2l-1.5 3.5l-3.7.3l2.9 2.5l-.9 3.5l3.2-2l3.2 2l-1-3.5l3-2.5l-3.7-.3z`, // star-crescent (Ramadan!)
+  decor: `M8 9h3V4h2v5h3l4 8H4zm6 9a2 2 0 0 1-2 2a2 2 0 0 1-2-2z`, // ceiling-light (lantaarn)
 
   clothing: `M16 21H8a1 1 0 0 1-1-1v-7.93l-1.3 1a.996.996 0 0 1-1.41 0l-2.83-2.78a.996.996 0 0 1 0-1.41L7.34 3H9c0 1.1 1.34 2 3 2s3-.9 3-2h1.66l5.88 5.88c.39.39.39 1.02 0 1.41l-2.83 2.83c-.39.38-1.02.38-1.41 0l-1.3-1V20a1 1 0 0 1-1 1`, // tshirt-crew
 
@@ -79,7 +79,7 @@ export const categoryIconNames: Record<string, string> = {
   catering: "room-service",
   cafe: "coffee",
   takeaway: "shopping",
-  decor: "star-crescent",
+  decor: "ceiling-light",
   clothing: "tshirt-crew",
   spiritual: "shape-outline",
   gifts: "gift",
