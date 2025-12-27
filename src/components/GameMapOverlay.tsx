@@ -932,12 +932,36 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
     });
   }, [mapReady, zoomLevel, introPhase]);
 
-  // Track which markers have been added
-  const markersAddedRef = useRef(false);
+  // Track the count of markers added (to detect new data)
+  const markersCountRef = useRef({ food: 0, shop: 0, mosques: 0 });
 
-  // Add ALL markers once when map is ready - visibility controlled by CSS
+  // Add ALL markers when map is ready - visibility controlled by CSS
+  // Re-adds if new data arrives (e.g., mosques loaded after initial render)
   useEffect(() => {
-    if (!mapRef.current || !mapReady || markersAddedRef.current) return;
+    if (!mapRef.current || !mapReady) return;
+
+    // Calculate expected counts
+    const foodCount = foodPartners.filter(p => p.latitude && p.longitude && p.partner_tier !== "free").length;
+    const shopCount = shopPartners.filter(p => p.latitude && p.longitude && p.partner_tier !== "free").length;
+    const mosqueCount = mosques.filter(m => m.latitude && m.longitude).length;
+
+    // Check if we already have all the markers
+    if (
+      markersCountRef.current.food === foodCount &&
+      markersCountRef.current.shop === shopCount &&
+      markersCountRef.current.mosques === mosqueCount &&
+      markersRef.current.length > 0
+    ) {
+      return; // No new data, skip
+    }
+
+    // Clear existing markers if re-adding
+    if (markersRef.current.length > 0) {
+      markersRef.current.forEach(marker => mapRef.current?.removeLayer(marker));
+      markersRef.current = [];
+      connectorLinesRef.current.forEach(line => mapRef.current?.removeLayer(line));
+      connectorLinesRef.current = [];
+    }
 
     // Combine all markers
     const allMarkers: Array<{
@@ -1070,13 +1094,47 @@ export function GameMapOverlay({ isOpen, onClose, foodPartners, shopPartners, mo
       }
     });
 
-    markersAddedRef.current = true;
-  }, [mapReady, foodPartners, shopPartners, mosques]);
+    // Update counts to track what we've added
+    markersCountRef.current = { food: foodCount, shop: shopCount, mosques: mosqueCount };
 
-  // Reset markersAddedRef when map is closed
+    // Immediately activate markers that should already be visible (for when data loads after phase reached)
+    // Use setTimeout to ensure DOM is ready
+    setTimeout(() => {
+      const activateMarkers = (tier: string) => {
+        document.querySelectorAll(`.game-marker-icon.tier-${tier}`).forEach(el => {
+          if (!el.classList.contains("marker-activated")) {
+            el.classList.add("marker-activated");
+          }
+        });
+        document.querySelectorAll(`.connector-dot.tier-${tier}`).forEach(el => {
+          if (!el.classList.contains("dot-activated")) {
+            el.classList.add("dot-activated");
+          }
+        });
+      };
+
+      // Check current phase and activate appropriate markers
+      const phase = introPhase;
+      const subPhase = sponsorSubPhase;
+      const shouldShowMosques = phase === "MOSQUES_RISE" || phase === "SPONSORS_WAVE" || phase === "COMPLETE";
+      const shouldShowPartner = (phase === "SPONSORS_WAVE" && subPhase >= 0) || phase === "COMPLETE";
+      const shouldShowPartnerPlus = (phase === "SPONSORS_WAVE" && subPhase >= 1) || phase === "COMPLETE";
+      const shouldShowPremium = (phase === "SPONSORS_WAVE" && subPhase >= 2) || phase === "COMPLETE";
+
+      if (shouldShowMosques) activateMarkers("mosque");
+      if (shouldShowPartner) {
+        activateMarkers("partner");
+        activateMarkers("free");
+      }
+      if (shouldShowPartnerPlus) activateMarkers("partner_plus");
+      if (shouldShowPremium) activateMarkers("premium");
+    }, 50);
+  }, [mapReady, foodPartners, shopPartners, mosques, introPhase, sponsorSubPhase]);
+
+  // Reset markers count when map is closed
   useEffect(() => {
     if (!isOpen) {
-      markersAddedRef.current = false;
+      markersCountRef.current = { food: 0, shop: 0, mosques: 0 };
     }
   }, [isOpen]);
 
