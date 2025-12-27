@@ -287,7 +287,7 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
                   <Languages className="w-4 h-4" />
                   Taal
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 items-center">
                   <button
                     onClick={() => setFilters({ ...filters, language: "all" })}
                     className={`px-4 py-2 rounded-full text-sm transition-all ${
@@ -298,7 +298,8 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
                   >
                     Alle talen
                   </button>
-                  {(Object.keys(languageLabels) as ActivityLanguage[]).map((lang) => (
+                  {/* Main languages */}
+                  {(["nl", "fr", "en", "tr", "ar"] as ActivityLanguage[]).map((lang) => (
                     <button
                       key={lang}
                       onClick={() => setFilters({ ...filters, language: lang })}
@@ -311,6 +312,19 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
                       {languageLabels[lang]}
                     </button>
                   ))}
+                  {/* Separator */}
+                  <div className="w-px h-6 bg-gray-300 mx-1" />
+                  {/* Other option */}
+                  <button
+                    onClick={() => setFilters({ ...filters, language: "other" })}
+                    className={`px-4 py-2 rounded-full text-sm transition-all ${
+                      filters.language === "other"
+                        ? "bg-blue-500 text-white font-medium"
+                        : "bg-white text-text-secondary hover:bg-gray-100 border border-gray-200"
+                    }`}
+                  >
+                    {languageLabels["other"]}
+                  </button>
                 </div>
               </div>
             )}
