@@ -9,6 +9,9 @@ export type ActivityType =
   | "shopping"
   | "other";
 
+// Language options
+export type ActivityLanguage = "nl" | "ar" | "tr" | "en" | "fr" | "other";
+
 // Recurrence pattern types
 export type RecurrencePattern = "daily" | "weekly" | "weekdays" | "weekends";
 
@@ -69,6 +72,9 @@ export interface Activity {
   // Images
   cover_image_url: string | null;
 
+  // Language
+  language: ActivityLanguage | null;
+
   // Status
   status: ActivityStatus;
   approval_token: string;
@@ -87,6 +93,16 @@ export const activityTypeLabels: Record<ActivityType, string> = {
   sports: "Sport",
   shopping: "Shopping",
   other: "Overig",
+};
+
+// Labels for languages (Dutch)
+export const languageLabels: Record<ActivityLanguage, string> = {
+  nl: "Nederlands",
+  ar: "Arabisch",
+  tr: "Turks",
+  en: "Engels",
+  fr: "Frans",
+  other: "Andere",
 };
 
 // Icon names for activity types (to be used with lucide-react)

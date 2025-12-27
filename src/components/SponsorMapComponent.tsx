@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { PartnerTier } from "@/lib/food-partner-types";
+import { getCategoryIconSvg } from "@/lib/map-icons";
 
 // Combined sponsor type for the map
 export type MapSponsor = {
@@ -86,29 +87,17 @@ const createMarkerSVG = (tier: PartnerTier, type: "food" | "shop", isSelected: b
   const config = configs[tier];
   const { mainColor, glowColor } = config;
 
-  // Icon based on tier and type
-  let iconContent = "";
+  // Icon based on tier and type - using Tabler icons
+  // Determine which icon to use based on tier priority, then type
+  let iconCategory = type === "food" ? "restaurant" : "decor";
   if (tier === "premium") {
-    // Crown icon
-    iconContent = `<path d="M12 4l3 6 6 2-4.5 4.5 1 6.5L12 20l-5.5 3 1-6.5L3 12l6-2z" fill="white" stroke="none"/>`;
+    iconCategory = "mosque"; // Crown/star for premium - using mosque as it's prominent
   } else if (tier === "partner_plus") {
-    // Star icon
-    iconContent = `<path d="M12 3l2.5 6H21l-5 4 2 6.5-6-4-6 4 2-6.5-5-4h6.5z" fill="white" stroke="none"/>`;
-  } else if (type === "food") {
-    // Fork and knife
-    iconContent = `
-      <circle cx="12" cy="12" r="7" fill="white"/>
-      <path d="M9 8v8M12 7v10M15 8v8" stroke="${mainColor}" stroke-width="1.5" stroke-linecap="round"/>
-    `;
-  } else {
-    // Shopping bag
-    iconContent = `
-      <rect x="6" y="10" width="12" height="9" rx="2" fill="white"/>
-      <path d="M6 10l2-5h8l2 5" fill="none" stroke="white" stroke-width="2"/>
-      <circle cx="9" cy="14" r="1.5" fill="${mainColor}"/>
-      <circle cx="15" cy="14" r="1.5" fill="${mainColor}"/>
-    `;
+    iconCategory = type === "food" ? "catering" : "gifts";
   }
+
+  // Get Tabler icon SVG (just the inner content, not full SVG wrapper)
+  const tablerIcon = getCategoryIconSvg(iconCategory, "white", 16);
 
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="60" viewBox="0 0 48 60">
@@ -139,9 +128,9 @@ const createMarkerSVG = (tier: PartnerTier, type: "food" | "shop", isSelected: b
       <!-- Inner glow circle -->
       <circle cx="24" cy="20" r="11" fill="rgba(255,255,255,0.15)"/>
 
-      <!-- Icon -->
-      <g transform="translate(12, 8)">
-        ${iconContent}
+      <!-- Icon - Tabler icon centered in pin -->
+      <g transform="translate(16, 12)">
+        ${tablerIcon}
       </g>
 
       ${tier === "premium" && isSelected ? `

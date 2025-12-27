@@ -18,8 +18,9 @@ import {
   LayoutGrid,
   type LucideIcon
 } from "lucide-react";
-import type { Activity, ActivityType } from "@/lib/activity-types";
-import { activityTypeLabels, isActivityToday, isActivityThisWeekend } from "@/lib/activity-types";
+import type { Activity, ActivityType, ActivityLanguage } from "@/lib/activity-types";
+import { activityTypeLabels, languageLabels, isActivityToday, isActivityThisWeekend } from "@/lib/activity-types";
+import { Languages } from "lucide-react";
 import { ActivityCard } from "./ActivityCard";
 
 // Eventbrite-style activity type icons with colors
@@ -51,11 +52,12 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
     type: "all" as "all" | ActivityType,
     date: "all" as DateFilter,
     for_youth: false,
+    language: "all" as "all" | ActivityLanguage,
   });
 
   // Check if any filter is active
   const hasActiveFilters =
-    filters.type !== "all" || filters.date !== "all" || filters.for_youth;
+    filters.type !== "all" || filters.date !== "all" || filters.for_youth || filters.language !== "all";
 
   // Filter activities
   const filteredActivities = useMemo(() => {
@@ -112,6 +114,11 @@ export function ActivityList({ activities, embedded = false }: ActivityListProps
     // Youth filter
     if (filters.for_youth) {
       result = result.filter((activity) => activity.for_youth);
+    }
+
+    // Language filter
+    if (filters.language !== "all") {
+      result = result.filter((activity) => activity.language === filters.language);
     }
 
     // Sort by date

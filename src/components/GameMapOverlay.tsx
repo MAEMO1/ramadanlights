@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, SkipForward, Filter, ChevronUp } from "lucide-react";
+import { getCategoryIconSvg, foodCategories as foodCats, shopCategories as shopCats } from "@/lib/map-icons";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { FoodPartner } from "@/lib/food-partner-types";
@@ -84,284 +85,11 @@ function offsetMarkerPosition(lat: number, lng: number, index: number): { positi
   return { position: [offsetLat, offsetLng], original, wasOffset: true };
 }
 
-// Game-style 2D SVG icons - Night blue + warm gold palette with thick outlines
-// Each icon has: thick strokes, highlight top-left, shadow bottom-right, readable at 24px
-const categoryIcons: Record<string, string> = {
-  // Food categories - Game-style restaurant/food icons
-  // Restaurant: Classic plate with fork and knife - universally recognizable
-  restaurant: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="rest-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FFE4A0"/>
-        <stop offset="100%" stop-color="#FFD700"/>
-      </linearGradient>
-    </defs>
-    <!-- Plate -->
-    <circle cx="32" cy="34" r="20" fill="url(#rest-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <circle cx="32" cy="34" r="14" fill="#1a1a2e" opacity="0.15"/>
-    <circle cx="32" cy="34" r="8" fill="url(#rest-grad)" stroke="#1a1a2e" stroke-width="2"/>
-    <!-- Fork -->
-    <path d="M14 12v10c0 3 2 5 5 5v19" stroke="#1a1a2e" stroke-width="5" stroke-linecap="round"/>
-    <path d="M14 12v10c0 3 2 5 5 5v19" stroke="url(#rest-grad)" stroke-width="3" stroke-linecap="round"/>
-    <path d="M11 12v8M14 12v8M17 12v8" stroke="url(#rest-grad)" stroke-width="2" stroke-linecap="round"/>
-    <!-- Knife -->
-    <path d="M50 12c3 0 5 4 5 10s-2 8-5 8v16" stroke="#1a1a2e" stroke-width="5" stroke-linecap="round"/>
-    <path d="M50 12c3 0 5 4 5 10s-2 8-5 8v16" stroke="url(#rest-grad)" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="16" cy="14" r="1.5" fill="#FFF5D4"/>
-  </svg>`,
+// Icons are now provided by @/lib/map-icons using Tabler Icons
+// See: https://tabler.io/icons for the full icon set
 
-  // Bakery: Clear bread loaf shape
-  bakery: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="bake-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#F4D9A0"/>
-        <stop offset="100%" stop-color="#C4956A"/>
-      </linearGradient>
-      <linearGradient id="bake-top" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#DEB887"/>
-        <stop offset="100%" stop-color="#8B6914"/>
-      </linearGradient>
-    </defs>
-    <!-- Bread loaf body -->
-    <ellipse cx="32" cy="42" rx="24" ry="14" fill="url(#bake-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <!-- Bread top/crust -->
-    <path d="M10 38c0-14 10-26 22-26s22 12 22 26" fill="url(#bake-top)" stroke="#1a1a2e" stroke-width="3"/>
-    <!-- Score marks on bread -->
-    <path d="M18 28c4-6 10-8 14-8M32 20c4 0 10 2 14 8" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-    <path d="M26 24l12 0" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
-    <!-- Steam -->
-    <path d="M24 8c0-3 2-3 2 0M32 6c0-3 2-3 2 0M40 8c0-3 2-3 2 0" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="14" cy="32" r="1.5" fill="#FFF5D4"/>
-  </svg>`,
-
-  // Butcher: T-bone steak - clearly meat
-  butcher: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="meat-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FF9999"/>
-        <stop offset="100%" stop-color="#CC4444"/>
-      </linearGradient>
-      <linearGradient id="fat-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FFF5E6"/>
-        <stop offset="100%" stop-color="#FFE4CC"/>
-      </linearGradient>
-    </defs>
-    <!-- Main steak shape -->
-    <path d="M12 20c-4 8-2 20 8 28s24 8 32 0s4-24-4-32s-20-8-28 0c-2 2-6 2-8 4z" fill="url(#meat-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <!-- Fat marbling -->
-    <path d="M20 28c4-2 12 0 16 4s6 12 2 16" fill="url(#fat-grad)" stroke="#1a1a2e" stroke-width="2"/>
-    <!-- T-bone -->
-    <path d="M28 24v20M22 34h16" stroke="#FFF5E6" stroke-width="4" stroke-linecap="round"/>
-    <path d="M28 24v20M22 34h16" stroke="#E8DCC8" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="14" cy="22" r="1.5" fill="#FFB4B4"/>
-  </svg>`,
-
-  supermarket: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="cart-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#5EEAD4"/>
-        <stop offset="100%" stop-color="#14B8A6"/>
-      </linearGradient>
-    </defs>
-    <path d="M10 12h6l8 28h24l6-20H20" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M10 12h6l8 28h24l6-20H20" fill="none" stroke="url(#cart-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="24" cy="50" r="5" fill="url(#cart-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <circle cx="44" cy="50" r="5" fill="url(#cart-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <rect x="26" y="24" width="14" height="10" rx="2" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="16" cy="14" r="1.5" fill="#A7F3D0"/>
-  </svg>`,
-
-  catering: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="cater-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FFE4A0"/>
-        <stop offset="100%" stop-color="#FFD700"/>
-      </linearGradient>
-    </defs>
-    <ellipse cx="32" cy="44" rx="22" ry="8" fill="#1a1a2e"/>
-    <ellipse cx="32" cy="42" rx="22" ry="8" fill="url(#cater-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <path d="M12 42c0-12 9-24 20-24s20 12 20 24" fill="url(#cater-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <ellipse cx="32" cy="14" rx="3" ry="4" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <path d="M32 10v-4" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="16" cy="32" r="1.5" fill="#FFF5D4"/>
-  </svg>`,
-
-  cafe: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="cafe-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#A78BFA"/>
-        <stop offset="100%" stop-color="#8B5CF6"/>
-      </linearGradient>
-      <linearGradient id="coffee-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#8B6914"/>
-        <stop offset="100%" stop-color="#5C4A1A"/>
-      </linearGradient>
-    </defs>
-    <rect x="12" y="22" width="30" height="28" rx="4" fill="url(#cafe-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <path d="M42 28h8c4 0 6 4 6 8s-2 8-6 8h-8" stroke="#1a1a2e" stroke-width="3" fill="url(#cafe-grad)"/>
-    <ellipse cx="27" cy="26" rx="12" ry="3" fill="url(#coffee-grad)" stroke="#1a1a2e" stroke-width="2"/>
-    <path d="M20 14c2-4 4-4 6 0M28 12c2-4 4-4 6 0" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
-    <rect x="8" y="50" width="38" height="4" rx="2" fill="#1a1a2e"/>
-    <circle cx="16" cy="26" r="1.5" fill="#C4B5FD"/>
-  </svg>`,
-
-  // Shop categories - Game-style retail icons
-  // Decor: Ramadan lantern (fanoos) - iconic Islamic decoration
-  decor: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="decor-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FFE4A0"/>
-        <stop offset="100%" stop-color="#FFD700"/>
-      </linearGradient>
-      <linearGradient id="lantern-body" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#B8860B"/>
-        <stop offset="100%" stop-color="#8B6914"/>
-      </linearGradient>
-    </defs>
-    <!-- Lantern top cap -->
-    <path d="M26 12h12l2 4H24l2-4z" fill="url(#decor-grad)" stroke="#1a1a2e" stroke-width="2"/>
-    <!-- Hanging loop -->
-    <circle cx="32" cy="8" r="3" fill="none" stroke="url(#decor-grad)" stroke-width="3"/>
-    <!-- Lantern body frame -->
-    <path d="M24 16h16v6l4 8v12l-4 8v4H24v-4l-4-8V30l4-8v-6z" fill="url(#lantern-body)" stroke="#1a1a2e" stroke-width="3"/>
-    <!-- Glass panels with glow -->
-    <rect x="26" y="20" width="12" height="30" rx="2" fill="#FFF8DC" opacity="0.7"/>
-    <rect x="28" y="24" width="8" height="22" rx="1" fill="#FFD700" opacity="0.5"/>
-    <!-- Inner flame/glow -->
-    <ellipse cx="32" cy="38" rx="4" ry="6" fill="#FFD700"/>
-    <ellipse cx="32" cy="36" rx="2" ry="3" fill="#FFF5D4"/>
-    <!-- Decorative details -->
-    <path d="M24 22h16M24 48h16" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="22" cy="18" r="1.5" fill="#FFF5D4"/>
-  </svg>`,
-
-  clothing: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="cloth-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#A78BFA"/>
-        <stop offset="100%" stop-color="#8B5CF6"/>
-      </linearGradient>
-    </defs>
-    <path d="M24 8l-14 12 6 6 4-4v32h24V22l4 4 6-6L40 8c-2 4-6 6-8 6s-6-2-8-6z" fill="url(#cloth-grad)" stroke="#1a1a2e" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M28 8c2 3 5 4 4 4s2-1 4-4" stroke="#1a1a2e" stroke-width="2"/>
-    <ellipse cx="32" cy="8" rx="8" ry="3" fill="#E9D5FF" stroke="#1a1a2e" stroke-width="2"/>
-    <rect x="28" y="30" width="8" height="18" rx="1" fill="#FFD700" opacity="0.5"/>
-    <circle cx="14" cy="16" r="1.5" fill="#C4B5FD"/>
-  </svg>`,
-
-  spiritual: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="spirit-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#5EEAD4"/>
-        <stop offset="100%" stop-color="#14B8A6"/>
-      </linearGradient>
-    </defs>
-    <path d="M32 6L10 18v22c0 10 10 16 22 16s22-6 22-16V18L32 6z" fill="url(#spirit-grad)" stroke="#1a1a2e" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M24 32l6 6 12-12" stroke="#FFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="32" cy="18" r="3" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="16" cy="22" r="1.5" fill="#A7F3D0"/>
-  </svg>`,
-
-  gifts: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="gift-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FF8A8A"/>
-        <stop offset="100%" stop-color="#EF4444"/>
-      </linearGradient>
-    </defs>
-    <rect x="10" y="26" width="44" height="30" rx="4" fill="url(#gift-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <rect x="10" y="18" width="44" height="12" rx="3" fill="#FFD700" stroke="#1a1a2e" stroke-width="3"/>
-    <rect x="28" y="18" width="8" height="38" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <path d="M22 18c0-8 5-12 10-8M42 18c0-8-5-12-10-8" stroke="#FFD700" stroke-width="4" stroke-linecap="round"/>
-    <ellipse cx="32" cy="10" rx="4" ry="3" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="14" cy="22" r="1.5" fill="#FEF3C7"/>
-  </svg>`,
-
-  beauty: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="beauty-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#F9A8D4"/>
-        <stop offset="100%" stop-color="#EC4899"/>
-      </linearGradient>
-    </defs>
-    <ellipse cx="32" cy="40" rx="16" ry="18" fill="url(#beauty-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <ellipse cx="32" cy="36" rx="10" ry="10" fill="#FDF2F8" opacity="0.4"/>
-    <rect x="26" y="8" width="12" height="16" rx="6" fill="url(#beauty-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <circle cx="32" cy="14" r="3" fill="#FFD700"/>
-    <path d="M28 24h8" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="20" cy="32" r="1.5" fill="#FBCFE8"/>
-  </svg>`,
-
-  kids: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="kids-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#FCD34D"/>
-        <stop offset="100%" stop-color="#F59E0B"/>
-      </linearGradient>
-    </defs>
-    <circle cx="32" cy="18" r="12" fill="url(#kids-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <circle cx="28" cy="16" r="2" fill="#1a1a2e"/>
-    <circle cx="36" cy="16" r="2" fill="#1a1a2e"/>
-    <path d="M28 22c2 2 6 2 8 0" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round"/>
-    <rect x="22" y="30" width="20" height="24" rx="4" fill="#A78BFA" stroke="#1a1a2e" stroke-width="3"/>
-    <rect x="14" y="34" width="8" height="12" rx="2" fill="#5EEAD4" stroke="#1a1a2e" stroke-width="2"/>
-    <rect x="42" y="34" width="8" height="12" rx="2" fill="#5EEAD4" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="24" cy="12" r="1.5" fill="#FEF3C7"/>
-  </svg>`,
-
-  tech: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="tech-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#60A5FA"/>
-        <stop offset="100%" stop-color="#3B82F6"/>
-      </linearGradient>
-    </defs>
-    <rect x="16" y="8" width="32" height="48" rx="4" fill="#1a1a2e" stroke="#1a1a2e" stroke-width="3"/>
-    <rect x="20" y="14" width="24" height="34" rx="2" fill="url(#tech-grad)"/>
-    <circle cx="32" cy="54" r="3" fill="#374151"/>
-    <rect x="24" y="18" width="16" height="8" rx="1" fill="#1a1a2e" opacity="0.3"/>
-    <circle cx="36" cy="30" r="4" fill="#FFD700"/>
-    <circle cx="22" cy="16" r="1.5" fill="#93C5FD"/>
-  </svg>`,
-
-  other: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="other-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#9CA3AF"/>
-        <stop offset="100%" stop-color="#6B7280"/>
-      </linearGradient>
-    </defs>
-    <rect x="8" y="24" width="48" height="28" rx="4" fill="url(#other-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <rect x="8" y="16" width="48" height="12" rx="3" fill="#374151" stroke="#1a1a2e" stroke-width="3"/>
-    <rect x="16" y="32" width="12" height="12" rx="2" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <rect x="36" y="32" width="12" height="12" rx="2" fill="#5EEAD4" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="14" cy="20" r="1.5" fill="#D1D5DB"/>
-  </svg>`,
-
-  // Mosque icon - Iconic dome and minaret with gold crescent
-  mosque: `<svg viewBox="0 0 64 64" fill="none">
-    <defs>
-      <linearGradient id="mosque-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#34D399"/>
-        <stop offset="100%" stop-color="#10B981"/>
-      </linearGradient>
-      <linearGradient id="mosque-dark" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#065F46"/>
-        <stop offset="100%" stop-color="#064E3B"/>
-      </linearGradient>
-    </defs>
-    <rect x="12" y="36" width="40" height="20" fill="url(#mosque-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <path d="M12 36c0-14 10-22 20-22s20 8 20 22" fill="url(#mosque-grad)" stroke="#1a1a2e" stroke-width="3"/>
-    <rect x="6" y="20" width="6" height="36" fill="url(#mosque-dark)" stroke="#1a1a2e" stroke-width="2"/>
-    <rect x="52" y="20" width="6" height="36" fill="url(#mosque-dark)" stroke="#1a1a2e" stroke-width="2"/>
-    <path d="M9 20l-3-8 6 0z" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <path d="M55 20l-3-8 6 0z" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="32" cy="18" r="5" fill="#FFD700" stroke="#1a1a2e" stroke-width="2"/>
-    <path d="M34 18a3 3 0 1 1-4-3" fill="none" stroke="#1a1a2e" stroke-width="1.5"/>
-    <rect x="26" y="40" width="12" height="16" rx="6 6 0 0" fill="url(#mosque-dark)" stroke="#1a1a2e" stroke-width="2"/>
-    <circle cx="16" cy="30" r="1.5" fill="#A7F3D0"/>
-  </svg>`,
-};
+// REMOVED: Old categoryIcons SVG block - see git history if needed
+// Now using getCategoryIconSvg from @/lib/map-icons
 
 // Size configurations based on tier - slightly larger for new detailed icons
 const tierSizes: Record<PartnerTier | "mosque", { size: number; zIndex: number; pulse: boolean }> = {
@@ -448,9 +176,10 @@ const createGameMarker = (
 ) => {
   const config = tierSizes[tier];
   const colors = tierColors[tier];
-  const iconSvg = categoryIcons[category] || categoryIcons.other;
   const size = config.size;
-  const iconSize = Math.round(size * 0.6); // Larger icon ratio for new detailed icons
+  const iconSize = Math.round(size * 0.55); // Icon size for Tabler icons
+  // Get SVG icon from Tabler-based icon system
+  const iconSvg = getCategoryIconSvg(category, colors.icon, iconSize);
   const borderWidth = tier === "premium" || tier === "mosque" ? 4 : 3;
 
   // Determine category group for filtering
