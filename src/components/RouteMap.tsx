@@ -37,8 +37,7 @@ const routes = {
     [51.0626315, 3.7099923], [51.0625436, 3.7100195], [51.0616656, 3.71028],
     [51.0615748, 3.7102994],
     // Extended south towards Rabot
-    [51.0612, 3.7104], [51.0608, 3.7105], [51.0604, 3.7106],
-    [51.0600, 3.7107], [51.0596, 3.7108]
+    [51.0612, 3.7104], [51.0608, 3.7105]
   ] as [number, number][],
   // Bevrijdingslaan & Phoenixstraat combined as one continuous route
   bevrijdingslaanPhoenix: [

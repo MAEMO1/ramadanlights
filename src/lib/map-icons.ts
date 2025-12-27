@@ -1,95 +1,103 @@
 /**
- * Map Icon System - Using Tabler Icons
+ * Map Icon System - Using Material Design Icons (MDI)
  *
- * This file provides SVG strings for map markers based on Tabler Icons.
- * All icons follow the Tabler design system: 24x24 viewBox, 2px stroke.
- * Colors are applied via the marker container, not the icons themselves.
+ * This file provides SVG paths for map markers based on MDI icons.
+ * All icons follow the MDI design system: 24x24 viewBox, filled style.
+ * These icons are more visually appealing than stroke-based icons.
  */
 
-// Tabler icon paths - extracted from @tabler/icons for use as SVG strings
-// Each icon is a 24x24 viewBox with stroke-width="2" stroke="currentColor" fill="none"
-const tablerPaths: Record<string, string> = {
+// MDI icon paths - extracted from Material Design Icons
+// Each icon uses fill="currentColor" for theming support
+const mdiPaths: Record<string, string> = {
   // Food Categories
-  restaurant: `<path d="M3 19h18M5 19v-9a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v9M4 15h16M9 15v-4M15 15v-4M12 19v-6"/>`, // tools-kitchen-2
-  bakery: `<path d="M3 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M15 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M9 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M3 12v-1a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v1M3 12l-1 7h20l-1 -7"/>`, // bread
-  butcher: `<path d="M13.62 8.382l1.966 -1.967a2 2 0 1 1 3.414 -1.415a2 2 0 1 1 -1.413 3.414l-1.82 1.821"/><path d="M5.904 18.596c2.733 2.734 5.9 4 7.07 2.829c1.172 -1.172 -.094 -4.338 -2.828 -7.071c-2.733 -2.734 -5.9 -4 -7.07 -2.829c-1.172 1.172 .094 4.338 2.828 7.071z"/><path d="M7.5 16l1 1"/><path d="M12.975 21.425c3.905 -3.906 4.855 -9.288 2.121 -12.021c-2.733 -2.734 -8.115 -1.784 -12.02 2.121"/>`, // meat
-  supermarket: `<path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M17 17h-11v-14h-2M6 5l14 1l-1 7h-13"/>`, // shopping-cart
-  catering: `<path d="M4 11h16a1 1 0 0 1 1 1v.5c0 1.5 -2.517 5.573 -4 6.5v1a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-1c-1.687 -1.054 -4 -5 -4 -6.5v-.5a1 1 0 0 1 1 -1z"/><path d="M12 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M16 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M8 4a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/>`, // soup
-  cafe: `<path d="M17 11v6a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-6z"/><path d="M5 11v-3a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v3"/><path d="M17 8h2a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-2"/><path d="M9 3l1 1l-1 1"/>`, // coffee
-  takeaway: `<path d="M9 5h6a1 1 0 0 1 1 1v2h-8v-2a1 1 0 0 1 1 -1"/><path d="M5 9h14l-.986 9.862a2 2 0 0 1 -1.993 1.138h-8.042a2 2 0 0 1 -1.993 -1.138l-.986 -9.862z"/>`, // package
+  restaurant: `M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4`, // silverware-fork-knife
+
+  bakery: `M12 2C6.5 2 2 5.36 2 9.5c0 1.69.74 3.25 2 4.5v8h16v-8c1.26-1.25 2-2.81 2-4.5C22 5.36 17.5 2 12 2m-4 16v-4h4v4H8z`, // bread-slice
+
+  butcher: `M18.06 3C15 3 12.27 4.5 11.34 7.04c-.12.33-.45.64-.75.86C8.5 9.47 7.17 11.83 7.17 14.5c0 4.14 3.36 7.5 7.5 7.5c3.86 0 7.03-2.92 7.45-6.67c.03-.24.05-.49.05-.75c0-1.69-.69-3.22-1.82-4.33c-.5-.5-.79-1.17-.79-1.88V3h-1.5m-3.39 5.5a.5.5 0 0 1 .5.5a.5.5 0 0 1-.5.5a.5.5 0 0 1-.5-.5a.5.5 0 0 1 .5-.5m-2.5 2a.5.5 0 0 1 .5.5a.5.5 0 0 1-.5.5a.5.5 0 0 1-.5-.5a.5.5 0 0 1 .5-.5m1.16 7c-2.5 0-4.58-1.89-4.87-4.33c-.02-.22-.04-.44-.04-.67c0-.66.14-1.28.38-1.85c.55.27 1.15.43 1.78.43c1.38 0 2.59-.71 3.3-1.78c.5.76 1.21 1.37 2.04 1.78c-.34.83-.71 1.81-.71 2.62c0 1.1.56 2.07 1.42 2.64c-.8.72-1.86 1.16-3.03 1.16h-.27z`, // food-drumstick (chicken leg)
+
+  supermarket: `M17 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2M1 2v2h2l3.6 7.59l-1.36 2.45c-.15.28-.24.61-.24.96a2 2 0 0 0 2 2h12v-2H7.42a.25.25 0 0 1-.25-.25q0-.075.03-.12L8.1 13h7.45c.75 0 1.41-.42 1.75-1.03l3.58-6.47c.07-.16.12-.33.12-.5a1 1 0 0 0-1-1H5.21l-.94-2M7 18c-1.11 0-2 .89-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2`, // cart
+
+  catering: `M12 5a2 2 0 0 1 2 2q0 .36-.12.69C17.95 8.5 21 11.91 21 16H3c0-4.09 3.05-7.5 7.12-8.31Q10 7.36 10 7a2 2 0 0 1 2-2m10 14H2v-2h20z`, // room-service (cloche)
+
+  cafe: `M2 21h18v-2H2M20 8h-2V5h2m0-2H4v10a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-3h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2`, // coffee
+
+  takeaway: `M12 13a5 5 0 0 1-5-5h2a3 3 0 0 0 3 3a3 3 0 0 0 3-3h2a5 5 0 0 1-5 5m0-10a3 3 0 0 1 3 3H9a3 3 0 0 1 3-3m7 3h-2a5 5 0 0 0-5-5a5 5 0 0 0-5 5H5c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2`, // shopping bag
 
   // Shop Categories
-  decor: `<path d="M8 4l3 3l3 -3l3 3v7l-6 8l-6 -8v-7z"/><path d="M8 7l3 3l3 -3"/>`, // lamp (simplified lantern)
-  clothing: `<path d="M15 4l6 2v5h-3v8a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-8h-3v-5l6 -2a3 3 0 0 0 6 0"/>`, // shirt
-  spiritual: `<path d="M12 3l10 6.5l-10 6.5l-10 -6.5z"/><path d="M12 12l10 6.5l-10 6.5l-10 -6.5z"/><path d="M10 12.5v5.5l2 1l2 -1v-5.5"/>`, // book
-  gifts: `<path d="M3 8m0 1a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1z"/><path d="M12 8l0 13"/><path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5"/>`, // gift
-  beauty: `<path d="M12 21a9 9 0 0 1 0 -18c4.97 0 9 3.582 9 8c0 1.06 -.474 2.078 -1.318 2.828c-.844 .75 -1.989 1.172 -3.182 1.172h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25"/><path d="M8.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M12.5 7.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M16.5 10.5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/>`, // palette
-  kids: `<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M9 10l.01 0"/><path d="M15 10l.01 0"/><path d="M9.5 15a3.5 3.5 0 0 0 5 0"/>`, // mood-smile
-  tech: `<path d="M3 5a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10z"/><path d="M7 20l10 0"/><path d="M9 16l0 4"/><path d="M15 16l0 4"/>`, // device-desktop
-  jewelry: `<path d="M6 5h12l3 5l-8.5 9.5a.7 .7 0 0 1 -1 0l-8.5 -9.5l3 -5"/><path d="M10 12l-2 -2.2l.6 -1"/>`, // diamond
-  books: `<path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0"/><path d="M3 6l0 13"/><path d="M12 6l0 13"/><path d="M21 6l0 13"/>`, // book-2
-  electronics: `<path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-11a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2m3 0v-2h5v2"/><path d="M11 14a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/><path d="M9 8h6"/>`, // device-mobile
-  sports: `<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M12 3v6"/><path d="M12 15v6"/>`, // ball
+  decor: `M12.3 2H12A10 10 0 0 0 2 12a10 10 0 0 0 10 10c3 0 4.7-1 6.5-2.5C13 21 8 17 8 12s5-9 10.5-7.5A8.56 8.56 0 0 0 12.3 2m4.5 4.2l-1.5 3.5l-3.7.3l2.9 2.5l-.9 3.5l3.2-2l3.2 2l-1-3.5l3-2.5l-3.7-.3z`, // star-crescent (Ramadan!)
+
+  clothing: `M16 21H8a1 1 0 0 1-1-1v-7.93l-1.3 1a.996.996 0 0 1-1.41 0l-2.83-2.78a.996.996 0 0 1 0-1.41L7.34 3H9c0 1.1 1.34 2 3 2s3-.9 3-2h1.66l5.88 5.88c.39.39.39 1.02 0 1.41l-2.83 2.83c-.39.38-1.02.38-1.41 0l-1.3-1V20a1 1 0 0 1-1 1`, // tshirt-crew
+
+  spiritual: `M12 2L6.5 11h11L12 2m0 3.84L14.26 9H9.74L12 5.84M17.5 13c-2.5 0-4.5 2-4.5 4.5s2 4.5 4.5 4.5s4.5-2 4.5-4.5s-2-4.5-4.5-4.5m0 7c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5M3 21.5h8v-8H3v8m2-6h4v4H5v-4z`, // shape-outline
+
+  gifts: `M9.06 1.93C7.17 1.92 5.33 3.74 6.17 6H3a2 2 0 0 0-2 2v2a1 1 0 0 0 1 1h9V8h2v3h9a1 1 0 0 0 1-1V8a2 2 0 0 0-2-2h-3.17C19 2.73 14.6.42 12.57 3.24L12 4l-.57-.78c-.63-.89-1.5-1.28-2.37-1.29M9 4c.89 0 1.34 1.08.71 1.71S8 5.89 8 5a1 1 0 0 1 1-1m6 0c.89 0 1.34 1.08.71 1.71S14 5.89 14 5a1 1 0 0 1 1-1M2 12v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-8h-9v8h-2v-8z`, // gift
+
+  beauty: `M12 3c-1.66 0-3 1.34-3 3c0 .55.15 1.06.41 1.5l-.06.05l-6.56 6.57c-.15.15-.2.36-.13.55s.25.33.47.33h17.74c.22 0 .4-.14.47-.33s.02-.4-.13-.55l-6.56-6.57l-.06-.05c.26-.44.41-.95.41-1.5c0-1.66-1.34-3-3-3m0 2c.55 0 1 .45 1 1s-.45 1-1 1s-1-.45-1-1s.45-1 1-1m-2.5 9h5v5.5c0 1.38-1.12 2.5-2.5 2.5s-2.5-1.12-2.5-2.5V14z`, // lipstick-variant
+
+  kids: `M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8S14 8.67 14 9.5s.67 1.5 1.5 1.5m-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8S7 8.67 7 9.5S7.67 11 8.5 11m3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5`, // emoticon-happy-outline
+
+  tech: `M4 6h18V4H4c-1.1 0-2 .9-2 2v11H0v3h14v-3H4V6m19 2h-6c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1m-1 9h-4v-7h4v7z`, // devices
+
+  jewelry: `M16 9h3l-5 7m-4-7h4l-2 8M5 9h3l2 7m5-12h2l2 3h-3m-5-3h2l1 3h-4M7 4h2L8 7H5m1-5L2 8l10 14L22 8l-4-6z`, // diamond-stone
+
+  books: `M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2M6 4h5v8l-2.5-1.5L6 12V4z`, // book-open-page-variant
+
+  electronics: `M7 2v11h3v9l7-12h-4l4-8H7z`, // flash
+
+  sports: `M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m-5.5-2.5l7.51-3.49L17.5 6.5L9.99 9.99L6.5 17.5m5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1s-1.1-.49-1.1-1.1s.49-1.1 1.1-1.1`, // compass
 
   // Special
-  mosque: `<path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7"/><path d="M3 21v-10"/><path d="M21 21v-10"/><path d="M6 21v-7"/><path d="M18 21v-7"/><path d="M6 14h12"/><path d="M12 3a3 3 0 0 1 3 3a5 5 0 0 1 -3 4a5 5 0 0 1 -3 -4a3 3 0 0 1 3 -3z"/>`, // building-mosque
-  other: `<path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/><path d="M12 9h.01"/><path d="M11 12h1v4h1"/>`, // info-circle
+  mosque: `M7 8h10c.3 0 .6.1.8.1c.1-.3.2-.7.2-1c0-1.3-.6-2.5-1.7-3.2L12 1L7.7 3.8c-1 .8-1.7 2-1.7 3.3c0 .4.1.7.2 1c.2 0 .5-.1.8-.1m17-1c0-1.1-2-3-2-3s-2 1.9-2 3c0 .7.4 1.4 1 1.7V13h-2v-2c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v2H3V8.7c.6-.3 1-1 1-1.7c0-1.1-2-3-2-3S0 5.9 0 7c0 .7.4 1.4 1 1.7V21h9v-4c0-1.1.9-2 2-2s2 .9 2 2v4h9V8.7c.6-.3 1-1 1-1.7`, // mosque
+
+  other: `M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m1 15h-2v-6h2v6m0-8h-2V7h2v2z`, // information
 };
 
 /**
  * Get SVG markup for a category icon
  * Returns a complete SVG element string that can be embedded in HTML
+ * Uses filled MDI icons for better visual appearance
  */
 export function getCategoryIconSvg(
   category: string,
   color: string = "currentColor",
   size: number = 24
 ): string {
-  const path = tablerPaths[category] || tablerPaths.other;
+  const pathData = mdiPaths[category] || mdiPaths.other;
 
-  return `<svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width="${size}"
-    height="${size}"
-    fill="none"
-    stroke="${color}"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  >${path}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}"><path d="${pathData}"/></svg>`;
 }
 
 /**
- * Category to Tabler icon name mapping (for reference)
+ * Category to MDI icon name mapping (for reference)
  */
 export const categoryIconNames: Record<string, string> = {
-  restaurant: "tools-kitchen-2",
-  bakery: "bread",
-  butcher: "meat",
-  supermarket: "shopping-cart",
-  catering: "soup",
+  restaurant: "silverware-fork-knife",
+  bakery: "bread-slice",
+  butcher: "food-drumstick",
+  supermarket: "cart",
+  catering: "room-service",
   cafe: "coffee",
-  takeaway: "package",
-  decor: "lamp",
-  clothing: "shirt",
-  spiritual: "book",
+  takeaway: "shopping",
+  decor: "star-crescent",
+  clothing: "tshirt-crew",
+  spiritual: "shape-outline",
   gifts: "gift",
-  beauty: "palette",
-  kids: "mood-smile",
-  tech: "device-desktop",
-  jewelry: "diamond",
-  books: "book-2",
-  electronics: "device-mobile",
-  sports: "ball",
-  mosque: "building-mosque",
-  other: "info-circle",
+  beauty: "lipstick-variant",
+  kids: "emoticon-happy-outline",
+  tech: "devices",
+  jewelry: "diamond-stone",
+  books: "book-open-page-variant",
+  electronics: "flash",
+  sports: "compass",
+  mosque: "mosque",
+  other: "information",
 };
 
 /**
  * List of all supported categories
  */
-export const allCategories = Object.keys(tablerPaths);
+export const allCategories = Object.keys(mdiPaths);
 
 /**
  * Food-related categories
